@@ -91,6 +91,15 @@ body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc
     font-weight: 700;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
+.warning-message {
+    padding: 1rem;
+    background: rgba(234, 179, 8, 0.1);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(234, 179, 8, 0.3);
+    color: #f59e0b;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
 </style>
 </head>
 
@@ -135,6 +144,9 @@ body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc
   </div>
 
   <main class="flex-1 overflow-y-auto">
+    <div v-if="showFallbackWarning" class="warning-message animate-fade-in">
+        ⚠️ **ملحوظة:** لم يتم العثور على مواد مطابقة لـ "{{ userData.section }}". يتم عرض جميع المواد المتاحة.
+    </div>
 
     <div v-if="stage===0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       <div v-for="year in filteredData" :key="year.id" @click="selectYear(year)"
@@ -143,10 +155,7 @@ body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc
         <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ year.name }}</h3>
         <span class="text-xs text-gray-400">{{ year.subjects?.length || 0 }} Subjects</span>
       </div>
-       <div v-if="stage === 0 && filteredData.length === 0 && !loading" class="text-center text-gray-500 col-span-full mt-10">
-            مفيش مواد متوافقة مع شعبة **{{ userData.section }}** حاليًا.
-        </div>
-    </div>
+      </div>
 
     <div v-if="stage===1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       <div v-for="subject in selectedYear.subjects" :key="subject.id" @click="selectSubject(subject)"
@@ -234,7 +243,6 @@ body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc
 <script>
 const { createApp, ref, computed } = Vue;
 
-// 1. قراءة بيانات المستخدم من localStorage
 function getUserData() {
     try {
         const stored = localStorage.getItem("user_data");
@@ -244,7 +252,7 @@ function getUserData() {
     } catch (e) {
         console.error("Error reading user_data from localStorage", e);
     }
-    // لو مفيش بيانات، يرجع بيانات افتراضية ويطرد المستخدم
+    // التوجيه لصفحة الدخول لو مفيش بيانات
     alert("برجاء تسجيل الدخول أولاً من صفحة login.html");
     window.location.href = "login.html"; 
     return { name: "غير مسجل", section: "غير معروف" };
@@ -262,6 +270,7 @@ createApp({
     const expandedChapters = ref([]);
     const searchQuery = ref('');
     const loading = ref(true);
+    const showFallbackWarning = ref(false); // الحالة الجديدة لرسالة التحذير
 
     // Toasts
     const toasts = ref([]);
@@ -287,25 +296,40 @@ createApp({
       else window.open(video.stream_url,'_blank');
     }
 
-    // 2. تعديل منطق التصفية هنا
+    // منطق التصفية البديلة
     const filteredData = computed(() => {
-      let filtered = data.value;
-      const section = userData.value.section.trim().toLowerCase(); // الشعبة من بيانات المستخدم
+      let currentData = data.value;
+      const section = userData.value.section.trim().toLowerCase();
       
-      // التصفية الأساسية: إظهار السنين اللي اسمها فيه الشعبة
-      if (section && ["علمي علوم", "علمي رياضة", "أدبي"].includes(userData.value.section)) {
-         filtered = filtered.filter(year => year.name.toLowerCase().includes(section));
+      // التصفية الأساسية: حاول مطابقة الشعبة
+      let sectionFiltered = [];
+      const validSections = ["علمي علوم", "علمي رياضة", "أدبي"].map(s => s.toLowerCase());
+
+      if (validSections.includes(section)) {
+         sectionFiltered = currentData.filter(year => year.name.toLowerCase().includes(section));
       }
       
+      // منطق التصفية البديلة (Fallback Logic)
+      if (sectionFiltered.length === 0) {
+        // لو مفيش مواد مطابقة للشعبة، أو الشعبة مش من الشعب الأساسية
+        // اعرض كل البيانات المتاحة
+        showFallbackWarning.value = true;
+        currentData = data.value;
+      } else {
+        // لو لقى مواد مطابقة، يعرض المواد اللي لقاها بس
+        showFallbackWarning.value = false;
+        currentData = sectionFiltered;
+      }
+
       // تصفية البحث (لو فيه)
       if(searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        filtered = filtered.filter(y => y.name.toLowerCase().includes(query));
+        currentData = currentData.filter(y => y.name.toLowerCase().includes(query));
       }
-      return filtered;
+      
+      return currentData;
     });
 
-    // 3. تغيير مصدر البيانات للينك الجديد
     const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
 
     fetch(DATA_SOURCE_URL)
@@ -321,7 +345,7 @@ createApp({
           showToast("⚠ فشل تحميل البيانات من السيرفر.", "error"); 
       });
 
-    return { data, stage, selectedYear, selectedSubject, selectedTeacher, expandedChapters, searchQuery, loading, filteredData, userData,
+    return { data, stage, selectedYear, selectedSubject, selectedTeacher, expandedChapters, searchQuery, loading, filteredData, userData, showFallbackWarning,
              selectYear, selectSubject, selectTeacher, toggleChapter, playVideo, toasts, showToast };
   }
 }).mount('#app');
