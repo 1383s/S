@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل دخول سريع | شاتي</title>
+<title>تسجيل دخول بسيط | شاتي</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap" rel="stylesheet">
 <style>
-  /* استخدام نفس ستايلات m79.html */
+  /* CSS مقتبس من m79.html لتناسق الشكل */
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: 'Cairo', sans-serif;
@@ -52,8 +52,10 @@
     text-align: center;
     outline: none;
     transition: 0.3s;
-    appearance: none; /* لإزالة سهم الـselect الافتراضي */
-    cursor: pointer;
+    -webkit-appearance: none; /* لإزالة شكل القائمة المنسدلة الافتراضي */
+  }
+  .login-box select {
+      text-align-last: center; /* لمحاذاة النص داخل القائمة المنسدلة */
   }
   .login-box input:focus, .login-box select:focus {
     border-color: #fff;
@@ -71,18 +73,13 @@
     cursor: pointer;
     transition: 0.3s;
     box-shadow: 0 5px 20px rgba(255,203,66,0.4);
+    margin-top: 15px;
   }
   .login-box button:hover {
     background: linear-gradient(45deg,#ff9f00,#ffcb42);
     box-shadow: 0 8px 25px rgba(255,203,66,0.6);
   }
-  .result {
-    margin-top: 15px;
-    font-size: 16px;
-    line-height: 1.6;
-  }
-  .success { color: #4ade80; }
-  .error { color: #f87171; }
+  .error { color: #f87171; margin-top: 10px; }
   @keyframes slideIn {
     0% { transform: translateY(-50px); opacity: 0; }
     100% { transform: translateY(0); opacity: 1; }
@@ -92,59 +89,51 @@
 <body>
 
 <div class="login-box">
-  <h2>🌟 تسجيل دخول سريع</h2>
-  <p>من فضلك أدخل بياناتك لفتح المواد</p>
+  <h2>👋 مرحبًا يا صاحبي</h2>
+  <p>من فضلك أدخل اسمك واختار شعبتك عشان نبدأ</p>
   
-  <input type="text" id="name" placeholder="اسم الطالب" required>
+  <input type="text" id="userName" placeholder="الاسم" required>
   
-  <select id="section" required>
-    <option value="" disabled selected>اختر الشعبة...</option>
+  <select id="userSection">
+    <option value="" disabled selected>اختر الشعبة</option>
     <option value="علمي علوم">علمي علوم</option>
     <option value="علمي رياضة">علمي رياضة</option>
     <option value="أدبي">أدبي</option>
   </select>
+  
+  <div class="error" id="errorMsg"></div>
 
-  <button onclick="quickLogin()">فتح المواد</button>
-  <div class="result" id="result"></div>
+  <button onclick="saveAndRedirect()">تسجيل الدخول</button>
 </div>
 
 <script>
-function quickLogin() {
-    const nameInput = document.getElementById("name");
-    const sectionSelect = document.getElementById("section");
-    const resultDiv = document.getElementById("result");
-    
-    const name = nameInput.value.trim();
-    const section = sectionSelect.value.trim();
+function saveAndRedirect() {
+    const nameInput = document.getElementById("userName").value.trim();
+    const sectionSelect = document.getElementById("userSection");
+    const sectionValue = sectionSelect.options[sectionSelect.selectedIndex].value;
+    const errorDiv = document.getElementById("errorMsg");
+    errorDiv.textContent = "";
 
-    resultDiv.innerHTML = "";
-
-    if (!name || !section) {
-        resultDiv.innerHTML = "<span class='error'>⚠ من فضلك أدخل الاسم واختر الشعبة.</span>";
+    if (!nameInput || !sectionValue) {
+        errorDiv.textContent = "⚠ من فضلك املأ الاسم واختر الشعبة.";
         return;
     }
 
-    // 1. تخزين البيانات في الـlocalStorage
-    localStorage.setItem("user_name", name);
-    localStorage.setItem("user_section", section);
+    // تجهيز البيانات زي ما كانت بتيجي من الـAPI (بس دلوقتي من عندنا)
+    const userData = {
+        name: nameInput,
+        section: sectionValue,
+        message: "تم تسجيل الدخول بنجاح محليًا.",
+        status: "Local Access"
+    };
 
-    // 2. التوجيه لصفحة المواد بنفس منطق الملف الأصلي
-    // (هنا دايماً الشرط هيتحقق لأننا اخترنا من القائمة)
-    if (["علمي علوم", "علمي رياضة", "أدبي"].includes(section)) {
-        resultDiv.innerHTML = "<div class='success'>✅ جاري تحميل المواد...</div>";
-        // التوجيه لصفحة المواد
-        window.location.href = "s234.html"; // تأكد أن الاسم مطابق لملف المواد
-    } else {
-         resultDiv.innerHTML = "<span class='error'>⚠ اختيار شعبة غير صحيح.</span>";
-    }
+    // تخزين البيانات في localStorage
+    localStorage.setItem("user_data", JSON.stringify(userData));
+    
+    // التوجيه لصفحة المواد
+    window.location.href = "lasti.html";
 }
-
-// تشغيل الدخول بضغطة Enter
-document.getElementById("section").addEventListener("keypress", e => {
-  if(e.key==="Enter") quickLogin();
-});
 </script>
 
 </body>
-
 </html>
