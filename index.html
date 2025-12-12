@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>جميع المواد المتاحة</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#3b82f6',
+        secondary: '#10b981',
+        dark: '#0f172a',
+        darker: '#020617',
+        card: '#1e293b',
+        'card-hover': '#334155'
+      },
+      fontFamily: { sans: ['Inter', 'sans-serif'] }
+    }
+  }
+}
+</script>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<style>
+/* CSS مقتبس من subjectss.html للحفاظ على الديزاين */
+body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc; margin:0; }
+.glass-panel {
+  background: rgba(30,41,59,0.7);
+  backdrop-filter: blur(12px);
+  border:1px solid rgba(255,255,255,0.05);
+}
+.glass-card {
+  background: rgba(30,41,59,0.5); 
+  backdrop-filter: blur(8px);
+  border:1px solid rgba(255,255,255,0.03); 
+  transition: all 0.3s ease;
+}
+.glass-card:hover {
+  background: rgba(51,65,85,0.6); 
+  transform: translateY(-2px);
+  border-color: rgba(59,130,246,0.3); 
+  box-shadow:0 4px 20px rgba(0,0,0,0.2);
+}
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+.loading-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0,0,0,0.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:white;
+}
+
+/* Toast Styles */
+.toast {
+  min-width:200px;
+  max-width:300px;
+  padding:0.75rem 1rem;
+  border-radius:0.5rem;
+  color:white;
+  font-weight:500;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+}
+.toast.info { background-color: #3b82f6; }
+.toast.success { background-color: #10b981; }
+.toast.error { background-color: #ef4444; }
+
+.toast-enter-from { opacity:0; transform: translateY(20px); }
+.toast-enter-to { opacity:1; transform: translateY(0); }
+.toast-leave-from { opacity:1; transform: translateY(0); }
+.toast-leave-to { opacity:0; transform: translateY(-20px); }
+.toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+
+</style>
+</head>
+
+<body class="h-screen overflow-hidden flex flex-col">
+
+<div id="app" class="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 lg:p-8">
+
+<header class="glass-panel h-16 flex items-center justify-between px-4 md:px-6 mb-4 shadow-lg">
+  <div class="flex items-center gap-3">
+    <div class="bg-blue-600/20 p-2 rounded-lg text-blue-400 flex items-center justify-center">
+      <i class="ph ph-video text-2xl"></i>
+    </div>
+    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+     school Viewer - كل المواد
+    </h1>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-500 to-slate-500 flex items-center justify-center text-xs font-bold cursor-default">
+      ALL
+    </div>
+  </div>
+</header>
+
+
+  <div v-if="stage > 0" class="flex items-center gap-2 text-gray-400 mb-4 text-sm flex-wrap">
+    <span @click="stage=0" class="hover:text-blue-400 cursor-pointer">Years (الكل)</span>
+    <i class="ph ph-caret-right"></i>
+    <span v-if="stage>=1" @click="stage=1" class="hover:text-blue-400 cursor-pointer">{{ selectedYear.name }}</span>
+    <i v-if="stage>=2" class="ph ph-caret-right"></i>
+    <span v-if="stage>=2" @click="stage=2" class="hover:text-blue-400 cursor-pointer">{{ selectedSubject.name }}</span>
+    <i v-if="stage===3" class="ph ph-caret-right"></i>
+    <span v-if="stage===3">{{ selectedTeacher.name }}</span>
+  </div>
+
+  <div v-if="loading" class="loading-dialog animate-fade-in">
+    <i class="ph ph-spinner animate-spin text-5xl mb-4"></i>
+    <p class="text-lg">Loading all content...</p>
+  </div>
+
+  <main class="flex-1 overflow-y-auto">
+
+    <div v-if="stage===0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div v-for="year in filteredData" :key="year.id" @click="selectYear(year)"
+          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
+        <img v-if="year.image_url" :src="year.image_url" class="rounded-xl mb-3 w-full h-32 object-cover">
+        <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ year.name }}</h3>
+        <span class="text-xs text-gray-400">{{ year.subjects?.length || 0 }} Subjects</span>
+      </div>
+    </div>
+
+    <div v-if="stage===1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+      <div v-for="subject in selectedYear.subjects" :key="subject.id" @click="selectSubject(subject)"
+          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
+        <img v-if="subject.image_url" :src="subject.image_url" class="rounded-xl mb-3 w-full h-32 object-cover">
+        <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ subject.name }}</h3>
+        <span class="text-xs text-gray-400">{{ subject.teachers?.length || 0 }} Teachers</span>
+      </div>
+    </div>
+
+    <div v-if="stage===2" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div v-for="teacher in selectedSubject.teachers" :key="teacher.id" @click="selectTeacher(teacher)"
+          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
+        <div class="flex items-center gap-4 relative z-10">
+          <div class="w-16 h-16 rounded-full bg-slate-700/50 overflow-hidden ring-2 ring-slate-700 group-hover:ring-blue-500/50 transition-all">
+            <img v-if="teacher.image_url" :src="teacher.image_url" class="w-full h-full object-cover">
+            <div v-else class="w-full h-full flex items-center justify-center text-slate-500">
+              <i class="ph ph-user text-2xl"></i>
+            </div>
+          </div>
+          <div>
+            <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ teacher.name }}</h3>
+            <p class="text-sm text-gray-500">{{ teacher.chapter_count || 0 }} Chapters</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="stage===3" class="max-w-5xl mx-auto space-y-4">
+      <div class="mb-6 flex items-center gap-4">
+        <button @click="stage=2" class="p-2 hover:bg-slate-800 rounded-lg text-gray-400 hover:text-white transition-colors">
+          <i class="ph ph-arrow-left text-xl"></i>
+        </button>
+        <h2 class="text-2xl font-bold">{{ selectedTeacher.name }}</h2>
+        <p class="text-gray-500 text-sm">{{ selectedSubject.name }}</p>
+      </div>
+
+      <div v-for="chapter in selectedTeacher.chapters" :key="chapter.id"
+           class="glass-card rounded-xl overflow-hidden border border-slate-800/50">
+        <button @click="toggleChapter(chapter.id)"
+          class="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors">
+          <span class="font-semibold text-lg">{{ chapter.name }}</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-500 font-medium px-2 py-1 bg-slate-800/50 rounded-md">{{ chapter.lectures?.length || 0 }} Lectures</span>
+            <i class="ph ph-caret-down transition-transform duration-300" :class="{'rotate-180': expandedChapters.includes(chapter.id)}"></i>
+          </div>
+        </button>
+
+        <div v-show="expandedChapters.includes(chapter.id)" class="border-t border-slate-800/50 bg-slate-900/30">
+          <div v-if="!chapter.lectures?.length" class="p-6 text-center text-gray-500">No lectures found.</div>
+          <div v-else class="grid divide-y divide-slate-800/50">
+            <div v-for="lecture in chapter.lectures" :key="lecture.id" class="p-4 pl-8 group hover:bg-white/5 transition-colors">
+              <h4 class="font-medium text-gray-300 mb-1">{{ lecture.name }}</h4>
+              <div class="flex gap-2 text-xs text-gray-500 mb-2">
+                <span>{{ lecture.video_count }} Videos</span>
+                <span>&bull;</span>
+                <span>{{ lecture.pdf_count }} PDFs</span>
+              </div>
+              <div class="grid gap-2">
+                <div v-for="video in lecture.videos" :key="video.id" @click="playVideo(video)"
+                     class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600/10 cursor-pointer transition-all border border-transparent hover:border-blue-500/20">
+                  <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-blue-400">
+                    <i class="ph ph-play-circle text-lg"></i>
+                  </div>
+                  <span class="text-sm font-medium text-gray-400 flex-1">{{ video.title }}</span>
+                  <span v-if="video.stream_url" class="text-[10px] text-emerald-500 font-semibold px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20">READY</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+    <transition-group name="toast" tag="div">
+      <div v-for="toast in toasts" :key="toast.id" :class="['toast', toast.type]">{{ toast.message }}</div>
+    </transition-group>
+  </div>
+
+</div>
+
+<script>
+const { createApp, ref, computed } = Vue;
+
+createApp({
+  setup() {
+    const data = ref([]);
+    const stage = ref(0);
+    const selectedYear = ref({});
+    const selectedSubject = ref({});
+    const selectedTeacher = ref({});
+    const expandedChapters = ref([]);
+    const loading = ref(true);
+
+    // Toasts
+    const toasts = ref([]);
+    const showToast = (message, type='info', duration=3000) => {
+      const id = Date.now() + Math.random();
+      toasts.value.push({ id, message, type });
+      setTimeout(() => {
+        const index = toasts.value.findIndex(t => t.id === id);
+        if(index !== -1) toasts.value.splice(index,1);
+      }, duration);
+    };
+
+    const selectYear = (year) => { selectedYear.value=year; stage.value=1; }
+    const selectSubject = (subject) => { selectedSubject.value=subject; stage.value=2; }
+    const selectTeacher = (teacher) => { selectedTeacher.value=teacher; stage.value=3; }
+    const toggleChapter = (id) => {
+      const idx = expandedChapters.value.indexOf(id);
+      if(idx===-1) expandedChapters.value.push(id);
+      else expandedChapters.value.splice(idx,1);
+    }
+    const playVideo = (video) => {
+      if(!video.stream_url) showToast("Stream not available", "error");
+      else window.open(video.stream_url,'_blank');
+    }
+
+    // منطق التصفية: ببساطة ارجع كل البيانات بدون فلترة
+    const filteredData = computed(() => {
+      return data.value;
+    });
+
+    const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+
+    fetch(DATA_SOURCE_URL)
+      .then(res => res.json())
+      .then(json => { 
+          data.value = json; 
+          loading.value = false; 
+          showToast(`تم تحميل ${data.value.length} سنة دراسية. يتم عرض جميع المواد المتاحة.`, "success"); 
+      })
+      .catch(err => { 
+          console.error(err); 
+          loading.value=false; 
+          showToast("⚠ فشل تحميل البيانات من السيرفر.", "error"); 
+      });
+
+    return { data, stage, selectedYear, selectedSubject, selectedTeacher, expandedChapters, loading, filteredData,
+             selectYear, selectSubject, selectTeacher, toggleChapter, playVideo, toasts, showToast };
+  }
+}).mount('#app');
+</script>
+
+</body>
+  </html>
