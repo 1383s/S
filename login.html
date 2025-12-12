@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل دخول سريع | شاتي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  /* استخدام نفس ستايلات m79.html */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Cairo', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle at top left, #6f42c1, #3f1f85);
+    overflow: hidden;
+  }
+  .login-box {
+    background: rgba(0,0,0,0.5);
+    border-radius: 25px;
+    padding: 50px 35px;
+    width: 95%;
+    max-width: 400px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    animation: slideIn 1s ease forwards;
+    opacity: 0;
+  }
+  .login-box h2 {
+    color: #ffcb42;
+    font-size: clamp(28px,5vw,38px);
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(255,203,66,0.5);
+  }
+  .login-box p {
+    color: #eee;
+    font-size: clamp(14px,3vw,18px);
+    margin-bottom: 20px;
+  }
+  .login-box input, .login-box select {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border: 2px solid #ffcb42;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    outline: none;
+    transition: 0.3s;
+    appearance: none; /* لإزالة سهم الـselect الافتراضي */
+    cursor: pointer;
+  }
+  .login-box input:focus, .login-box select:focus {
+    border-color: #fff;
+    box-shadow: 0 0 10px #ffcb42;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(45deg,#ffcb42,#ff9f00);
+    color: #3f1f85;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: 0 5px 20px rgba(255,203,66,0.4);
+  }
+  .login-box button:hover {
+    background: linear-gradient(45deg,#ff9f00,#ffcb42);
+    box-shadow: 0 8px 25px rgba(255,203,66,0.6);
+  }
+  .result {
+    margin-top: 15px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  .success { color: #4ade80; }
+  .error { color: #f87171; }
+  @keyframes slideIn {
+    0% { transform: translateY(-50px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h2>🌟 تسجيل دخول سريع</h2>
+  <p>من فضلك أدخل بياناتك لفتح المواد</p>
+  
+  <input type="text" id="name" placeholder="اسم الطالب" required>
+  
+  <select id="section" required>
+    <option value="" disabled selected>اختر الشعبة...</option>
+    <option value="علمي علوم">علمي علوم</option>
+    <option value="علمي رياضة">علمي رياضة</option>
+    <option value="أدبي">أدبي</option>
+  </select>
+
+  <button onclick="quickLogin()">فتح المواد</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+function quickLogin() {
+    const nameInput = document.getElementById("name");
+    const sectionSelect = document.getElementById("section");
+    const resultDiv = document.getElementById("result");
+    
+    const name = nameInput.value.trim();
+    const section = sectionSelect.value.trim();
+
+    resultDiv.innerHTML = "";
+
+    if (!name || !section) {
+        resultDiv.innerHTML = "<span class='error'>⚠ من فضلك أدخل الاسم واختر الشعبة.</span>";
+        return;
+    }
+
+    // 1. تخزين البيانات في الـlocalStorage
+    localStorage.setItem("user_name", name);
+    localStorage.setItem("user_section", section);
+
+    // 2. التوجيه لصفحة المواد بنفس منطق الملف الأصلي
+    // (هنا دايماً الشرط هيتحقق لأننا اخترنا من القائمة)
+    if (["علمي علوم", "علمي رياضة", "أدبي"].includes(section)) {
+        resultDiv.innerHTML = "<div class='success'>✅ جاري تحميل المواد...</div>";
+        // التوجيه لصفحة المواد
+        window.location.href = "s234.html"; // تأكد أن الاسم مطابق لملف المواد
+    } else {
+         resultDiv.innerHTML = "<span class='error'>⚠ اختيار شعبة غير صحيح.</span>";
+    }
+}
+
+// تشغيل الدخول بضغطة Enter
+document.getElementById("section").addEventListener("keypress", e => {
+  if(e.key==="Enter") quickLogin();
+});
+</script>
+
+</body>
+</html>
