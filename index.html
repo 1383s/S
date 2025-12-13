@@ -1,286 +1,609 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
-
+<html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>جميع المواد المتاحة</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول / تفعيل الجهاز - منصة 1383</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        primary: '#3b82f6',
-        secondary: '#10b981',
-        dark: '#0f172a',
-        darker: '#020617',
-        card: '#1e293b',
-        'card-hover': '#334155'
-      },
-      fontFamily: { sans: ['Inter', 'sans-serif'] }
-    }
-  }
-}
-</script>
+    <style>
+        /* تعريف الألوان والثيم لرسائل الحالة */
+        :root {
+            --light-text: #FFFFFF;
+            --green-active: #00F5C4; /* لون النجاح */
+            --red-error: #FF4F4F;     /* لون الخطأ */
+            --pending: #ffb347;       /* لون الانتظار */
+            /* 💡 التغييرات لثيم الأخضر الداكن (Dark Forest Green) */
+            --main-light-green: #08402C; /* لون الخلفية والزرار الأساسي */
+            --main-dark-green: #042016;  /* درجة أغمق للخلفية لعمل تدرج */
+            --wave-color-1: #0C241C;    /* لون الموجة 1 */
+            --wave-color-2: #020A07;    /* لون الموجة 2 */
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@phosphor-icons/web"></script>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        /* --------------------------
+           1. CSS Reset & Base Styles
+           -------------------------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
+        }
 
-<style>
-/* CSS مقتبس من subjectss.html للحفاظ على الديزاين */
-body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc; margin:0; }
-.glass-panel {
-  background: rgba(30,41,59,0.7);
-  backdrop-filter: blur(12px);
-  border:1px solid rgba(255,255,255,0.05);
-}
-.glass-card {
-  background: rgba(30,41,59,0.5); 
-  backdrop-filter: blur(8px);
-  border:1px solid rgba(255,255,255,0.03); 
-  transition: all 0.3s ease;
-}
-.glass-card:hover {
-  background: rgba(51,65,85,0.6); 
-  transform: translateY(-2px);
-  border-color: rgba(59,130,246,0.3); 
-  box-shadow:0 4px 20px rgba(0,0,0,0.2);
-}
-.animate-fade-in { animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        /* --------------------------
+           2. Body & Background (Glassmorphism Base)
+           -------------------------- */
+        body {
+            display: flex;
+            flex-direction: column; 
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* خلفية متدرجة أخضر داكن (باستخدام 08402C ودرجة أغمق) */
+            background: linear-gradient(180deg, var(--main-light-green) 0%, var(--main-dark-green) 100%);
+            overflow: hidden;
+            position: relative;
+            color: var(--light-text);
+            padding: 20px;
+        }
 
-.loading-dialog {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: rgba(0,0,0,0.7);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  color:white;
-}
+        /* تمويجات سفلية (Waves Effect) - تم تحديث ألوان الموجة هنا */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* استخدام خلفية التمويجات - تم تعديل الألوان لدرجات الأخضر الجديدة */
+            /* الخلفية: 08402C | الموجة 1: 0C241C | الموجة 2: 020A07 */
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600"><rect fill="%2308402C" width="1000" height="600"/><g fill="%230C241C"><path d="M0 450c100-50 200-50 300 0s200 50 300 0 200-50 400 0v150H0z"/><path d="M0 480c100-30 200-30 300 0s200 30 300 0 200-30 400 0v120H0z"/></g><g fill="%23020A07"><path d="M0 500c100-20 200-20 300 0s200 20 300 0 200-20 400 0v90H0z"/><path d="M0 540c100-10 200-10 300 0s200 10 300 0 200-10 400 0v60H0z"/></g></svg>');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: bottom center;
+            z-index: -1;
+            filter: brightness(0.9);
+        }
 
-/* Toast Styles */
-.toast {
-  min-width:200px;
-  max-width:300px;
-  padding:0.75rem 1rem;
-  border-radius:0.5rem;
-  color:white;
-  font-weight:500;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
-}
-.toast.info { background-color: #3b82f6; }
-.toast.success { background-color: #10b981; }
-.toast.error { background-color: #ef4444; }
+        /* --------------------------
+           3. Stars & Shooting Stars Effects
+           -------------------------- */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.8) 1px, transparent 1%),
+                              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.7) 1px, transparent 1%),
+                              radial-gradient(circle at 30% 60%, rgba(255,255,255,0.6) 1px, transparent 1%),
+                              radial-gradient(circle at 50% 10%, rgba(255,255,255,0.5) 1px, transparent 1%);
+            background-size: 100px 100px, 120px 120px, 80px 80px, 150px 150px;
+            background-repeat: repeat;
+            opacity: 0.8;
+            z-index: -1;
+            animation: star-move 60s linear infinite alternate;
+        }
+        
+        @keyframes star-move {
+            from { background-position: 0% 0%; }
+            to { background-position: 10% 10%; }
+        }
+        
+        .shooting-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #fff;
+            border-radius: 50%;
+            /* توهج الشهاب باستخدام لون الخلفية (08402C) */
+            box-shadow: 0 0 10px 1px #fff, 0 0 20px 5px #08402C; 
+            opacity: 0;
+            transform: rotateZ(315deg);
+            animation: shoot 5s linear infinite;
+            z-index: 1; 
+        }
 
-.toast-enter-from { opacity:0; transform: translateY(20px); }
-.toast-enter-to { opacity:1; transform: translateY(0); }
-.toast-leave-from { opacity:1; transform: translateY(0); }
-.toast-leave-to { opacity:0; transform: translateY(-20px); }
-.toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+        @keyframes shoot {
+            0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
+            1% { opacity: 1; }
+            100% { opacity: 0; transform: translate3d(400px, 400px, 0) rotateZ(315deg); }
+        }
 
-</style>
+        /* --------------------------
+           4. Glassmorphism Card Style 
+           -------------------------- */
+        .login-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 90%;
+            max-width: 420px; 
+            text-align: center;
+            animation: fadeIn 1s ease-out;
+            color: #ffffff;
+            z-index: 10; 
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --------------------------
+           5. Header & Form Elements (RTL Ready)
+           -------------------------- */
+        h2 {
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            color: #ffffff;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 45px 15px 15px; 
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px; 
+            color: #ffffff;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s ease;
+            text-align: right;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--green-active);
+            box-shadow: 0 0 0 2px rgba(0, 245, 196, 0.3);
+        }
+
+        .input-group .icon {
+            position: absolute;
+            right: 15px;
+            left: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+        
+        /* --------------------------
+           6. Status Message Box
+           -------------------------- */
+        #statusMessage {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 1em;
+            display: none; 
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        /* --------------------------
+           7. Button & Link Style
+           -------------------------- */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s ease;
+            letter-spacing: 0.5px;
+            margin-top: 15px;
+            
+            /* خلفية الزر بالتدرج الجديد (يبدأ وينتهي بدرجات من 08402C) */
+            background: linear-gradient(90deg, var(--main-light-green), var(--main-dark-green));
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .login-btn:hover {
+            /* خلفية الزر عند التحويم وتوهج الظل باستخدام 08402C */
+            background: linear-gradient(90deg, #1A6041, var(--main-dark-green)); /* أخضر أفتح قليلا عند التحويم */
+            box-shadow: 0 7px 25px rgba(8, 64, 44, 0.6); 
+            transform: translateY(-2px);
+        }
+        
+        .get-code-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 0.95em;
+            color: var(--pending); 
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .get-code-link:hover {
+            color: var(--green-active); 
+            text-decoration: underline;
+        }
+
+        /* --------------------------
+           8. Top Code Status Bar (Firebase Active Code Display)
+           -------------------------- */
+        .top-status-bar {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            
+            /* 💡 التعديل لجعل المحتوى متوسطاً ومرتباً عمودياً */
+            display: flex;
+            flex-direction: column; /* ترتيب العناصر عمودياً (فوق بعض) */
+            justify-content: center; /* توسيط عمودي */
+            align-items: center; /* توسيط أفقي */
+            text-align: center;
+        }
+
+        .status-text {
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-bottom: 10px; /* مسافة تحت النص لتفصله عن الزر */
+        }
+
+        .code-display {
+            color: var(--green-active); 
+            font-weight: 700;
+            font-family: monospace;
+            font-size: 1.1em;
+            margin-right: 5px;
+        }
+
+        .clear-btn {
+            background: var(--red-error); 
+            color: var(--light-text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: 0.3s;
+            margin-top: 0; /* تم نقل المسافة إلى .status-text */
+        }
+        .clear-btn:hover {
+            opacity: 0.8;
+            transform: scale(0.98);
+        }
+
+        /* --------------------------
+           9. Footer Style
+           -------------------------- */
+        .footer-rights {
+            color: rgba(255, 255, 255, 0.5); 
+            font-size: 0.8em;
+            text-align: center;
+            padding: 10px;
+            position: absolute; 
+            bottom: 0; 
+            width: 100%;
+            z-index: 5; 
+            backdrop-filter: blur(2px); 
+            -webkit-backdrop-filter: blur(2px);
+        }
+
+    </style>
 </head>
+<body>
+    <div class="stars"></div>
 
-<body class="h-screen overflow-hidden flex flex-col">
-
-<div id="app" class="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 lg:p-8">
-
-<header class="glass-panel h-16 flex items-center justify-between px-4 md:px-6 mb-4 shadow-lg">
-  <div class="flex items-center gap-3">
-    <div class="bg-blue-600/20 p-2 rounded-lg text-blue-400 flex items-center justify-center">
-      <i class="ph ph-video text-2xl"></i>
-    </div>
-    <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
-     school Viewer - كل المواد
-    </h1>
-  </div>
-
-  <div class="flex items-center gap-4">
-    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-500 to-slate-500 flex items-center justify-center text-xs font-bold cursor-default">
-      ALL
-    </div>
-  </div>
-</header>
-
-
-  <div v-if="stage > 0" class="flex items-center gap-2 text-gray-400 mb-4 text-sm flex-wrap">
-    <span @click="stage=0" class="hover:text-blue-400 cursor-pointer">Years (الكل)</span>
-    <i class="ph ph-caret-right"></i>
-    <span v-if="stage>=1" @click="stage=1" class="hover:text-blue-400 cursor-pointer">{{ selectedYear.name }}</span>
-    <i v-if="stage>=2" class="ph ph-caret-right"></i>
-    <span v-if="stage>=2" @click="stage=2" class="hover:text-blue-400 cursor-pointer">{{ selectedSubject.name }}</span>
-    <i v-if="stage===3" class="ph ph-caret-right"></i>
-    <span v-if="stage===3">{{ selectedTeacher.name }}</span>
-  </div>
-
-  <div v-if="loading" class="loading-dialog animate-fade-in">
-    <i class="ph ph-spinner animate-spin text-5xl mb-4"></i>
-    <p class="text-lg">Loading all content...</p>
-  </div>
-
-  <main class="flex-1 overflow-y-auto">
-
-    <div v-if="stage===0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      <div v-for="year in filteredData" :key="year.id" @click="selectYear(year)"
-          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
-        <img v-if="year.image_url" :src="year.image_url" class="rounded-xl mb-3 w-full h-32 object-cover">
-        <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ year.name }}</h3>
-        <span class="text-xs text-gray-400">{{ year.subjects?.length || 0 }} Subjects</span>
-      </div>
-    </div>
-
-    <div v-if="stage===1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-      <div v-for="subject in selectedYear.subjects" :key="subject.id" @click="selectSubject(subject)"
-          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
-        <img v-if="subject.image_url" :src="subject.image_url" class="rounded-xl mb-3 w-full h-32 object-cover">
-        <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ subject.name }}</h3>
-        <span class="text-xs text-gray-400">{{ subject.teachers?.length || 0 }} Teachers</span>
-      </div>
-    </div>
-
-    <div v-if="stage===2" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      <div v-for="teacher in selectedSubject.teachers" :key="teacher.id" @click="selectTeacher(teacher)"
-          class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
-        <div class="flex items-center gap-4 relative z-10">
-          <div class="w-16 h-16 rounded-full bg-slate-700/50 overflow-hidden ring-2 ring-slate-700 group-hover:ring-blue-500/50 transition-all">
-            <img v-if="teacher.image_url" :src="teacher.image_url" class="w-full h-full object-cover">
-            <div v-else class="w-full h-full flex items-center justify-center text-slate-500">
-              <i class="ph ph-user text-2xl"></i>
+    <div class="login-card">
+        
+        <div id="topCodeStatus" class="top-status-bar">
             </div>
-          </div>
-          <div>
-            <h3 class="font-bold text-lg text-gray-200 group-hover:text-blue-400 transition-colors">{{ teacher.name }}</h3>
-            <p class="text-sm text-gray-500">{{ teacher.chapter_count || 0 }} Chapters</p>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <div v-if="stage===3" class="max-w-5xl mx-auto space-y-4">
-      <div class="mb-6 flex items-center gap-4">
-        <button @click="stage=2" class="p-2 hover:bg-slate-800 rounded-lg text-gray-400 hover:text-white transition-colors">
-          <i class="ph ph-arrow-left text-xl"></i>
-        </button>
-        <h2 class="text-2xl font-bold">{{ selectedTeacher.name }}</h2>
-        <p class="text-gray-500 text-sm">{{ selectedSubject.name }}</p>
-      </div>
-
-      <div v-for="chapter in selectedTeacher.chapters" :key="chapter.id"
-           class="glass-card rounded-xl overflow-hidden border border-slate-800/50">
-        <button @click="toggleChapter(chapter.id)"
-          class="w-full px-6 py-4 flex items-center justify-between hover:bg-white/5 transition-colors">
-          <span class="font-semibold text-lg">{{ chapter.name }}</span>
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-slate-500 font-medium px-2 py-1 bg-slate-800/50 rounded-md">{{ chapter.lectures?.length || 0 }} Lectures</span>
-            <i class="ph ph-caret-down transition-transform duration-300" :class="{'rotate-180': expandedChapters.includes(chapter.id)}"></i>
-          </div>
-        </button>
-
-        <div v-show="expandedChapters.includes(chapter.id)" class="border-t border-slate-800/50 bg-slate-900/30">
-          <div v-if="!chapter.lectures?.length" class="p-6 text-center text-gray-500">No lectures found.</div>
-          <div v-else class="grid divide-y divide-slate-800/50">
-            <div v-for="lecture in chapter.lectures" :key="lecture.id" class="p-4 pl-8 group hover:bg-white/5 transition-colors">
-              <h4 class="font-medium text-gray-300 mb-1">{{ lecture.name }}</h4>
-              <div class="flex gap-2 text-xs text-gray-500 mb-2">
-                <span>{{ lecture.video_count }} Videos</span>
-                <span>&bull;</span>
-                <span>{{ lecture.pdf_count }} PDFs</span>
-              </div>
-              <div class="grid gap-2">
-                <div v-for="video in lecture.videos" :key="video.id" @click="playVideo(video)"
-                     class="flex items-center gap-3 p-2 rounded-lg hover:bg-blue-600/10 cursor-pointer transition-all border border-transparent hover:border-blue-500/20">
-                  <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-blue-400">
-                    <i class="ph ph-play-circle text-lg"></i>
-                  </div>
-                  <span class="text-sm font-medium text-gray-400 flex-1">{{ video.title }}</span>
-                  <span v-if="video.stream_url" class="text-[10px] text-emerald-500 font-semibold px-2 py-0.5 bg-emerald-500/10 rounded border border-emerald-500/20">READY</span>
-                </div>
-              </div>
+        <h2>منصة 1383 متوقفه </h2>
+        <div id="statusMessage" style="display:none;">
             </div>
-          </div>
-        </div>
-      </div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <i class="fas fa-lock icon"></i>
+                <input type="text" id="activationCode" placeholder="ادخل كودك " pattern="\d{6}" maxlength="6" required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="login-btn">
+                 تفعيل ودخول
+            </button>
+        </form>
+
     </div>
+    
+    <footer class="footer-rights">
+               جميع الحقوق محفوظة لموقع 1383
+    </footer>
 
-  </main>
+    <script>
+        // 🚨 Configuration - إعدادات Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+          authDomain: "thanawy-1383.firebaseapp.com",
+          databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+          projectId: "thanawy-1383",
+          storageBucket: "thanawy-1383.firebasestorage.app",
+          messagingSenderId: "1026664406457",
+          appId: "1:1026664406457:web:87d71f7e41bef36ba0aa68",
+          measurementId: "G-J5R2EFM2D0"
+        };
+        
+        if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
 
-  <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-    <transition-group name="toast" tag="div">
-      <div v-for="toast in toasts" :key="toast.id" :class="['toast', toast.type]">{{ toast.message }}</div>
-    </transition-group>
-  </div>
+        // 💡 تعريف عناصر واجهة المستخدم
+        const STATUS_MESSAGE = document.getElementById('statusMessage');
+        const LOGIN_FORM = document.getElementById('loginForm');
+        const LOGIN_BTN = document.getElementById('loginBtn');
+        const ACTIVATION_CODE_INPUT = document.getElementById('activationCode');
+        const codeStatusDiv = document.getElementById('topCodeStatus'); // شريط عرض الكود
 
-</div>
 
-<script>
-const { createApp, ref, computed } = Vue;
+        // 💡 دالة لعرض رسائل الحالة بخلفية متغيرة
+        function updateStatusMessage(text, type) {
+            STATUS_MESSAGE.textContent = text;
+            STATUS_MESSAGE.style.display = 'block';
+            
+            // تحديد الألوان بناءً على النوع
+            if (type === 'success') {
+                STATUS_MESSAGE.style.background = 'rgba(0, 245, 196, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'rgba(0, 245, 196, 0.4)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--green-active)';
+            } else if (type === 'error') {
+                STATUS_MESSAGE.style.background = 'rgba(255, 79, 79, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'rgba(255, 79, 79, 0.4)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--red-error)';
+            } else if (type === 'pending') {
+                STATUS_MESSAGE.style.background = 'rgba(255, 179, 71, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'rgba(255, 179, 71, 0.4)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--pending)';
+            }
+        }
 
-createApp({
-  setup() {
-    const data = ref([]);
-    const stage = ref(0);
-    const selectedYear = ref({});
-    const selectedSubject = ref({});
-    const selectedTeacher = ref({});
-    const expandedChapters = ref([]);
-    const loading = ref(true);
 
-    // Toasts
-    const toasts = ref([]);
-    const showToast = (message, type='info', duration=3000) => {
-      const id = Date.now() + Math.random();
-      toasts.value.push({ id, message, type });
-      setTimeout(() => {
-        const index = toasts.value.findIndex(t => t.id === id);
-        if(index !== -1) toasts.value.splice(index,1);
-      }, duration);
-    };
+        // **********************************************
+        // 🚨 الدوال الأساسية: توليد Device ID والتحقق من الكود 
+        // **********************************************
 
-    const selectYear = (year) => { selectedYear.value=year; stage.value=1; }
-    const selectSubject = (subject) => { selectedSubject.value=subject; stage.value=2; }
-    const selectTeacher = (teacher) => { selectedTeacher.value=teacher; stage.value=3; }
-    const toggleChapter = (id) => {
-      const idx = expandedChapters.value.indexOf(id);
-      if(idx===-1) expandedChapters.value.push(id);
-      else expandedChapters.value.splice(idx,1);
-    }
-    const playVideo = (video) => {
-      if(!video.stream_url) showToast("Stream not available", "error");
-      else window.open(video.stream_url,'_blank');
-    }
+        // دالة توليد Device ID فريد للجهاز
+        function generateDeviceID() {
+             return 'DID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + Date.now().toString(36);
+        }
 
-    // منطق التصفية: ببساطة ارجع كل البيانات بدون فلترة
-    const filteredData = computed(() => {
-      return data.value;
-    });
+        // 1. استرجاع أو توليد Device ID للجهاز الحالي
+        let localDeviceId = localStorage.getItem('localDeviceId');
+        if (!localDeviceId) {
+            localDeviceId = generateDeviceID();
+            localStorage.setItem('localDeviceId', localDeviceId);
+        }
 
-    const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+        // 2. دالة حذف الكود من الجهاز
+        function clearLocalCode() {
+            localStorage.removeItem('activeCode');
+            localStorage.removeItem('approved'); 
+            
+            updateStatusMessage('✅ تم حذف الكود بنجاح. جاري إعادة تحميل الصفحة...', 'success');
+            LOGIN_BTN.disabled = true;
 
-    fetch(DATA_SOURCE_URL)
-      .then(res => res.json())
-      .then(json => { 
-          data.value = json; 
-          loading.value = false; 
-          showToast(`تم تحميل ${data.value.length} سنة دراسية. يتم عرض جميع المواد المتاحة.`, "success"); 
-      })
-      .catch(err => { 
-          console.error(err); 
-          loading.value=false; 
-          showToast("⚠ فشل تحميل البيانات من السيرفر.", "error"); 
-      });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
 
-    return { data, stage, selectedYear, selectedSubject, selectedTeacher, expandedChapters, loading, filteredData,
-             selectYear, selectSubject, selectTeacher, toggleChapter, playVideo, toasts, showToast };
-  }
-}).mount('#app');
-</script>
+        // 3. عرض حالة الكود في الشريط العلوي عند تحميل الصفحة (مع خاصية الدخول التلقائي)
+        const activeCode = localStorage.getItem('activeCode');
+        
+        // *******************************************************************
+        // 💡 التعديل: دالة جديدة للتحقق من حالة الكود المخزن محلياً والدخول التلقائي
+        // *******************************************************************
+        async function checkAutoLoginStatus() {
+            if (!activeCode) {
+                 // حالة عدم وجود كود مسجل
+                codeStatusDiv.innerHTML = `<span class="status-text" style="color:rgba(255, 255, 255, 0.7);">ليس لديك كود تفعيل مُحفوظ على هذا الجهاز.</span>`;
+                STATUS_MESSAGE.style.display = 'none'; 
+                
+                // تفعيل معالج الحدث لـ LOGIN_FORM
+                LOGIN_FORM.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    checkAndLogin();
+                });
+                return;
+            }
 
+            // 1. عرض حالة الكود الحالي
+            codeStatusDiv.innerHTML = `
+                <span class="status-text">كود تفعيلك الحالي: <span class="code-display">${activeCode}</span></span>
+                <button class="clear-btn" onclick="clearLocalCode()">حذف الكود من جهازك</button>
+            `;
+            LOGIN_FORM.style.display = 'none'; // إخفاء الفورم أثناء التحقق/الدخول
+
+            updateStatusMessage('⏳ جاري التحقق من صلاحية الكود المحفوظ...', 'pending');
+
+            try {
+                const snapshot = await db.ref('approvedStudents/' + activeCode).once('value');
+                const data = snapshot.val();
+                // نستخدم Date.now() للتحقق من انتهاء الصلاحية بناءً على الوقت الحالي
+                const now = Date.now(); 
+                
+                // 2. التحقق من انتهاء الصلاحية أو التعطيل
+                if (!data || (data.expiry && data.expiry <= now) || data.isBlocked === true) {
+                    
+                    // إزالة الكود القديم في حال كان منتهي الصلاحية أو محظوراً
+                    localStorage.removeItem('activeCode');
+                    localStorage.removeItem('approved'); 
+
+                    updateStatusMessage('انتهت صلاحية الكود يرجي تجديد الاشتراك.', 'error');
+                    
+                    // إعادة إظهار الفورم
+                    LOGIN_FORM.style.display = 'block'; 
+                    codeStatusDiv.innerHTML = `<span class="status-text" style="color:rgba(255, 255, 255, 0.7);">ليس لديك كود تفعيل مُحفوظ على هذا الجهاز.</span>`;
+                    
+                    // تفعيل معالج الحدث لـ LOGIN_FORM مجدداً
+                    LOGIN_FORM.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        checkAndLogin();
+                    });
+
+                    return;
+                }
+
+                // 3. حالة الكود سليم: البدء في الدخول التلقائي
+                let countdown = 5;
+                
+                // إظهار رسالة العداد
+                updateStatusMessage(`✅ تم تسجيل الدخول تلقائياً. جاري التوجيه خلال: ${countdown} ثوانٍ...`, 'success');
+
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    updateStatusMessage(`✅ تم تسجيل الدخول تلقائياً. جاري التوجيه خلال: ${countdown} ثوانٍ...`, 'success');
+                    
+                    if (countdown <= 0) {
+                        clearInterval(countdownInterval);
+                        window.location.href = 'subjects.html'; // التوجيه للصفحة
+                    }
+                }, 1000); 
+
+            } catch (error) {
+                updateStatusMessage('❌ فشل التحقق التلقائي من الصلاحية. حاول إدخال الكود يدوياً.', 'error');
+                LOGIN_FORM.style.display = 'block';
+                console.error("Firebase auto-login error:", error);
+                
+                // تفعيل معالج الحدث لـ LOGIN_FORM
+                LOGIN_FORM.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    checkAndLogin();
+                });
+            }
+        }
+        
+        // استدعاء الدالة عند تحميل الصفحة
+        checkAutoLoginStatus();
+
+
+        // 4. دالة التحقق من الكود في Firebase (لم يتم تغييرها، فهي تعمل بشكل صحيح)
+        async function checkAndLogin() {
+            const activationCode = ACTIVATION_CODE_INPUT.value.trim();
+            
+            if (activationCode.length !== 6 || isNaN(activationCode)) {
+                updateStatusMessage('❌ برجاء إدخال كود تفعيل صحيح مكون من 6 أرقام.', 'error');
+                return;
+            }
+
+            LOGIN_BTN.disabled = true;
+            updateStatusMessage('⏳ جاري التحقق من كود التفعيل...', 'pending');
+
+            try {
+                const snapshot = await db.ref('approvedStudents/' + activationCode).once('value');
+                const data = snapshot.val();
+                const now = Date.now();
+
+                if (!data) {
+                    updateStatusMessage('❌ كود التفعيل غير صحيح أو غير موجود.', 'error');
+                    return;
+                }
+
+                // 🚨 التحقق من انتهاء الصلاحية
+                if (data.expiry && data.expiry <= now) {
+                    updateStatusMessage('❌ كود التفعيل الخاص بك منتهي الصلاحية.', 'error');
+                    return;
+                }
+                
+                if (data.isBlocked === true) {
+                    updateStatusMessage(' انتهت صلاحية الكود يرجي تجديد الاشتراك.', 'error');
+                    return;
+                }
+
+                // 🚨 التحقق من شرط الجهاز الواحد 
+                const storedDeviceId = data.deviceId;
+
+                if (!storedDeviceId) {
+                    // الكود سليم وجهاز الطالب هو أول جهاز يسجل الدخول
+                    await db.ref('approvedStudents/' + activationCode + '/deviceId').set(localDeviceId);
+                    localStorage.setItem('activeCode', activationCode);
+                    localStorage.setItem('approved', 'true');
+                    
+                    updateStatusMessage('✅ تم التفعيل بنجاح! جاري الدخول...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'subjects.html'; // الانتقال للصفحة الرئيسية
+                    }, 1000);
+                    
+                } else if (storedDeviceId === localDeviceId) {
+                    // الكود سليم ومفعل بالفعل على نفس الجهاز
+                    localStorage.setItem('activeCode', activationCode);
+                    localStorage.setItem('approved', 'true');
+                    
+                    updateStatusMessage('✅ تم تسجيل الدخول بنجاح! جاري الدخول...', 'success');
+
+                    setTimeout(() => {
+                        window.location.href = 'subjects.html'; // الانتقال للصفحة الرئيسية
+                    }, 1000);
+
+                } else {
+                    // ❌ الكود سليم لكن مفعل على جهاز آخر
+                    updateStatusMessage('❌ هذا الكود مُفعل على جهاز آخر بالفعل.', 'error');
+                }
+
+            } catch (error) {
+                updateStatusMessage('❌ فشل الاتصال بالخادم. حاول مرة أخرى.', 'error');
+                console.error("Firebase error:", error);
+            } finally {
+                // إعادة تفعيل الزر في حالة الخطأ
+                LOGIN_BTN.disabled = false;
+            }
+        }
+        
+        // 5. إنشاء الشهب بشكل عشوائي 
+        const body = document.querySelector('body');
+        const numStars = 10; 
+
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+
+            const startX = Math.random() * window.innerWidth / 2;
+            const startY = Math.random() * window.innerHeight / 2;
+            star.style.left = `${startX}px`;
+            star.style.top = `${startY}px`;
+
+            const delay = Math.random() * 5; 
+            star.style.animationDelay = `${delay}s`;
+
+            body.appendChild(star);
+        }
+    </script>
 </body>
-  </html>
+</html>
