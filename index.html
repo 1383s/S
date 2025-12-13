@@ -311,6 +311,65 @@
             backdrop-filter: blur(2px); 
             -webkit-backdrop-filter: blur(2px);
         }
+        /* --------------------------
+           9. Footer Style (تم التحديث)
+           -------------------------- */
+        .footer-rights {
+            /* تم إلغاء التنسيق القديم ليحل محله التنسيق الجديد */
+            display: none !important;
+        }
+
+        /* --------------------------
+           10. New Developer Footer Style
+           -------------------------- */
+        .developer-footer {
+            position: absolute; 
+            bottom: 0; 
+            width: 100%;
+            z-index: 5; 
+            padding: 15px 10px;
+            background: rgba(0, 0, 0, 0.4); /* خلفية شبه شفافة */
+            backdrop-filter: blur(2px); 
+            -webkit-backdrop-filter: blur(2px);
+            
+            /* تنسيق المحتوى بالداخل */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .developer-info {
+            display: flex;
+            align-items: center;
+            color: var(--light-text);
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .developed-text {
+            opacity: 0.7;
+            margin-right: 5px;
+        }
+
+        .developer-name {
+            color: var(--green-active); /* لون Highlight زي لون النجاح #00F5C4 */
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-right: 15px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 0 5px rgba(0, 245, 196, 0.5); /* توهج بسيط */
+        }
+
+        .logo-box {
+            background-color: var(--main-light-green); /* اللون الأخضر اللي اخترتيه: 08402C */
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9em;
+            box-shadow: 0 4px 10px rgba(8, 64, 44, 0.8);
+            transform: skewX(-5deg); /* إضافة ميلان خفيف لزيادة الجاذبية */
+        }
 
     </style>
 </head>
@@ -339,8 +398,12 @@
 
     </div>
     
-    <footer class="footer-rights">
-               جميع الحقوق محفوظة لموقع 1383
+    <footer class="developer-footer">
+    <div class="developer-info">
+        <span class="developed-text">Developed By </span>
+        <span class="developer-name">Elgiza</span>
+        <div class="logo-box">Full Mark</div>
+    </div>
     </footer>
 
     <script>
@@ -607,3 +670,4 @@
     </script>
 </body>
 </html>
+
