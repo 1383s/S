@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>الملف الشخصي</title>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --primary: #6A11CB;
+    --secondary: #2575FC;
+    --accent: #00F5C4;
+    --error: #FF4F4F;
+    --success: #00C896;
+    --dark: #0F0F1B;
+    --darker: #1A1A2E;
+    --light: #FFFFFF;
+    --gray: #A0A0B0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: linear-gradient(135deg, var(--darker), var(--dark));
+    color: var(--light);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+  }
+
+  .profile-container {
+    background: rgba(26, 26, 46, 0.95);
+    border-radius: 20px;
+    padding: 25px 20px;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.4);
+    text-align: center;
+  }
+
+  .profile-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: auto;
+    border: 2px solid var(--accent);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+
+  .profile-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .profile-phone {
+    font-size: 0.9rem;
+    color: var(--gray);
+    margin-bottom: 15px;
+  }
+
+  .info-card {
+    background: rgba(255,255,255,0.05);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 8px 0;
+    text-align: right;
+    font-size: 0.95rem;
+  }
+
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 6px 0;
+  }
+
+  .info-label {
+    color: var(--gray);
+    font-weight: 500;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: var(--light);
+  }
+
+  .status-value.active {
+    color: var(--success);
+    font-weight: 700;
+  }
+  .status-value.expired {
+    color: var(--error);
+    font-weight: 700;
+  }
+
+  /* Digital Timer */
+  .timer {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--light);
+    margin-bottom: 4px;
+    letter-spacing: 2px;
+  }
+
+  .timer-labels {
+    font-size: 0.7rem;
+    color: var(--gray);
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 10px;
+  }
+
+  /* Progress Bar */
+  .progress-container {
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    height: 10px;
+    margin: 8px 0;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00ff99, #ffcc00, #ff4444);
+    transition: width 1s linear;
+  }
+
+  .logout-btn {
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--error), #FF6B6B);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 600;
+    transition: 0.3s;
+  }
+
+  .logout-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255,79,79,0.4);
+  }
+  .fixed-bottom-bar {
+    position: fixed; /* عشان يفضل ثابت حتى لو الطالب نزل تحت */
+    bottom: 0;      /* يلزق في أسفل الشاشة */
+    left: 0;        /* يغطي العرض كله */
+    width: 100%;
+    background: var(--black-bg); /* خلفية غامقة عشان اللون الأصفر يظهر */
+    border-top: 2px solid var(--yellow-card); /* خط أصفر شيك يفصل بينه وبين المحتوى */
+    color: var(--light-text);
+    text-align: center;
+    padding: 10px 0;
+    z-index: 999; /* عشان يكون فوق معظم العناصر */
+    display: flex; /* عشان نرتب العناصر جنب بعض */
+    justify-content: center;
+    align-items: center;
+    font-family: 'Tajawal', sans-serif;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-label {
+    color: var(--gray-text);
+    font-size: 16px;
+    font-weight: 500;
+    margin-left: 10px; /* مسافة بين النص والكود */
+}
+
+.bottom-code {
+    color: var(--green-active); /* لون أخضر عشان يلفت النظر */
+    font-size: 20px;
+    font-weight: 700;
+    font-family: monospace; /* عشان الكود يبان أوضح */
+    letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+  <div class="profile-container">
+    <div class="profile-avatar" id="profileAvatar">👤</div>
+    <h2 class="profile-name" id="profileName">1383</h2>
+    <p class="profile-phone" id="profilePhone">-</p>
+
+    <!-- معلومات عامة -->
+    <div class="info-card">
+      <div class="info-item">
+        <span class="info-label">الحالة:  احلا بريميوم من 1383</span>
+        <span id="profileStatus" class="status-value">كينج</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">الدفع: 150</span>
+        <span class="info-value">تم التحقق من الدفع بنجاح</span>
+      </div>
+    </div>
+    
+    <!-- Digital Countdown -->
+    <div class="timer" id="profileTimer">99:99:99:99</div>
+    <div class="timer-labels">
+      <span>أيام</span>
+      <span>ساعات</span>
+      <span>دقائق</span>
+      <span>ثواني</span>
+    </div>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <button class="logout-btn" onclick="logout()">🚪 العوده الي قائمه المواد</button>
+  </div>
+    
+    <div id="bottomCodeDisplay" class="fixed-bottom-bar">
+      <p class="bottom-label">كود تفعيلك الحالي:</p>
+      <span id="displayActivationCodeBottom" class="bottom-code">...</span>
+    </div>
+  
+<script>
+
+   
+  const firebaseConfig = {
+  apiKey: "AIzaSyBlGgAa0SDuvd8KM6pTalQh1J5PRXgcmSk",
+  authDomain: "plus-c3d02.firebaseapp.com",
+  projectId: "plus-c3d02",
+  storageBucket: "plus-c3d02.firebasestorage.app",
+  messagingSenderId: "61620553895",
+  appId: "1:61620553895:web:c186ce886c28d269523382",
+  measurementId: "G-5EBPB2GM4L"
+};
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  let currentUid = localStorage.getItem("localUid");
+  /*88*/
+// ** الكود الجديد اللي لازم تحطه **
+  const activeCode = localStorage.getItem('activeCode');
+  const displayElement = document.getElementById('displayActivationCodeBottom');
+
+  if (activeCode && displayElement) {
+      displayElement.textContent = activeCode;
+  }
+// ** نهاية الكود الجديد **
+  function loadProfile() {
+      // ⬅️ تم تجاهل كل فحص لـ Firebase وعرض البيانات البريميوم مباشرةً
+
+      // 1. عرض بيانات وهمية "بريميوم"
+      document.getElementById("profileName").textContent = "👑 عضو بريميوم نشط";
+      document.getElementById("profilePhone").textContent = "010-XXXX-XXXX";
+      document.getElementById("profileAvatar").textContent = "⭐️";
+
+      let statusEl = document.getElementById("profileStatus");
+      let timerEl = document.getElementById("profileTimer");
+      let progressBar = document.getElementById("progressBar");
+
+      // 2. إعداد عداد وهمي (صالح لمدة شهر مثلاً)
+      // هنحدد وقت انتهاء وهمي بعيد في المستقبل
+      const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000); 
+      const startTime = Date.now();
+      
+      function updateCountdown() {
+        const now = Date.now();
+        const distance = expiryTime - now;
+        const totalDuration = expiryTime - startTime;
+
+        if (distance <= 0) {
+            timerEl.textContent = "00:00:00:00";
+            statusEl.textContent = "❌ منتهي";
+            statusEl.className = "status-value expired";
+            progressBar.style.width = "0%";
+            clearInterval(timer);
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        timerEl.textContent =
+          `${String(days).padStart(2,'0')} : ${String(hours).padStart(2,'0')} : ${String(minutes).padStart(2,'0')} : ${String(seconds).padStart(2,'0')}`;
+
+        statusEl.textContent = "✅ نشط";
+        statusEl.className = "status-value active";
+
+        // Progress
+        const percent = ((now - startTime) / totalDuration) * 100;
+        progressBar.style.width = Math.max(0, Math.min(100, 100 - percent)) + "%";
+      }
+
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+  }
+
+  function logout() {
+    /*localStorage.clear();*/
+    window.location.href = "subjects.html";
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>

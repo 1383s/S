@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>الفيديوهات - منصة 1383</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script>
+    // 🚨 1. Configuration - لازم تحط نفس الإعدادات اللي في index.html
+    const firebaseConfig = {
+      apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+      authDomain: "thanawy-1383.firebaseapp.com",
+      databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+      projectId: "thanawy-1383",
+      storageBucket: "thanawy-1383.firebasestorage.app",
+      messagingSenderId: "1026664406457",
+      appId: "1:1026664406457:web:87d71f7e41bef36ba0aa68",
+      measurementId: "G-J5R2EFM2D0"
+    };
+
+    // 🚨 2. عنوان صفحة الدخول اللي هترجع ليها
+    const LOGIN_PAGE_URL = "https://1383ss.vercel.app"; 
+
+    // دالة التوجيه لصفحة الدخول
+    function redirectToLogin(reason) {
+        // بنستخدم replace عشان الصفحة دي متتسجلش في الـ Browser History
+        window.location.replace(LOGIN_PAGE_URL);
+    }
+
+    // *******************************************************************
+
+    const activeCode = localStorage.getItem('activeCode');
+    const localDeviceId = localStorage.getItem('localDeviceId');
+
+    // 3. التحقق المبدئي: لو مفيش كود أو Device ID متسجل محليًا
+    if (!activeCode || !localDeviceId) {
+        redirectToLogin("Missing local code or Device ID.");
+    } else {
+        // 4. التحقق من Firebase
+        
+        if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const db = firebase.database();
+
+        async function verifyCodeOnServer(code) {
+            try {
+                // بنحاول نقرا بيانات الكود ده من الداتا بيز مرة واحدة بس
+                const snapshot = await db.ref('approvedStudents/' + code).once('value');
+                const data = snapshot.val();
+                const now = Date.now();
+
+                // أ. الكود مش موجود
+                if (!data) {
+                    redirectToLogin("Code not found.");
+                    return;
+                }
+
+                // ب. الكود منتهي الصلاحية
+                if (data.expiry <= now) {
+                    redirectToLogin("Code is expired.");
+                    return;
+                }
+                
+                // ج. الكود مُعطّل من الإدارة
+                if (data.isBlocked === true) {
+                    redirectToLogin("Code is blocked.");
+                    return;
+                }
+                
+                // د. الكود مفعل على جهاز تاني
+                const storedDeviceId = data.deviceId;
+                
+                if (!storedDeviceId || storedDeviceId !== localDeviceId) {
+                    // عشان الأمان، بنمسح الداتا المحلية عشان الطالب يرجع يسجل دخول تاني
+                    localStorage.removeItem('activeCode');
+                    localStorage.removeItem('localDeviceId');
+                    redirectToLogin("Code linked to another device.");
+                    return;
+                }
+
+                // لو وصل لحد هنا يبقى: ✅ الكود سليم ومفعل على نفس الجهاز
+                // خلاص، سيبه يكمل ويشوف المحتوى
+
+            } catch (error) {
+                // لو فشل الاتصال بالخادم، الأمان يقتضي إننا نرجعه لصفحة الدخول
+                // عشان منعاً للدخول غير المصرح به لو الـ Server كان واقع
+                redirectToLogin("Verification server error.");
+            }
+        }
+
+        // إبدأ عملية التحقق
+        verifyCodeOnServer(activeCode);
+    }
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /*
+* شاتي - ستايل الـ Dark Mode لصفحة الفيديوهات باللون الأزرق
+*/
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap');
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: #0d0d0d;
+    color: #fff;
+    margin: 0;
+    padding: 15px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    /* 🔵 اللون الأزرق */
+    color: #3498db;
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: 900;
+    text-align: center;
+    flex-grow: 1;
+}
+
+#back {
+    /* 🔵 خلفية وإطار ولون أزرق شفاف/صلب */
+    background: rgba(52, 152, 219, 0.1);
+    border: 1.5px solid #3498db;
+    color: #3498db;
+    padding: 6px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+    margin-left: 5px;
+}
+
+#back:hover {
+    /* 🔵 درجة أزرق أغمق في الـ hover */
+    background: rgba(52, 152, 219, 0.2);
+    transform: translateY(-1px);
+}
+
+#videos-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    max-width: 1100px;
+    margin: auto;
+}
+
+.video-box {
+    background: #1a1a1a;
+    /* 🔵 إطار أزرق شفاف */
+    border: 1px solid rgba(52, 152, 219, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+    transition: 0.3s;
+    overflow: hidden;
+    /* 🔵 ظل أزرق خفيف */
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.05);
+}
+
+.video-box:hover {
+    transform: translateY(-4px);
+    /* 🔵 ظل أزرق واضح في الـ hover */
+    box-shadow: 0 0 18px rgba(52, 152, 219, 0.25);
+}
+
+.video-title {
+    font-size: 18px;
+    font-weight: 800;
+    /* 🔵 اللون الأزرق */
+    color: #3498db;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.thumb {
+    background: #000;
+    border-radius: 10px;
+    height: 160px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.thumb::after {
+    content: "▶";
+    position: absolute;
+    font-size: 40px;
+    /* 🔵 اللون الأزرق لزر التشغيل */
+    color: #3498db;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+    transition: transform 0.3s ease;
+}
+
+.thumb:hover::after {
+    transform: scale(1.1);
+}
+
+.loading, .error {
+    text-align: center;
+    /* 🔵 اللون الأزرق للرسائل */
+    color: #3498db;
+    font-size: 17px;
+    padding: 20px;
+}
+
+footer {
+    text-align: center;
+    color: #888;
+    margin-top: 35px;
+    font-size: 0.85rem;
+    /* 🔵 خط أزرق شفاف فاصل */
+    border-top: 1px solid rgba(52, 152, 219, 0.1);
+    padding-top: 15px;
+}
+
+footer span {
+    /* 🔵 اللون الأزرق */
+    color: #3498db;
+}
+
+/* ✅ نافذة اختيار الجودات */
+.popup {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    display: none;
+}
+
+.popup-content {
+    background: #1a1a1a;
+    /* 🔵 إطار أزرق */
+    border: 2px solid #3498db;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    width: 300px;
+    /* 🔵 ظل أزرق */
+    box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
+}
+
+.popup-content h3 {
+    /* 🔵 اللون الأزرق */
+    color: #3498db;
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+.quality-btn {
+    display: block;
+    /* 🔵 خلفية زرقاء */
+    background: #3498db;
+    /* ⚪️ تم تغيير لون الخط للأبيض لضمان الرؤية على الخلفية الزرقاء */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    margin: 8px auto;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    width: 80%;
+}
+
+.quality-btn:hover {
+    /* 🔵 أزرق أغمق للـ hover */
+    background: #2980b9;
+    transform: translateY(-2px);
+}
+
+.cancel-btn {
+    margin-top: 10px;
+    background: none;
+    /* 🔵 إطار ولون خط أزرق */
+    border: 1px solid #3498db;
+    color: #3498db;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cancel-btn:hover {
+    /* 🔵 خلفية أزرق شفاف في الـ hover */
+    background: rgba(52, 152, 219, 0.1);
+}
+  </style>
+</head>
+
+<body>
+  <header>
+    <button id="back">⬅ رجوع</button>
+    <h1>🎬 الفيديوهات</h1>
+    <div style="width:35px;"></div>
+  </header>
+
+  <main>
+    <div id="videos-container">
+      <div class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</div>
+    </div>
+  </main>
+
+  <footer>
+    © جميع الحقوق محفوظة لمنصة <span>1383</span> 🔥
+  </footer>
+
+  <!-- ✅ نافذة اختيار الجوده -->
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <h3>اختر الجودة 🎥</h3>
+      <div id="quality-options"></div>
+      <button class="cancel-btn" onclick="closePopup()">إلغاء</button>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const subject = urlParams.get("subject");
+    const teacher = urlParams.get("teacher");
+    const chapter = urlParams.get("chapter");
+    const lecture = urlParams.get("lecture");
+
+    const videosContainer = document.getElementById("videos-container");
+    const backBtn = document.getElementById("back");
+    const popup = document.getElementById("popup");
+    const qualityOptions = document.getElementById("quality-options");
+
+    backBtn.onclick = () => {
+      window.location.href = `lecture_name.html?subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&chapter=${encodeURIComponent(chapter)}`;
+    };
+
+    function normalize(str) {
+      return (str || "").trim().replace(/[\s.\-ـ_]/g, "").toLowerCase();
+    }
+
+    function closePopup() {
+      popup.style.display = "none";
+    }
+
+    function showQualityOptions(video) {
+      qualityOptions.innerHTML = "";
+      popup.style.display = "flex";
+
+      video.links.forEach(link => {
+        const btn = document.createElement("button");
+        btn.className = "quality-btn";
+        btn.textContent = link.label ? link.label + "p" : "غير معروف";
+        btn.onclick = () => {
+          localStorage.setItem("video_sources", JSON.stringify(link));
+          localStorage.setItem("video_title", video.name);
+          window.location.href = "player.html";
+        };
+        qualityOptions.appendChild(btn);
+      });
+    }
+
+    async function loadVideos() {
+      try {
+        const res = await fetch("coursatk_scraped_data.json");
+        if (!res.ok) throw new Error("فشل تحميل البيانات");
+        const json = await res.json();
+        const data = json.data || json;
+
+        const wantedSubject = normalize(subject);
+        const wantedTeacher = normalize(teacher);
+        const wantedChapter = normalize(chapter);
+        const wantedLecture = normalize(lecture);
+
+        const videos = [];
+
+        (data || []).forEach((year) => {
+          (year.subjects || []).forEach((sub) => {
+            if (normalize(sub.subject_name).includes(wantedSubject)) {
+              (sub.teachers || []).forEach((t) => {
+                if (normalize(t.teacher_name).includes(wantedTeacher)) {
+                  (t.chapters || []).forEach((chap) => {
+                    if (normalize(chap.chapter_name).includes(wantedChapter)) {
+                      (chap.lectures || []).forEach((lec) => {
+                        if (!lecture || normalize(lec.lecture_name).includes(wantedLecture)) {
+                          (lec.videos || []).forEach((vid) => {
+                            if (vid.links && vid.links.length > 0) {
+                              videos.push({
+                                name: vid.video_name,
+                                links: vid.links
+                              });
+                            }
+                          });
+                        }
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
+        });
+
+        videosContainer.innerHTML = "";
+
+        if (videos.length === 0) {
+          videosContainer.innerHTML = "<div class='error'>⚠️ لا توجد فيديوهات في هذه المحاضرة.</div>";
+          return;
+        }
+
+        videos.forEach((video) => {
+          const box = document.createElement("div");
+          box.className = "video-box";
+          box.innerHTML = `
+            <div class="video-title">${video.name}</div>
+            <div class="thumb"></div>
+          `;
+          box.querySelector(".thumb").onclick = () => showQualityOptions(video);
+          videosContainer.appendChild(box);
+        });
+
+      } catch (err) {
+        console.error(err);
+        videosContainer.innerHTML = "<div class='error'>❌ حدث خطأ أثناء تحميل البيانات.</div>";
+      }
+    }
+
+    loadVideos();
+  </script>
+</body>
+</html>
