@@ -1,13 +1,14 @@
-
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>المواد - منصة 1383</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
     // 🚨 1. Configuration - لازم تحط نفس الإعدادات اللي في index.html
     const firebaseConfig = {
       apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
@@ -25,7 +26,6 @@
 
     // دالة التوجيه لصفحة الدخول
     function redirectToLogin(reason) {
-        // بنستخدم replace عشان الصفحة دي متتسجلش في الـ Browser History
         window.location.replace(LOGIN_PAGE_URL);
     }
 
@@ -47,70 +47,98 @@
 
         async function verifyCodeOnServer(code) {
             try {
-                // بنحاول نقرا بيانات الكود ده من الداتا بيز مرة واحدة بس
                 const snapshot = await db.ref('approvedStudents/' + code).once('value');
                 const data = snapshot.val();
                 const now = Date.now();
 
-                // أ. الكود مش موجود
                 if (!data) {
                     redirectToLogin("Code not found.");
                     return;
                 }
 
-                // ب. الكود منتهي الصلاحية
                 if (data.expiry <= now) {
                     redirectToLogin("Code is expired.");
                     return;
                 }
                 
-                // ج. الكود مُعطّل من الإدارة
                 if (data.isBlocked === true) {
                     redirectToLogin("Code is blocked.");
                     return;
                 }
                 
-                // د. الكود مفعل على جهاز تاني
                 const storedDeviceId = data.deviceId;
                 
                 if (!storedDeviceId || storedDeviceId !== localDeviceId) {
-                    // عشان الأمان، بنمسح الداتا المحلية عشان الطالب يرجع يسجل دخول تاني
                     localStorage.removeItem('activeCode');
                     localStorage.removeItem('localDeviceId');
                     redirectToLogin("Code linked to another device.");
                     return;
                 }
 
-                // لو وصل لحد هنا يبقى: ✅ الكود سليم ومفعل على نفس الجهاز
-              // 🚨 السطر الجديد: عرض الكود في الشريط السفلي
-              //document.getElementById('displayActivationCodeBottom').textContent = code;
-                // خلاص، سيبه يكمل ويشوف المحتوى
+                // ✅ الكود سليم ومفعل على نفس الجهاز
+                // نطلق حدث إن التحقق نجح عشان كود الـ Vue.js يشتغل
+                window.authPassed = true;
+                document.dispatchEvent(new Event("authReady")); 
 
             } catch (error) {
                 // لو فشل الاتصال بالخادم، الأمان يقتضي إننا نرجعه لصفحة الدخول
-                // عشان منعاً للدخول غير المصرح به لو الـ Server كان واقع
                 redirectToLogin("Verification server error.");
             }
         }
 
-        // إبدأ عملية التحقق
         verifyCodeOnServer(activeCode);
     }
+    
+    // دالة إضافية للحصول على بيانات المستخدم زي اللي في lasti.html
+    function getUserData() {
+        try {
+            const stored = localStorage.getItem("user_data");
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.error("Error reading user_data from localStorage", e);
+        }
+        return { name: "الزائر", section: "غير محدد" };
+    }
 </script>
-  <style>
-/*
-* شاتي - ستايل الـ Luxurious Purple/Dark Mode لمنصة تعليمية متقدمة
-*/
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
-/* ممكن نستخدم خط عصري وشيك بدل Orbitron */
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200..900&display=swap'); 
 
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+// 🟢 تعديل ألوان Tailwind لتصبح خضراء زي ما طلبت
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#10b981',      // Emerald Green (اللون الأساسي الجديد)
+        secondary: '#3b82f6',    // Blue (للتنوع، تم الاحتفاظ به)
+        dark: '#0f172a',
+        darker: '#020617',
+        card: '#1e293b',
+        'card-hover': '#334155'
+      },
+      fontFamily: { 
+        // 💡 استخدام خط القاهرة عشان يتوافق مع الديزاين الأصلي
+        sans: ['Cairo', 'sans-serif'] 
+      }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200..900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+<style>
+/* 🚨 ستايلات subjects.html الأصلية، مع تعديل الألوان لـ Vue/Tailwind */
 :root {
-  /* 🟣 الثوابت البنفسجية والداكنة الفاخرة */
-  --main-purple: #7a3e9c; /* بنفسجي أساسي غامق */
-  --light-purple: #b36ff5; /* بنفسجي فاتح للمسات النيون */
-  --dark-bg: #1f083d; /* خلفية بنفسجية غامقة جدا */
-  --darker-bg: #2a0a52; /* أغمق للخلفيات الداخلية/البطاقات */
+  /* 🟢 تم تغيير الألوان الأساسية للأخضر و الخلفية للـ Darker */
+  --main-color: #10b981; /* الأخضر الأساسي */
+  --light-color: #34d399; /* أخضر فاتح للمسات النيون */
+  --dark-bg: #020617; /* خلفية داكنة جداً */
+  --darker-bg: #0f172a; /* أغمق للخلفيات الداخلية/البطاقات */
   --accent-gold: #ffc300; /* لون ثانوي ذهبي/أصفر فاتح للتميز */
   --light-text: #f0f0f5;
   --gray-text: #bdc3c7;
@@ -120,19 +148,18 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* ... */
-  padding: 90px 0 70px; 
-  /* ... */
+  padding: 90px 15px 70px;
   font-family: 'Cairo', sans-serif;
   background: var(--dark-bg);
   color: var(--light-text);
-  padding: 90px 15px 70px; /* زودت الـ padding عشان الأشرطة الثابتة */
   margin: 0;
   transition: background 0.4s, color 0.4s;
   overflow-x: hidden;
+  /* 💡 هذا الكود أصبح مهم لـ Vue/Tailwind */
+  height: 100vh;
 }
 
-/* ===== الشريط العلوي (Top Bar) ===== */
+/* ===== الشريط العلوي (Top Bar) - الحفاظ على الستايل الأصلي بقدر الإمكان ===== */
 .topbar {
   display: flex;
   align-items: center;
@@ -145,14 +172,8 @@ body {
   right: 0;
   left: 0;
   z-index: 1000;
-  transition: background 0.3s, color 0.3s;
-  border-bottom: 3px solid var(--light-purple); /* خط بنفسجي نيون */
-  box-shadow: 0 4px 20px rgba(122, 62, 156, 0.4);
-}
-
-.menu-btn {
-  font-size: 24px;
-  cursor: pointer;
+  border-bottom: 3px solid var(--main-color); /* خط أخضر نيون */
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
 }
 
 .title {
@@ -162,239 +183,47 @@ body {
   font-weight: 800;
   letter-spacing: 1.5px;
 }
+/* ... باقي أيقونات الـ Topbar كما هي ... */
 
-.icons {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.icons img {
-  width: 28px;
-  height: 28px;
-  /* فلتر خفيف عشان تبقى شكلها "جولد" أو مضيء */
-  filter: drop-shadow(0 0 5px rgba(255, 195, 0, 0.5)); 
-  cursor: pointer;
-  transition: 0.3s;
-}
-.icons img:hover {
-    filter: drop-shadow(0 0 10px var(--light-purple));
-}
-
-/* تحديث الـ Toggle */
-.toggle-dark {
-  background: var(--dark-bg);
-  border: 2px solid var(--light-purple);
-  border-radius: 12px;
-  width: 45px;
-  height: 25px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.toggle-dark::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  right: 3px; /* عشان الـ RTL */
-  width: 15px;
-  height: 15px;
-  background: var(--light-purple);
-  border-radius: 50%;
-  transition: 0.3s;
-  box-shadow: 0 0 8px var(--light-purple);
-}
-
-.toggle-dark.active::after {
-  right: 23px;
-  background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold);
-}
-
-/* ===== باقي التنسيقات ===== */
 h1 {
-  color: var(--light-purple);
+  color: var(--main-color);
   text-align: center;
   font-size: 3.2rem;
   margin-bottom: 50px;
-  text-shadow: 0 0 20px var(--light-purple); /* ظل نيون بنفسجي قوي */
+  text-shadow: 0 0 20px var(--main-color); /* ظل نيون أخضر قوي */
   font-family: 'Tajawal', sans-serif;
   font-weight: 900;
   letter-spacing: 3px;
 }
 
-/* ===== باقي التنسيقات ===== */
-/* ... الكود اللي قبل الـ ul ... */
-
-ul {
-  padding: 0 10px;
-  list-style: none;
-
-  /* 🛠️ تأكدي إن العرض ده هو اللي بتجربيه دلوقتي */
-  max-width: 350px; 
-  
-  /* ⬅️ ده السطر اللي بيوسط القائمة كلها */
-  margin: 0 auto; 
-  
-  display: flex; 
-  flex-direction: column; 
-  gap: 20px; 
-  transform: translateX(20px);
+/* 🚨 ستايلات Vue Cards المأخوذة من lasti.html ومعدلة للأخضر */
+.glass-card {
+  background: rgba(30,41,59,0.5); 
+  backdrop-filter: blur(8px);
+  border:1px solid rgba(255,255,255,0.03); 
+  transition: all 0.3s ease;
+}
+.glass-card:hover {
+  background: rgba(51,65,85,0.6); 
+  transform: translateY(-2px);
+  border-color: rgba(16,185,129,0.5); /* الأخضر الأساسي */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.animate-fade-in { animation: fadeIn 0.4s ease-out; }
+@keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+.loading-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0,0,0,0.7);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:white;
 }
 
-li {
-  background: var(--darker-bg);
-  border-radius: 25px;
-  padding: 30px 25px 40px;
-  cursor: pointer;
-  border: 1px solid rgba(179, 111, 245, 0.2);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-  
-  /* ⬅️ **بداية التعديل للمنتصف:** */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* لتوسيط العناصر المرنة عموديًا */
-  text-align: center;  /* لتوسيط النصوص والـ Inline Elements */
-  /* ⬅️ **نهاية التعديل** */
-  
-  justify-content: flex-start;
-  user-select: none;
-  width: 100%;
-}
-
-/* ... باقي الكود ... */
-li:hover {
-  background: linear-gradient(145deg, var(--main-purple), #5d2b7e); /* تدرج بنفسجي على الماوس */
-  color: #fff;
-  transform: translateY(-12px) scale(1.02); /* رفع أكبر */
-  border-color: var(--accent-gold);
-  box-shadow: 0 25px 50px rgba(122, 62, 156, 0.8); /* ظل بنفسجي قوي جدا */
-}
-
-li:active {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(122, 62, 156, 0.6);
-}
-
-.circle {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  background: #3a0e69;
-  overflow: hidden;
-  margin-bottom: 30px;
-  border: 5px solid var(--light-purple);
-  box-shadow: 0 0 20px var(--light-purple);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-li:hover .circle {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 25px var(--accent-gold);
-}
-
-.circle img {
-  width: 90%;
-  height: 90%;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7)); 
-  transition: all 0.3s;
-}
-
-li span {
-  font-weight: 800;
-  font-size: 1.5rem;
-  text-align: center;
-  color: var(--light-text);
-  transition: color 0.3s;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-}
-li:hover span {
-    color: var(--accent-gold); 
-}
-
-li.loading {
-  cursor: default;
-  color: var(--gray-text);
-  background: transparent;
-  box-shadow: none;
-  font-weight: 500;
-  font-size: 1.3rem;
-  grid-column: 1 / -1;
-  text-align: center;
-  margin-top: 30px;
-}
-
-li.loading::after {
-  content: "";
-  width: 35px;
-  height: 35px;
-  border: 4px solid var(--light-purple);
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 15px;
-  vertical-align: middle;
-  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; /* Loader شيك */
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ===== وضع الفاتح (Light Mode) - تناغم الألوان ===== */
-body.light-mode {
-  background: #fdfdfd;
-  color: #1f083d;
-}
-body.light-mode .topbar {
-  background: #fff;
-  color: #1f083d;
-  border-bottom-color: var(--main-purple);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-body.light-mode li {
-  background: #fff;
-  color: #1f083d;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-  border-color: #eee;
-}
-body.light-mode li:hover {
-  background: var(--main-purple);
-  color: #fff;
-  box-shadow: 0 15px 40px rgba(122, 62, 156, 0.5);
-}
-body.light-mode li span {
-  color: #1f083d;
-}
-body.light-mode li:hover span {
-  color: var(--accent-gold);
-}
-body.light-mode .circle {
-  background: #eee;
-  border-color: var(--main-purple);
-  box-shadow: none;
-}
-body.light-mode li:hover .circle {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
-}
-body.light-mode .toggle-dark {
-  border-color: var(--main-purple);
-}
-body.light-mode .toggle-dark::after {
-  background: var(--main-purple);
-  box-shadow: 0 0 8px var(--main-purple);
-}
-body.light-mode .toggle-dark.active::after {
-  background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold);
-}
-
-/* ===== Toast إشعار (بنفسجي فاخر) ===== */
+/* 🚨 Toast الأصلي من subjects.html */
 #toast {
   visibility: hidden;
   min-width: 300px;
@@ -409,8 +238,8 @@ body.light-mode .toggle-dark.active::after {
   bottom: 30px;
   transform: translateX(-50%);
   font-size: 1.2rem;
-  border: 2px solid var(--light-purple);
-  box-shadow: 0 0 15px var(--light-purple), 0 8px 25px rgba(0,0,0,0.8);
+  border: 2px solid var(--light-color); /* أخضر فاتح */
+  box-shadow: 0 0 15px var(--light-color), 0 8px 25px rgba(0,0,0,0.8);
   opacity: 0;
   transition: opacity 0.5s, bottom 0.5s;
 }
@@ -419,14 +248,8 @@ body.light-mode .toggle-dark.active::after {
   opacity: 1;
   bottom: 50px;
 }
-body.light-mode #toast {
-  background: #fff;
-  color: var(--main-purple);
-  border-color: var(--main-purple);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
 
-/* ✅ زر البروفايل العائم (بنفسجي فاخر) */
+/* ✅ زر البروفايل العائم */
 .profile-float-btn {
   position: fixed;
   bottom: 30px;
@@ -446,328 +269,257 @@ body.light-mode #toast {
 }
 .profile-float-btn:hover {
   transform: scale(1.15) rotate(5deg);
-  background: var(--light-purple);
-  box-shadow: 0 0 25px var(--light-purple); 
+  background: var(--main-color); /* أخضر */
+  box-shadow: 0 0 25px var(--main-color); 
 }
-
 .profile-float-btn img {
     width: 32px;
     height: 32px;
-    filter: invert(1); /* عشان أيقونة البروفايل تبان فاتحة على الخلفية الغامقة */
-}
-body.light-mode .profile-float-btn {
-  background: var(--main-purple);
-  border: 3px solid #fff;
-}
-body.light-mode .profile-float-btn:hover {
-  background: var(--light-purple);
-  border-color: var(--accent-gold); 
+    filter: invert(1);
 }
 
-/* ✅ تنسيق زر الصفحة الرئيسية */
-.home-button {
-    background: linear-gradient(90deg, #b36ff5, #7a3e9c);
-    color: #fff;
-    padding: 12px 25px;
-    border-radius: 12px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.1rem;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1100;
-    box-shadow: 0 6px 20px rgba(122, 62, 156, 0.5);
-    transition: transform 0.3s, opacity 0.3s;
+/* 🚨 Toast المخصصة من subjects.html للـ Success/Error */
+.custom-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-family: "Cairo", sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
+  z-index: 9999;
 }
-.home-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(179, 111, 245, 0.7);
-}
+.custom-toast.info { background: linear-gradient(135deg,#3498db,#2980b9); }
+.custom-toast.success { background: linear-gradient(135deg,#10b981,#059669); } /* 🟢 تم تعديل النجاح للأخضر */
+.custom-toast.error { background: linear-gradient(135deg,#e74c3c,#c0392b); }
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
 
-/* ===== Media Queries لتجاوبية أفضل ===== */
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-  ul {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 25px;
-  }
-  .circle {
-    width: 120px;
-    height: 120px;
-  }
-  li span {
-    font-size: 1.2rem;
-  }
-  .profile-float-btn {
-    width: 55px;
-    height: 55px;
-    bottom: 20px;
-    left: 20px;
-  }
+/* 🚨 ستايل تحذير الـ Fallback */
+.warning-message {
+    padding: 1rem;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
 }
-@media (max-width: 480px) {
-    h1 {
-        font-size: 2rem;
-    }
-    ul {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 15px;
-    }
-    .circle {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 20px;
-    }
-    .home-button {
-        padding: 10px 18px;
-        font-size: 1rem;
-        top: 15px;
-        right: 15px;
-    }
-    body {
-        padding-top: 80px;
-    }
-}
-
-/*
-* ملاحظة بخصوص الأكواد الإضافية (مثل activation-info-container و fixed-bottom-bar):
-* هذه الأكواد لم يتم استخدامها في الـ HTML المرفق، لذا تركتها بدون تعديل على الألوان البنفسجية الجديدة.
-* لو حابة أعدلها، قولي لي.
-*/
-.activation-info-container, .fixed-bottom-bar, .info-label, .activation-code-box, .return-btn, .bottom-label, .bottom-code {
-    /* تركتها كما هي، لكن الألوان السابقة هتتغير مع الـ Light/Dark Mode */
-    /* يُفضل إعادة تنسيقها بالاعتماد على الـ CSS Variables الجديدة */
-}
-  </style>
+</style>
 </head>
-<body>
 
-  <!-- ✅ الشريط العلوي -->
+<body class="flex-col h-screen overflow-hidden">
+
   <div class="topbar">
-    
     <div class="title">hacked by 1383</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
-      <!-- واتساب -->
       <a href="" target="_blank">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
       </a>
-      <!-- مشاركة -->
       <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
-      <!-- إشعارات -->
       <img id="notifyBtn" src="https://cdn-icons-png.flaticon.com/512/1827/1827272.png" alt="Notification">
     </div>
   </div>
 
-  <!-- ✅ Toast -->
   <div id="toast">الإشعارات هتتفعل قريبًا 🔔✨</div>
 
   <h1> SUBJECTS 2026 </h1>
-  <ul id="subjects-list">
-    <li class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
-  </ul>
 
-  <!-- ✅ زر بروفايل عائم -->
+  <div id="app" class="flex-1 flex flex-col w-full max-w-7xl overflow-hidden p-0">
+    
+    <div v-if="loading" class="loading-dialog animate-fade-in">
+        <i class="ph ph-spinner animate-spin text-5xl mb-4 text-primary"></i>
+        <p class="text-lg">جاري تحميل المحتوى يا بوب...</p>
+    </div>
+
+    <main v-if="!loading" class="flex-1 overflow-y-auto px-4 pb-12">
+        <div v-if="showFallbackWarning" class="warning-message animate-fade-in">
+            ⚠️ **ملحوظة:** لم يتم العثور على مواد مطابقة لـ "{{ userData.section }}" (يتم عرض جميع السنوات والمواد المتاحة).
+        </div>
+
+        <div v-if="stage===0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <div v-for="year in filteredData" :key="year.id" @click="selectYear(year)"
+                class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200 text-center">
+                <div class="w-full h-32 bg-slate-800 rounded-xl mb-3 flex items-center justify-center overflow-hidden mx-auto">
+                    <i class="ph ph-calendar-blank text-5xl text-primary/50" v-if="!year.image_url"></i>
+                    <img v-else :src="year.image_url" class="w-full h-full object-cover">
+                </div>
+                
+                <h3 class="font-bold text-lg text-gray-200 group-hover:text-primary transition-colors">{{ year.name }}</h3>
+                <span class="text-sm text-gray-400">{{ year.subjects?.length || 0 }} مادة</span>
+            </div>
+        </div>
+
+        <div v-if="stage===1" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <button @click="stage=0" class="glass-card rounded-xl p-5 cursor-pointer flex flex-col items-center justify-center group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200 h-full text-center">
+                <i class="ph ph-arrow-right text-3xl text-gray-400 group-hover:text-primary mb-2"></i>
+                <span class="font-bold text-md text-gray-200 group-hover:text-primary transition-colors">رجوع للسنوات</span>
+            </button>
+            <div v-for="subject in selectedYear.subjects" :key="subject.id" @click="selectSubject(subject)"
+                class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200 text-center">
+                <div class="w-full h-32 bg-slate-800 rounded-xl mb-3 flex items-center justify-center overflow-hidden mx-auto">
+                    <i class="ph ph-book-open text-5xl text-primary/50" v-if="!subject.image_url"></i>
+                    <img v-else :src="subject.image_url" class="w-full h-full object-cover">
+                </div>
+
+                <h3 class="font-bold text-lg text-gray-200 group-hover:text-primary transition-colors">{{ subject.name }}</h3>
+                <span class="text-sm text-gray-400">{{ subject.teachers?.length || 0 }} مُدرس</span>
+            </div>
+        </div>
+
+        <div v-if="stage > 1" class="p-6 text-center text-gray-500">
+          <p>⚠️ باقي المحتوى مش محتاج يتعرض هنا (المدرسين/المحاضرات).</p>
+          <button @click="stage=1" class="mt-4 p-2 text-sm text-primary hover:text-white">الرجوع للمواد</button>
+        </div>
+    </main>
+
+    <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+      <transition-group name="toast" tag="div">
+        <div v-for="toast in toasts" :key="toast.id" :class="['custom-toast', toast.type]" :style="{ animationDuration: '3s' }">{{ toast.message }}</div>
+      </transition-group>
+    </div>
+  </div>
   <a href="profile.html" class="profile-float-btn">
     <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="بروفايل">
   </a>
 
-<script>
-// ✅ Toast احترافية — نسخة واحدة فقط
-function showToast(message, type = "info") {
-  const toast = document.createElement("div");
-  toast.className = `custom-toast ${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
-
-  const style = document.createElement("style");
-  style.textContent = `
-    .custom-toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-family: "Cairo", sans-serif;
-      font-weight: 600;
-      font-size: 15px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-      animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-      z-index: 9999;
-    }
-    .custom-toast.info { background: linear-gradient(135deg,#3498db,#2980b9); }
-    .custom-toast.success { background: linear-gradient(135deg,#2ecc71,#27ae60); }
-    .custom-toast.error { background: linear-gradient(135deg,#e74c3c,#c0392b); }
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
-  `;
-  document.head.appendChild(style);
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
-}
-
-// ✅ متغير لتتبع حالة التحقق
-window.authPassed = false;
-// ✅ التحقق المعدل: تخطي تسجيل الدخول والرجوع للصفحة الرئيسية
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // ⬅️ نعتبر إن التحقق نجح على طول عشان نتخطى الفحص
-  window.authPassed = true;
-  
-  // تشغيل حدث authReady عشان باقي الأكواد تشتغل
-  document.dispatchEvent(new Event("authReady")); 
-  
-  // ممكن تحطي رسالة بسيطة للتأكد، أو تلغي السطر دا لو مش عايزة إشعار يظهر
-  showToast("✅ تم تخطي التحقق والدخول بنجاح", "success"); 
-});
-</script>
-
 <script type="module">
-const subjectsList = document.getElementById('subjects-list');
+const { createApp, ref, computed } = Vue;
 
-const subjectImages = {
-   "أحياء": "1.jpg",
-    "فيزياء": "2.jpg",
-    "كيمياء": "3.jpg",
-    "لغة عربية": "5.jpg",
-    "English": "6.jpg",
-    "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
-    "الرياضيات": "4.jpg",
-    "تاريخ": "99.jpg",
-    "جغرافيا": "9.jpg",
-    "الإحصاء": "8.jpg",
-  
-  "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
-  };
-async function loadSubjects() {
-  try {
-    // حمّل الملف JSON
-    const res = await fetch('coursatk.json');
-    const json = await res.json();
-
-    // حسب تركيب ملفك — غالبًا البيانات داخل data[]
-    const data = json.data || json;
-
-    // استخراج أسماء المواد
-    const subjects = new Set();
-    (data || []).forEach(year => {
-      (year.subjects || []).forEach(sub => {
-        subjects.add(sub.subject_name || sub.subjectName || sub.name);
-      });
-    });
-
-    subjectsList.innerHTML = '';
-
-    if (subjects.size === 0) {
-      subjectsList.innerHTML = '<li class="loading">⚠️ لا توجد مواد.</li>';
-      return;
-    }
-    const order = [
-      "لغة عربية",
-      "English",
-      "أحياء",
-      "فيزياء",
-      "كيمياء",
-      "جيولوجيا",
-      "الرياضيات",
-      "تاريخ",
-      "جغرافيا",
-      "الإحصاء",
-      "ادبي"
-    ];
-
-    [...subjects].sort().forEach(subject => {
-      const li = document.createElement('li');
-      const circle = document.createElement('div');
-      circle.className = 'circle';
-      const img = document.createElement('img');
-      img.src = subjectImages[subject] || 'https://img.icons8.com/ios-filled/100/ffd700/book.png';
-      circle.appendChild(img);
-      const span = document.createElement('span');
-      span.textContent = subject;
-      li.appendChild(circle);
-      li.appendChild(span);
-      li.onclick = () => window.location.href = `teachers.html?subject=${encodeURIComponent(subject)}`;
-      subjectsList.appendChild(li);
-    });
-
-    showToast("✅ تم تحميل المواد بنجاح");
-  } catch (err) {
-    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات</li>`;
-    console.error(err);
-  }
+// 💡 دالة Toast المخصصة لـ Vue
+function createVueToastFunction(toastsRef) {
+    return (message, type='info', duration=3000) => {
+        const id = Date.now() + Math.random();
+        toastsRef.value.push({ id, message, type });
+        setTimeout(() => {
+            const index = toastsRef.value.findIndex(t => t.id === id);
+            if(index !== -1) toastsRef.value.splice(index,1);
+        }, duration);
+    };
 }
 
-// 🟡 Toast
-function showToast(msg) {
+// 💡 تعريف الدالة المخصصة في subjects.html
+function showOriginalToast(msg) {
   const toast = document.getElementById("toast");
   toast.textContent = msg;
   toast.className = "show";
   setTimeout(() => toast.className = toast.className.replace("show", ""), 3000);
 }
 
-// 🌓 وضع النهار/الليل
-const toggle = document.getElementById("darkToggle");
-toggle.addEventListener("click", () => {
-  toggle.classList.toggle("active");
-  document.body.classList.toggle("light-mode");
-});
 
-// 📤 زر المشاركة
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "تطبيق 1383",
-        text: "جرب تطبيق 1383 2026 📚✨",
-        url: window.location.href
-      });
-    } catch {
-      showToast("❌ تم إلغاء المشاركة");
-    }
-  } else {
-    showToast("المشاركة غير مدعومة في متصفحك 😢");
-  }
-});
+document.addEventListener("authReady", () => {
+    // 🚨 يتم تشغيل الـ Vue App فقط بعد نجاح التحقق من Firebase
+    
+    createApp({
+      setup() {
+        const data = ref([]);
+        const userData = ref(getUserData()); 
+        const stage = ref(0); 
+        const selectedYear = ref({});
+        const selectedSubject = ref({});
+        const loading = ref(true);
+        const showFallbackWarning = ref(false); 
 
-// 🔔 زر الإشعارات
-document.getElementById("notifyBtn").addEventListener("click", () => {
-  showToast("الإشعارات هتتفعل قريبًا 🔔✨");
-});
-// ** أضف الدالة دي مع باقي الـ JavaScript اللي في صفحة المحتوى **
+        // Toasts
+        const toasts = ref([]);
+        const showToast = createVueToastFunction(toasts);
 
-function redirectToHomePage() {
-    // العنوان اللي طلبتيه للرجوع
-    window.location.href = "https://1383ss.vercel.app";
-}
-
-// ** عدّل على دالة التحقق verifyCodeOnServer الموجودة عندك **
-async function verifyCodeOnServer(code) {
-    try {
-        // ... (كل كود التحقق زي ما هو) ...
-
-        // لو وصل لحد هنا يبقى: ✅ الكود سليم ومفعل على نفس الجهاز
+        const selectYear = (year) => { selectedYear.value=year; stage.value=1; }
         
-        // 🚨 هنا هنضيف سطر عرض الكود في الخانة الجديدة
-        document.getElementById('displayActivationCode').textContent = code;
-        
-        // لو حابة تخفي الـ Loading Screen لو كنتي حاطة واحدة، ده مكانها
-        // console.log("Access granted. Code displayed."); 
-        
-    } catch (error) {
-        // ... (باقي الـ Error handling زي ما هو) ...
-    }
-}
-// 🚀 تشغيل تحميل المواد
-loadSubjects();
+        // 💡 فتح صفحة teachers.html عند اختيار المادة
+        const selectSubject = (subject) => { 
+            selectedSubject.value = subject;
+            window.location.href = `teachers.html?year=${encodeURIComponent(selectedYear.value.name)}&subject=${encodeURIComponent(subject.name)}`;
+        }
+
+        // منطق التصفية البديلة (Fallback Logic) بناءً على شعبة المستخدم
+        const filteredData = computed(() => {
+          let currentData = data.value;
+          const section = userData.value.section.trim().toLowerCase();
+          
+          let sectionFiltered = [];
+          const validSections = ["علمي علوم", "علمي رياضة", "أدبي"].map(s => s.toLowerCase());
+
+          if (validSections.includes(section)) {
+             sectionFiltered = currentData.filter(year => year.name.toLowerCase().includes(section));
+          }
+          
+          if (sectionFiltered.length === 0) {
+            showFallbackWarning.value = true;
+            currentData = data.value;
+          } else {
+            showFallbackWarning.value = false;
+            currentData = sectionFiltered;
+          }
+          
+          return currentData;
+        });
+
+        // 🌐 اللينك المطلوب لتحميل المواد
+        const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+
+        fetch(DATA_SOURCE_URL)
+          .then(res => res.json())
+          .then(json => { 
+              data.value = json; 
+              loading.value = false; 
+              showToast(`✅ أهلاً يا ${userData.value.name}! تم تحميل ${data.value.length} سنة دراسية.`, "success"); 
+          })
+          .catch(err => { 
+              console.error(err); 
+              loading.value=false; 
+              showToast("⚠ فشل تحميل البيانات من السيرفر. تأكد من اللينك.", "error"); 
+          });
+
+        return { 
+            data, stage, selectedYear, selectedSubject, loading, 
+            filteredData, userData, showFallbackWarning,
+            toasts, selectYear, selectSubject
+        }
+      }
+    }).mount('#app');
+    
+    // 🚨 تشغيل الـ Listeners الأخرى بعد التحقق
+
+    // 🌓 وضع النهار/الليل
+    const toggle = document.getElementById("darkToggle");
+    toggle.addEventListener("click", () => {
+      toggle.classList.toggle("active");
+      document.body.classList.toggle("light-mode");
+    });
+
+    // 📤 زر المشاركة
+    document.getElementById("shareBtn").addEventListener("click", async () => {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: "تطبيق 1383",
+            text: "جرب تطبيق 1383 2026 📚✨",
+            url: window.location.href
+          });
+        } catch {
+          showOriginalToast("❌ تم إلغاء المشاركة");
+        }
+      } else {
+        showOriginalToast("المشاركة غير مدعومة في متصفحك 😢");
+      }
+    });
+
+    // 🔔 زر الإشعارات
+    document.getElementById("notifyBtn").addEventListener("click", () => {
+      showOriginalToast("الإشعارات هتتفعل قريبًا 🔔✨");
+    });
+});
 </script>
 
-</body>
 </body>
 </html>
