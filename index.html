@@ -322,21 +322,25 @@
         /* --------------------------
            10. New Developer Footer Style
            -------------------------- */
-        .developer-footer {
-            position: absolute; 
-            bottom: 55px; 
-            width: 100%;
-            z-index: 5; 
-            padding: 15px 10px;
-            background: rgba(0, 0, 0, 0.4); /* خلفية شبه شفافة */
-            backdrop-filter: blur(2px); 
-            -webkit-backdrop-filter: blur(2px);
-            
-            /* تنسيق المحتوى بالداخل */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        /* --------------------------
+   10. New Developer Footer Style
+   -------------------------- */
+.developer-footer {
+    position: fixed; /* 💡 التعديل هنا: fixed بدلاً من absolute لضمان الثبات مع الـ Scroll */
+    bottom: 10px; /* المسافة من أسفل الشاشة */
+    width: 100%;
+    z-index: 5; 
+    padding: 15px 10px;
+    background: rgba(0, 0, 0, 0.4); 
+    backdrop-filter: blur(2px); 
+    -webkit-backdrop-filter: blur(2px);
+    
+    /* تنسيق المحتوى بالداخل */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* ... باقي خصائص الـ developer-info والـ logo-box زي ما هي ... */
 
         .developer-info {
             display: flex;
@@ -670,6 +674,7 @@
     </script>
 </body>
 </html>
+
 
 
 
