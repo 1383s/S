@@ -117,24 +117,22 @@
             100% { opacity: 0; transform: translate3d(400px, 400px, 0) rotateZ(315deg); }
         }
 
-        /* --------------------------
-           4. Glassmorphism Card Style 
-           -------------------------- */
-        .login-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            width: 90%;
-            max-width: 420px; 
-            text-align: center;
-            animation: fadeIn 1s ease-out;
-            color: #ffffff;
-            z-index: 10; 
-        }
+.login-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 15px;
+    /* 💡 التعديل هنا: 40px من فوق ويمين ويسار، و 25px من أسفل */
+    padding: 40px 40px 25px 40px; 
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    width: 90%;
+    max-width: 420px; 
+    text-align: center;
+    animation: fadeIn 1s ease-out;
+    color: #ffffff;
+    z-index: 10; 
+}
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -689,6 +687,7 @@
     </script>
 </body>
 </html>
+
 
 
 
