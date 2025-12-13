@@ -253,8 +253,7 @@ function getUserData() {
         console.error("Error reading user_data from localStorage", e);
     }
     // التوجيه لصفحة الدخول لو مفيش بيانات
-    alert("برجاء تسجيل الدخول أولاً من صفحة login.html");
-    window.location.href = "login.html"; 
+    alert("برجاء تسجيل الدخول ")
     return { name: "غير مسجل", section: "غير معروف" };
 }
 
