@@ -323,11 +323,13 @@
            10. New Developer Footer Style
            -------------------------- */
         /* --------------------------
+/* --------------------------
    10. New Developer Footer Style
    -------------------------- */
+/* ... developer-footer و developer-info هما اللي هيتعدلوا ... */
 .developer-footer {
-    position: fixed; /* 💡 التعديل هنا: fixed بدلاً من absolute لضمان الثبات مع الـ Scroll */
-    bottom: 10px; /* المسافة من أسفل الشاشة */
+    position: fixed; 
+    bottom: 10px; 
     width: 100%;
     z-index: 5; 
     padding: 15px 10px;
@@ -335,46 +337,56 @@
     backdrop-filter: blur(2px); 
     -webkit-backdrop-filter: blur(2px);
     
-    /* تنسيق المحتوى بالداخل */
     display: flex;
     justify-content: center;
     align-items: center;
 }
-/* ... باقي خصائص الـ developer-info والـ logo-box زي ما هي ... */
 
-        .developer-info {
-            display: flex;
-            align-items: center;
-            color: var(--light-text);
-            font-size: 1em;
-            font-weight: 600;
-        }
+.developer-info {
+    /* 💡 تعديل: عكس الترتيب عشان يبقى "Full Mark" ثم "Elgiza" */
+    display: flex;
+    align-items: center;
+    color: var(--light-text);
+    font-size: 1em;
+    font-weight: 600;
+    flex-direction: row-reverse; /* عكس الترتيب */
+    gap: 15px; /* مسافة بين العناصر */
+}
 
-        .developed-text {
-            opacity: 0.7;
-            margin-right: 5px;
-        }
+.developed-text {
+    /* 💡 تعديل: نخلي Developed By تبان آخر حاجة زي الصورة */
+    order: 3;
+    opacity: 0.7;
+    margin-right: 5px;
+    margin-left: 0; /* إلغاء الـ margin-right اللي كان موجود */
+}
 
-        .developer-name {
-            color: var(--green-active); /* لون Highlight زي لون النجاح #00F5C4 */
-            font-size: 1.1em;
-            font-weight: 700;
-            margin-right: 15px;
-            letter-spacing: 0.5px;
-            text-shadow: 0 0 5px rgba(0, 245, 196, 0.5); /* توهج بسيط */
-        }
+.developer-name {
+    /* 💡 تعديل: تكبير الخط وزيادة التوهج */
+    color: var(--green-active); /* لون Highlight زي لون النجاح #00F5C4 */
+    font-size: 1.5em; /* كبرنا الخط ليكون أحرف */
+    font-weight: 700;
+    margin-right: 0; /* إلغاء الـ margin-right اللي كان موجود */
+    letter-spacing: 0.5px;
+    /* زيادة التوهج ليكون واضحًا وقويًا */
+    text-shadow: 0 0 15px var(--green-active), 0 0 20px var(--green-active); 
+    order: 2; /* الترتيب التاني */
+}
 
-        .logo-box {
-            background-color: var(--main-light-green); /* اللون الأخضر اللي اخترتيه: 08402C */
-            color: #fff;
-            padding: 5px 15px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.9em;
-            box-shadow: 0 4px 10px rgba(8, 64, 44, 0.8);
-            transform: skewX(-5deg); /* إضافة ميلان خفيف لزيادة الجاذبية */
-        }
-
+.logo-box {
+    /* 💡 تعديل: تكبير الخط وزيادة الظل */
+    background-color: var(--main-light-green); /* اللون الأخضر اللي اخترتيه: 08402C */
+    color: #fff;
+    padding: 7px 20px; /* زيادة الـ Padding */
+    border-radius: 8px;
+    font-weight: 900; /* خط أثقل */
+    font-size: 1.1em; /* كبرنا خط اللوجو */
+    /* زيادة الظل ليكون بارز */
+    box-shadow: 0 6px 15px rgba(8, 64, 44, 0.9);
+    transform: skewX(-5deg); 
+    order: 1; /* الترتيب الأول */
+}
+/* ... باقي الـ CSS ... */
     </style>
 </head>
 <body>
@@ -674,6 +686,7 @@
     </script>
 </body>
 </html>
+
 
 
 
