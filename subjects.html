@@ -552,58 +552,64 @@ const subjectImages = {
   
   "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
   };
+// **هذا الكود يحل المشكلة ويجب وضعه مكان loadSubjects() القديمة في subjects.html**
+
 async function loadSubjects() {
   try {
-    // ⬇️ التعديل هنا: استخدام fetch للـ URL الخارجي بدل قراءة الملف المحلي
     const res = await fetch(DATA_SOURCE_URL); 
-    const json = await res.json();
+    const allYearsData = await res.json();
 
-    // 💡 بما أن اللينك بيرجع Array of Years [{name: "...", subjects: [...]}, ...]
-    // هنجمع كل المواد من كل السنين الدراسية.
-    const allYearsData = json;
+    // 💡 نستخدم Map لتخزين كل مادة مرة واحدة مع الاحتفاظ بأول سنة تظهر فيها (للتجربة)
+    // وممكن نخزن الـ Year ID عشان نبعته في الـ URL
+    const uniqueSubjects = new Map();
 
-    // استخراج أسماء المواد
-    const subjects = new Set();
     (allYearsData || []).forEach(year => {
-      // الـ year هنا بيكون مثلاً: { name: "علمي علوم", subjects: [...] }
-      (year.subjects || []).forEach(sub => {
-        // sub هي المادة: { id: 1, name: "أحياء", ... }
-        subjects.add(sub.name); // ⬅️ اسم المادة في الـ JSON الجديد هو 'name'
-      });
+        const yearId = year.id; // ⬅️ لازم يكون الـ ID بتاع السنة موجود في الـ JSON
+        const yearName = year.name; 
+        
+        (year.subjects || []).forEach(sub => {
+            if (!uniqueSubjects.has(sub.name)) {
+                // حفظ بيانات المادة مع ID السنة اللي ظهرت فيها
+                uniqueSubjects.set(sub.name, {
+                    name: sub.name,
+                    id: sub.id, // ID المادة
+                    yearId: yearId, // ID السنة
+                    yearName: yearName
+                });
+            }
+        });
     });
 
     subjectsList.innerHTML = '';
 
-    if (subjects.size === 0) {
+    if (uniqueSubjects.size === 0) {
       subjectsList.innerHTML = '<li class="loading">⚠️ لا توجد مواد.</li>';
       return;
     }
-    const order = [
-      "لغة عربية",
-      "English",
-      "أحياء",
-      "فيزياء",
-      "كيمياء",
-      "جيولوجيا",
-      "الرياضيات",
-      "تاريخ",
-      "جغرافيا",
-      "الإحصاء",
-      "ادبي"
-    ];
+    
+    // تحويل الـ Map لقائمة عشان نقدر نعمل عليها Loop
+    const sortedSubjects = Array.from(uniqueSubjects.values()).sort((a, b) => a.name.localeCompare(b.name));
 
-    [...subjects].sort().forEach(subject => {
+
+    sortedSubjects.forEach(subjectData => {
       const li = document.createElement('li');
       const circle = document.createElement('div');
       circle.className = 'circle';
       const img = document.createElement('img');
-      img.src = subjectImages[subject] || 'https://img.icons8.com/ios-filled/100/ffd700/book.png';
+      img.src = subjectImages[subjectData.name] || 'https://img.icons8.com/ios-filled/100/ffd700/book.png';
       circle.appendChild(img);
       const span = document.createElement('span');
-      span.textContent = subject;
+      span.textContent = subjectData.name;
       li.appendChild(circle);
       li.appendChild(span);
-      li.onclick = () => window.location.href = `teachers.html?subject=${encodeURIComponent(subject)}`;
+      
+      // 🚨 **التعديل الجذري هنا:** إرسال yearId و subjectId
+      li.onclick = () => {
+          // نبعت yid (Year ID) و sid (Subject ID)
+          const url = `teachers.html?yid=${subjectData.yearId}&sid=${subjectData.id}`;
+          window.location.href = url;
+      };
+      
       subjectsList.appendChild(li);
     });
 
@@ -614,66 +620,8 @@ async function loadSubjects() {
   }
 }
 
-// 🟡 Toast
-function showToast(msg) {
-  const toast = document.getElementById("toast");
-  toast.textContent = msg;
-  toast.className = "show";
-  setTimeout(() => toast.className = toast.className.replace("show", ""), 3000);
-}
-
-// 🌓 وضع النهار/الليل
-const toggle = document.getElementById("darkToggle");
-toggle.addEventListener("click", () => {
-  toggle.classList.toggle("active");
-  document.body.classList.toggle("light-mode");
-});
-
-// 📤 زر المشاركة
-document.getElementById("shareBtn").addEventListener("click", async () => {
-  if (navigator.share) {
-    try {
-      await navigator.share({
-        title: "تطبيق 1383",
-        text: "جرب تطبيق 1383 2026 📚✨",
-        url: window.location.href
-      });
-    } catch {
-      showToast("❌ تم إلغاء المشاركة");
-    }
-  } else {
-    showToast("المشاركة غير مدعومة في متصفحك 😢");
-  }
-});
-
-// 🔔 زر الإشعارات
-document.getElementById("notifyBtn").addEventListener("click", () => {
-  showToast("الإشعارات هتتفعل قريبًا 🔔✨");
-});
-// ** أضف الدالة دي مع باقي الـ JavaScript اللي في صفحة المحتوى **
-
-function redirectToHomePage() {
-    // العنوان اللي طلبتيه للرجوع
-    window.location.href = "https://fulll-mark.vercel.app";
-}
-
-// ** عدّل على دالة التحقق verifyCodeOnServer الموجودة عندك **
-async function verifyCodeOnServer(code) {
-    try {
-        // ... (كل كود التحقق زي ما هو) ...
-
-        // لو وصل لحد هنا يبقى: ✅ الكود سليم ومفعل على نفس الجهاز
-        
-        // 🚨 هنا هنضيف سطر عرض الكود في الخانة الجديدة
-        document.getElementById('displayActivationCode').textContent = code;
-        
-        // لو حابة تخفي الـ Loading Screen لو كنتي حاطة واحدة، ده مكانها
-        // console.log("Access granted. Code displayed."); 
-        
-    } catch (error) {
-        // ... (باقي الـ Error handling زي ما هو) ...
-    }
-}
+// 🚀 تشغيل تحميل المواد
+// loadSubjects();
 // 🚀 تشغيل تحميل المواد
 loadSubjects();
 </script>
