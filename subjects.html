@@ -3,51 +3,49 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>المواد - منصة 1383</title>
+<title>full mark subjects</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
   
   <style>
-/*
-* شاتي - ستايل الـ Luxurious Purple/Dark Mode لمنصة تعليمية متقدمة
-*/
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
-/* ممكن نستخدم خط عصري وشيك بدل Orbitron */
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200..900&display=swap'); 
+/* خط إضافي لـ Cyber/Tech Feel */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
+
 
 :root {
-  /* 🟣 الثوابت البنفسجية والداكنة الفاخرة */
-  --main-purple: #7a3e9c; /* بنفسجي أساسي غامق */
-  --light-purple: #b36ff5; /* بنفسجي فاتح للمسات النيون */
-  --dark-bg: #1f083d; /* خلفية بنفسجية غامقة جدا */
-  --darker-bg: #2a0a52; /* أغمق للخلفيات الداخلية/البطاقات */
-  --accent-gold: #ffc300; /* لون ثانوي ذهبي/أصفر فاتح للتميز */
-  --light-text: #f0f0f5;
-  --gray-text: #bdc3c7;
+  /* 🟢 ثوابت الـ Cyber Green والـ Dark Tech */
+  --dark-black: #020A07;           /* الخلفية الأساسية - أسود فاحم */
+  --main-green-bg: #08402C;        /* أخضر داكن للـ Cards - اللون الرئيسي المطلوب */
+  --darker-green-bg: #0C241C;      /* أخضر أغمق للـ Topbar/Hover */
+  --neon-accent: #27d97e;          /* أخضر نيون ساطع */
+  --light-text: #f0f0f5;           /* نص فاتح */
+  --gray-text: #8e8e8e;            /* نص ثانوي */
 }
 
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* ... */
-  padding: 90px 0 70px; 
-  /* ... */
+  padding: 90px 15px 70px;
   font-family: 'Cairo', sans-serif;
-  background: var(--dark-bg);
+  background: var(--dark-black);
   color: var(--light-text);
-  padding: 90px 15px 70px; /* زودت الـ padding عشان الأشرطة الثابتة */
   margin: 0;
   transition: background 0.4s, color 0.4s;
   overflow-x: hidden;
 }
 
-/* ===== الشريط العلوي (Top Bar) ===== */
+/* ===== الشريط العلوي (Top Bar) - تأثير الزجاج الثلجي/Frosted Glass ===== */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--darker-bg);
+  /* خلفية شفافة من اللون الأساسي + زجاج ثلجي */
+  background: rgba(8, 64, 44, 0.4); 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
   padding: 10px 15px;
   color: var(--light-text);
   position: fixed;
@@ -56,8 +54,8 @@ body {
   left: 0;
   z-index: 1000;
   transition: background 0.3s, color 0.3s;
-  border-bottom: 3px solid var(--light-purple); /* خط بنفسجي نيون */
-  box-shadow: 0 4px 20px rgba(122, 62, 156, 0.4);
+  border-bottom: 2px solid var(--neon-accent); /* خط أخضر نيون */
+  box-shadow: 0 4px 15px rgba(39, 217, 126, 0.2);
 }
 
 .menu-btn {
@@ -67,10 +65,11 @@ body {
 
 .title {
   font-size: 16px;
-  color: var(--accent-gold); /* ذهبي لافت */
-  font-family: 'Tajawal', sans-serif;
-  font-weight: 800;
-  letter-spacing: 1.5px;
+  color: var(--neon-accent); /* نيون لافت */
+  font-family: 'Orbitron', sans-serif; /* خط تقني */
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-shadow: 0 0 8px rgba(39, 217, 126, 0.7);
 }
 
 .icons {
@@ -82,21 +81,22 @@ body {
 .icons img {
   width: 28px;
   height: 28px;
-  /* فلتر خفيف عشان تبقى شكلها "جولد" أو مضيء */
-  filter: drop-shadow(0 0 5px rgba(255, 195, 0, 0.5)); 
+  /* فلتر عشان تبقى شكلها نيون أخضر */
+  filter: invert(1) drop-shadow(0 0 6px var(--neon-accent)); 
   cursor: pointer;
   transition: 0.3s;
 }
 .icons img:hover {
-    filter: drop-shadow(0 0 10px var(--light-purple));
+    filter: invert(1) drop-shadow(0 0 12px var(--neon-accent));
+    transform: scale(1.1);
 }
 
-/* تحديث الـ Toggle */
+/* تحديث الـ Toggle - Cyber Switch */
 .toggle-dark {
-  background: var(--dark-bg);
-  border: 2px solid var(--light-purple);
-  border-radius: 12px;
-  width: 45px;
+  background: var(--dark-black);
+  border: 2px solid var(--neon-accent);
+  border-radius: 20px;
+  width: 50px;
   height: 25px;
   position: relative;
   cursor: pointer;
@@ -107,292 +107,303 @@ body {
   content: "";
   position: absolute;
   top: 3px;
-  right: 3px; /* عشان الـ RTL */
+  right: 3px; 
   width: 15px;
   height: 15px;
-  background: var(--light-purple);
+  background: var(--neon-accent);
   border-radius: 50%;
   transition: 0.3s;
-  box-shadow: 0 0 8px var(--light-purple);
+  box-shadow: 0 0 8px var(--neon-accent);
 }
 
 .toggle-dark.active::after {
-  right: 23px;
-  background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold);
+  right: 27px;
+  background: var(--light-text);
+  box-shadow: 0 0 8px var(--light-text);
 }
 
 /* ===== باقي التنسيقات ===== */
 h1 {
-  color: var(--light-purple);
+  color: var(--neon-accent);
   text-align: center;
-  font-size: 3.2rem;
+  font-size: 3rem;
   margin-bottom: 50px;
-  text-shadow: 0 0 20px var(--light-purple); /* ظل نيون بنفسجي قوي */
-  font-family: 'Tajawal', sans-serif;
+  text-shadow: 0 0 15px rgba(39, 217, 126, 0.8); /* ظل نيون أخضر قوي */
+  font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  /* تأثير الـ Glitch الخفيف ممكن إضافته لزيادة الجاذبية */
 }
-
-/* ===== باقي التنسيقات ===== */
-/* ... الكود اللي قبل الـ ul ... */
 
 ul {
   padding: 0 10px;
   list-style: none;
-
-  /* 🛠️ تأكدي إن العرض ده هو اللي بتجربيه دلوقتي */
-  max-width: 350px; 
-  
-  /* ⬅️ ده السطر اللي بيوسط القائمة كلها */
+  max-width: 900px; /* عرض أكبر للـ Grid */
   margin: 0 auto; 
   
-  display: flex; 
-  flex-direction: column; 
-  gap: 20px; 
-  transform: translateX(20px);
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Grid عصري */
+  gap: 30px; 
+  transform: none; /* إلغاء الـ transform القديم */
 }
 
 li {
-  background: var(--darker-bg);
-  border-radius: 25px;
-  padding: 30px 25px 40px;
+  /* بطاقة المادة - تستخدم اللون الأساسي المطلوب #08402C */
+  background: var(--main-green-bg); 
+  border-radius: 15px;
+  padding: 30px 25px 30px;
   cursor: pointer;
-  border: 1px solid rgba(179, 111, 245, 0.2);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-  transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(39, 217, 126, 0.2);
+  /* ظل خفيف مع إحساس الـ Depth */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7); 
+  transition: background-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
   
-  /* ⬅️ **بداية التعديل للمنتصف:** */
   display: flex;
   flex-direction: column;
-  align-items: center; /* لتوسيط العناصر المرنة عموديًا */
-  text-align: center;  /* لتوسيط النصوص والـ Inline Elements */
-  /* ⬅️ **نهاية التعديل** */
-  
-  justify-content: flex-start;
+  align-items: center; 
+  text-align: center;  
+  justify-content: space-between;
   user-select: none;
   width: 100%;
+  min-height: 250px; /* ارتفاع ثابت نسبيًا */
 }
 
-/* ... باقي الكود ... */
 li:hover {
-  background: linear-gradient(145deg, var(--main-purple), #5d2b7e); /* تدرج بنفسجي على الماوس */
+  /* خلفية أغمق للـ Hover من اللون الثانوي #0C241C */
+  background: var(--darker-green-bg); 
   color: #fff;
-  transform: translateY(-12px) scale(1.02); /* رفع أكبر */
-  border-color: var(--accent-gold);
-  box-shadow: 0 25px 50px rgba(122, 62, 156, 0.8); /* ظل بنفسجي قوي جدا */
+  transform: translateY(-8px) scale(1.03); /* رفع أقل وأكثر انسيابية */
+  border-color: var(--neon-accent);
+  /* ظل نيون أخضر قوي جدا */
+  box-shadow: 0 15px 40px rgba(39, 217, 126, 0.5); 
 }
 
 li:active {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(122, 62, 156, 0.6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(39, 217, 126, 0.4);
 }
 
 .circle {
-  width: 160px;
-  height: 160px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  background: #3a0e69;
+  background: var(--darker-green-bg); /* خلفية الدائرة أغمق */
   overflow: hidden;
-  margin-bottom: 30px;
-  border: 5px solid var(--light-purple);
-  box-shadow: 0 0 20px var(--light-purple);
+  margin-bottom: 25px;
+  border: 4px solid var(--neon-accent);
+  box-shadow: 0 0 15px var(--neon-accent);
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.4s;
 }
 li:hover .circle {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 25px var(--accent-gold);
+  border-color: var(--light-text);
+  box-shadow: 0 0 20px var(--light-text);
 }
 
 .circle img {
-  width: 90%;
-  height: 90%;
+  width: 80%;
+  height: 80%;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7)); 
-  transition: all 0.3s;
+  /* فلتر لـ Cyber Glow */
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); 
+  transition: all 0.4s;
 }
 
 li span {
-  font-weight: 800;
-  font-size: 1.5rem;
+  font-weight: 700;
+  font-size: 1.4rem;
   text-align: center;
   color: var(--light-text);
   transition: color 0.3s;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  text-shadow: 0 0 5px rgba(0,0,0,0.5);
+  font-family: 'Tajawal', sans-serif;
 }
 li:hover span {
-    color: var(--accent-gold); 
+    color: var(--neon-accent); 
+    text-shadow: 0 0 10px var(--neon-accent);
 }
 
 li.loading {
   cursor: default;
   color: var(--gray-text);
-  background: transparent;
+  background: var(--dark-black);
   box-shadow: none;
   font-weight: 500;
   font-size: 1.3rem;
-  grid-column: 1 / -1;
+  /* عشان تأخذ عرض العمود في الـ Grid */
+  grid-column: span 1; 
   text-align: center;
   margin-top: 30px;
+  /* تخليها تمتد على كل الأعمدة */
+  grid-column: 1 / -1; 
 }
 
 li.loading::after {
   content: "";
   width: 35px;
   height: 35px;
-  border: 4px solid var(--light-purple);
+  border: 4px solid var(--neon-accent);
   border-top: 4px solid transparent;
   border-radius: 50%;
   display: inline-block;
   margin-right: 15px;
   vertical-align: middle;
-  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; /* Loader شيك */
+  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; 
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* ===== وضع الفاتح (Light Mode) - تناغم الألوان ===== */
+/* ===== وضع الفاتح (Light Mode) - تناغم الألوان (تم تعديلها للأخضر) ===== */
 body.light-mode {
-  background: #fdfdfd;
-  color: #1f083d;
+  background: #f8fcf8; /* أبيض فاتح مع لمسة خضراء */
+  color: #1a1a1a;
 }
 body.light-mode .topbar {
-  background: #fff;
-  color: #1f083d;
-  border-bottom-color: var(--main-purple);
+  background: rgba(255, 255, 255, 0.9);
+  color: #1a1a1a;
+  border-bottom-color: var(--main-green-bg);
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 body.light-mode li {
   background: #fff;
-  color: #1f083d;
+  color: #1a1a1a;
   box-shadow: 0 2px 15px rgba(0,0,0,0.1);
   border-color: #eee;
 }
 body.light-mode li:hover {
-  background: var(--main-purple);
+  background: var(--main-green-bg);
   color: #fff;
-  box-shadow: 0 15px 40px rgba(122, 62, 156, 0.5);
+  box-shadow: 0 15px 40px rgba(8, 64, 44, 0.4);
 }
 body.light-mode li span {
-  color: #1f083d;
+  color: #1a1a1a;
 }
 body.light-mode li:hover span {
-  color: var(--accent-gold);
+  color: var(--neon-accent);
+  text-shadow: none;
 }
 body.light-mode .circle {
   background: #eee;
-  border-color: var(--main-purple);
+  border-color: var(--main-green-bg);
   box-shadow: none;
 }
 body.light-mode li:hover .circle {
-  border-color: var(--accent-gold);
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  border-color: var(--neon-accent);
+  box-shadow: 0 0 20px rgba(39, 217, 126, 0.3);
 }
 body.light-mode .toggle-dark {
-  border-color: var(--main-purple);
+  border-color: var(--main-green-bg);
+  background: #fff;
 }
 body.light-mode .toggle-dark::after {
-  background: var(--main-purple);
-  box-shadow: 0 0 8px var(--main-purple);
+  background: var(--main-green-bg);
+  box-shadow: 0 0 8px var(--main-green-bg);
 }
 body.light-mode .toggle-dark.active::after {
-  background: var(--accent-gold);
-  box-shadow: 0 0 8px var(--accent-gold);
+  background: var(--neon-accent);
+  box-shadow: 0 0 8px var(--neon-accent);
+}
+body.light-mode .icons img {
+    filter: none; /* إزالة الـ filter في الـ light mode */
 }
 
-/* ===== Toast إشعار (بنفسجي فاخر) ===== */
+/* ===== Toast إشعار (أخضر تقني) ===== */
 #toast {
   visibility: hidden;
   min-width: 300px;
-  background: var(--darker-bg);
-  color: var(--accent-gold);
+  background: var(--darker-green-bg);
+  color: var(--neon-accent);
   text-align: center;
-  border-radius: 18px;
-  padding: 18px;
+  border-radius: 10px;
+  padding: 15px;
   position: fixed;
   z-index: 2000;
   left: 50%;
   bottom: 30px;
   transform: translateX(-50%);
-  font-size: 1.2rem;
-  border: 2px solid var(--light-purple);
-  box-shadow: 0 0 15px var(--light-purple), 0 8px 25px rgba(0,0,0,0.8);
+  font-size: 1.1rem;
+  border: 1px solid var(--neon-accent);
+  box-shadow: 0 0 12px var(--neon-accent), 0 6px 20px rgba(0,0,0,0.7);
   opacity: 0;
-  transition: opacity 0.5s, bottom 0.5s;
+  transition: opacity 0.4s, bottom 0.4s;
 }
 #toast.show {
   visibility: visible;
   opacity: 1;
-  bottom: 50px;
+  bottom: 40px;
 }
 body.light-mode #toast {
   background: #fff;
-  color: var(--main-purple);
-  border-color: var(--main-purple);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  color: var(--main-green-bg);
+  border-color: var(--main-green-bg);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-/* ✅ زر البروفايل العائم (بنفسجي فاخر) */
+/* ✅ زر البروفايل العائم (أخضر تقني) */
 .profile-float-btn {
   position: fixed;
   bottom: 30px;
   left: 30px;
-  width: 65px;
-  height: 65px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: var(--darker-bg);
-  border: 3px solid var(--accent-gold);
+  background: var(--darker-green-bg);
+  border: 3px solid var(--neon-accent);
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 0 15px var(--accent-gold);
+  box-shadow: 0 0 15px var(--neon-accent);
   transition: 0.3s;
   z-index: 1200;
 }
 .profile-float-btn:hover {
-  transform: scale(1.15) rotate(5deg);
-  background: var(--light-purple);
-  box-shadow: 0 0 25px var(--light-purple); 
+  transform: scale(1.1) rotate(5deg);
+  background: var(--main-green-bg);
+  box-shadow: 0 0 25px var(--neon-accent); 
 }
 
 .profile-float-btn img {
-    width: 32px;
-    height: 32px;
-    filter: invert(1); /* عشان أيقونة البروفايل تبان فاتحة على الخلفية الغامقة */
+    width: 30px;
+    height: 30px;
+    filter: invert(1) drop-shadow(0 0 5px var(--neon-accent)); /* عشان أيقونة البروفايل تبان نيون */
 }
 body.light-mode .profile-float-btn {
-  background: var(--main-purple);
+  background: var(--main-green-bg);
   border: 3px solid #fff;
 }
 body.light-mode .profile-float-btn:hover {
-  background: var(--light-purple);
-  border-color: var(--accent-gold); 
+  background: var(--neon-accent);
+  border-color: var(--main-green-bg); 
+}
+body.light-mode .profile-float-btn img {
+    filter: invert(0);
 }
 
 /* ✅ تنسيق زر الصفحة الرئيسية */
 .home-button {
-    background: linear-gradient(90deg, #b36ff5, #7a3e9c);
+    background: linear-gradient(90deg, var(--neon-accent), var(--main-green-bg));
     color: #fff;
-    padding: 12px 25px;
-    border-radius: 12px;
+    padding: 10px 22px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     position: fixed;
     top: 20px;
     right: 20px;
     z-index: 1100;
-    box-shadow: 0 6px 20px rgba(122, 62, 156, 0.5);
+    box-shadow: 0 6px 20px rgba(39, 217, 126, 0.4);
     transition: transform 0.3s, opacity 0.3s;
 }
 .home-button:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(179, 111, 245, 0.7);
+    box-shadow: 0 8px 30px rgba(39, 217, 126, 0.7);
 }
 
 /* ===== Media Queries لتجاوبية أفضل ===== */
@@ -401,55 +412,55 @@ body.light-mode .profile-float-btn:hover {
     font-size: 2.5rem;
   }
   ul {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
   }
   .circle {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
   }
   li span {
     font-size: 1.2rem;
   }
   .profile-float-btn {
-    width: 55px;
-    height: 55px;
+    width: 50px;
+    height: 50px;
     bottom: 20px;
     left: 20px;
   }
 }
 @media (max-width: 480px) {
     h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;
     }
     ul {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        grid-template-columns: 1fr; /* عمود واحد في شاشات الموبايل الصغيرة */
         gap: 15px;
     }
+    li {
+        min-height: 200px;
+    }
     .circle {
-        width: 100px;
-        height: 100px;
-        margin-bottom: 20px;
+        width: 90px;
+        height: 90px;
+        margin-bottom: 15px;
     }
     .home-button {
-        padding: 10px 18px;
-        font-size: 1rem;
+        padding: 8px 15px;
+        font-size: 0.9rem;
         top: 15px;
         right: 15px;
     }
     body {
-        padding-top: 80px;
+        padding-top: 70px;
     }
 }
 
-/*
-* ملاحظة بخصوص الأكواد الإضافية (مثل activation-info-container و fixed-bottom-bar):
-* هذه الأكواد لم يتم استخدامها في الـ HTML المرفق، لذا تركتها بدون تعديل على الألوان البنفسجية الجديدة.
-* لو حابة أعدلها، قولي لي.
-*/
+/* تنسيقات إضافية (لم يتم استخدامها في الـ HTML لكن تم تعديل ألوانها لتناسب الثيم الجديد) */
 .activation-info-container, .fixed-bottom-bar, .info-label, .activation-code-box, .return-btn, .bottom-label, .bottom-code {
-    /* تركتها كما هي، لكن الألوان السابقة هتتغير مع الـ Light/Dark Mode */
-    /* يُفضل إعادة تنسيقها بالاعتماد على الـ CSS Variables الجديدة */
+    background: var(--darker-green-bg);
+    color: var(--light-text);
+    border: 1px solid var(--neon-accent);
 }
   </style>
 </head>
@@ -457,7 +468,7 @@ body.light-mode .profile-float-btn:hover {
 
   <div class="topbar">
     
-    <div class="title">hacked by 1383</div>
+    <div class="title">By ELGIZAWY</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
       <a href="" target="_blank">
@@ -487,6 +498,7 @@ function showToast(message, type = "info") {
   toast.innerHTML = `<span>${message}</span>`;
 
   const style = document.createElement("style");
+  // ** تم تعديل الـ CSS بتاع الـ Toast عشان الـ Neon Green/Dark Theme **
   style.textContent = `
     .custom-toast {
       position: fixed;
@@ -501,13 +513,14 @@ function showToast(message, type = "info") {
       display: flex;
       align-items: center;
       gap: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
       animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
       z-index: 9999;
+      border: 1px solid #27d97e;
     }
-    .custom-toast.info { background: linear-gradient(135deg,#3498db,#2980b9); }
-    .custom-toast.success { background: linear-gradient(135deg,#2ecc71,#27ae60); }
-    .custom-toast.error { background: linear-gradient(135deg,#e74c3c,#c0392b); }
+    .custom-toast.info { background: linear-gradient(135deg, #08402C, #0C241C); }
+    .custom-toast.success { background: linear-gradient(135deg, #27d97e, #1a8f54); }
+    .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
     @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
   `;
@@ -626,6 +639,5 @@ async function loadSubjects() {
 loadSubjects();
 </script>
 
-</body>
 </body>
 </html>
