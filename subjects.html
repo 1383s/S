@@ -139,13 +139,18 @@ h1 {
 ul {
   padding: 0 10px;
   list-style: none;
-  max-width: 900px; /* عرض أكبر للـ Grid */
+  
+  /* ⭐️ عرض أكبر للقائمة عشان تشتغل على التابلت والديسكتوب */
+  max-width: 1200px; 
+  
   margin: 0 auto; 
   
+  /* 🛠️ Grid Layout اللي بيتجاوب */
   display: grid; 
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Grid عصري */
+  /* Default: 3 أو 4 أعمدة بحد أدنى 250px للعرض */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
   gap: 30px; 
-  transform: none; /* إلغاء الـ transform القديم */
+  transform: none; 
 }
 
 li {
@@ -165,8 +170,8 @@ li {
   text-align: center;  
   justify-content: space-between;
   user-select: none;
-  width: 100%;
-  min-height: 250px; /* ارتفاع ثابت نسبيًا */
+  /* شلنا الـ width: 100% عشان الـ Grid يحدد العرض صح */
+  min-height: 250px; 
 }
 
 li:hover {
@@ -233,12 +238,10 @@ li.loading {
   box-shadow: none;
   font-weight: 500;
   font-size: 1.3rem;
-  /* عشان تأخذ عرض العمود في الـ Grid */
-  grid-column: span 1; 
-  text-align: center;
-  margin-top: 30px;
   /* تخليها تمتد على كل الأعمدة */
   grid-column: 1 / -1; 
+  text-align: center;
+  margin-top: 30px;
 }
 
 li.loading::after {
@@ -406,13 +409,24 @@ body.light-mode .profile-float-btn img {
     box-shadow: 0 8px 30px rgba(39, 217, 126, 0.7);
 }
 
-/* ===== Media Queries لتجاوبية أفضل ===== */
+/* ===== Media Queries لتجاوبية أفضل (تم تحديثها) ===== */
+
+/* ⭐️ New Media Query for Large Tablets/Small Desktops */
+@media (max-width: 1024px) {
+    ul {
+        /* 2 أو 3 أعمدة كحد أدنى */
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 25px;
+    }
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 2.5rem;
   }
   ul {
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    /* شاشات الـ Tablet العمودي */
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 20px;
   }
   .circle {
@@ -434,15 +448,17 @@ body.light-mode .profile-float-btn img {
         font-size: 1.8rem;
     }
     ul {
-        grid-template-columns: 1fr; /* عمود واحد في شاشات الموبايل الصغيرة */
+        /* الموبايل - عمود واحد عريض ومريح */
+        grid-template-columns: 1fr; 
         gap: 15px;
     }
     li {
-        min-height: 200px;
+        min-height: 180px;
+        padding: 25px 20px; 
     }
     .circle {
-        width: 90px;
-        height: 90px;
+        width: 80px;
+        height: 80px;
         margin-bottom: 15px;
     }
     .home-button {
@@ -573,11 +589,10 @@ async function loadSubjects() {
     const allYearsData = await res.json();
 
     // 💡 نستخدم Map لتخزين كل مادة مرة واحدة مع الاحتفاظ بأول سنة تظهر فيها (للتجربة)
-    // وممكن نخزن الـ Year ID عشان نبعته في الـ URL
     const uniqueSubjects = new Map();
 
     (allYearsData || []).forEach(year => {
-        const yearId = year.id; // ⬅️ لازم يكون الـ ID بتاع السنة موجود في الـ JSON
+        const yearId = year.id; 
         const yearName = year.name; 
         
         (year.subjects || []).forEach(sub => {
