@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>full mark teachers</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
       <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
     <script type="module" src="devcheck.js"></script>
   <script src="auth.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
@@ -63,7 +65,7 @@
     .animate-fade-in { animation: fadeIn 0.4s ease-out; }
     @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
-    /* Toast Styles and Loading Dialog (مقتبس من صفحتك الأصلية) */
+    /* Toast Styles and Loading Dialog */
     .toast {
       min-width:200px; max-width:300px; padding:0.75rem 1rem; border-radius:0.5rem; color:white; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,0.3);
     }
@@ -146,14 +148,29 @@
     </main>
 
     <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
-        </div>
+        <TransitionGroup name="toast">
+            <div v-for="toast in toasts" :key="toast.id" 
+                :class="['toast', toast.type]"
+                class="fixed bottom-4 right-4 md:right-6 lg:right-8 p-3 shadow-lg rounded-lg text-sm transition-all"
+                :style="{ bottom: (4 + toasts.indexOf(toast) * 3) + 'rem', right: '1rem' }">
+                {{ toast.message }}
+            </div>
+        </TransitionGroup>
+    </div>
 
 </div>
 
 <script>
 const { createApp, ref, reactive } = Vue;
 
-const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+// ** الـ Object اللي بيربط الشعبة بالـ URL بتاعها **
+const JSON_URLS = {
+    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+    'ادبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://plus-teal.vercel.app/organized_outputa.json", 
+    'ازهر': "https://plus-teal.vercel.app/organized_outpua.json", 
+    'DEFAULT': "https://plus-teal.vercel.app/organized_output.json"
+};
 
 // دالة مساعده لقراءة الـ Parameters من الـ URL
 function getUrlParams() {
@@ -176,10 +193,15 @@ createApp({
         const yearData = reactive({ name: 'Year', id: params.yid || null });
         const subjectData = reactive({ name: 'The Subject', id: params.sid || null });
 
-        // Toasts (... نفس منطق التوست في صفحتك الأصلية ...)
+        let studentDivision = null; 
+        const STUDENT_CODE_KEY = "activeCode"; // ** ⚠️ تم التعديل ليطابق صفحة المواد ⚠️ **
+
+        // تأكد من تهيئة Firebase في مكان آخر
+        const db = firebase.database(); 
+
+        // Toasts
         const toasts = ref([]);
         const showToast = (message, type='info', duration=3000) => {
-             // ... (Toast implementation) ...
              const id = Date.now() + Math.random();
             toasts.value.push({ id, message, type });
             setTimeout(() => {
@@ -199,7 +221,7 @@ createApp({
             window.location.href = url;
         }
 
-        // جلب البيانات بناءً على الـ IDs اللي في الـ URL
+        // جلب البيانات بناءً على الـ IDs اللي في الـ URL والشعبة
         const fetchData = async () => {
             if (!params.yid || !params.sid) {
                 loading.value = false;
@@ -207,25 +229,55 @@ createApp({
                 return;
             }
 
+            // 1. قراءة الـ activeCode من الـ localStorage
+            const activeCode = localStorage.getItem(STUDENT_CODE_KEY);
+            if (!activeCode) {
+                loading.value = false;
+                showToast("Error: Active code not found. Cannot determine division.", "error");
+                // هنا ممكن تحوّل لصفحة تسجيل الدخول لو عايز
+                // window.location.href = 'index.html';
+                return;
+            }
+
             try {
-                const res = await fetch(DATA_SOURCE_URL);
-                if (!res.ok) throw new Error("Failed to fetch data source");
+                // 2. جلب الشعبة من Firebase بالمسار الجديد
+                showToast("Checking student division...", "info");
+                const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+                const studentData = snapshot.val();
+                
+                if (studentData && studentData.section) {
+                    // 3. قراءة الشعبة من section
+                    studentDivision = studentData.section.trim();
+                } else {
+                    showToast("Division not found in student data. Using default.", "warning");
+                    studentDivision = 'DEFAULT';
+                }
+
+                // 4. تحديد مصدر البيانات باستخدام الـ Object
+                const dynamicDataUrl = JSON_URLS[studentDivision] || JSON_URLS['DEFAULT'];
+
+                
+                // 5. استكمال جلب البيانات من الـ URL الجديد
+                showToast(`Fetching data source for division: ${studentDivision}`, "info");
+                const res = await fetch(dynamicDataUrl); 
+                
+                if (!res.ok) throw new Error(`Failed to fetch data source for ${studentDivision}`);
                 const fullData = await res.json();
 
-                // 1. البحث عن السنة
+                // 6. البحث عن السنة
                 const year = fullData.find(y => y.id == params.yid);
                 if (!year) throw new Error("Year not found");
                 yearData.name = year.name; 
 
-                // 2. البحث عن المادة داخل السنة
+                // 7. البحث عن المادة داخل السنة
                 const subject = year.subjects.find(s => s.id == params.sid);
                 if (!subject) throw new Error("Subject not found");
                 subjectData.name = subject.name; 
                 
-                // 3. عرض المُعلّمين
+                // 8. عرض المُعلّمين
                 teachers.value = subject.teachers || [];
                 
-                showToast(`Loaded ${teachers.value.length} teachers for ${subject.name}.`, "success");
+                showToast(`Loaded ${teachers.value.length} teachers for ${subject.name} (${studentDivision}).`, "success");
 
             } catch (err) {
                 console.error("Data fetching error:", err);
