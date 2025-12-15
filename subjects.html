@@ -558,15 +558,71 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.dispatchEvent(new Event("authReady")); 
   
   // ممكن تحطي رسالة بسيطة للتأكد، أو تلغي السطر دا لو مش عايزة إشعار يظهر
-  showToast("✅ تم تخطي التحقق والدخول بنجاح", "success"); 
+  // showToast("✅ تم تخطي التحقق والدخول بنجاح", "success"); 
 });
 </script>
 
 <script type="module">
-const subjectsList = document.getElementById('subjects-list');
+// 🚨 كونفيج Firebase (تحتاج للتأكد من بياناتك هنا)
+const firebaseConfig = {
+    apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+    authDomain: "thanawy-1383.firebaseapp.com",
+    databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+    projectId: "thanawy-1383",
+    // ...
+};
 
-// 🌐 اللينك الجديد اللي طلبته لسحب البيانات
-const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+// 💡 تهيئة Firebase (نحتاج لاستخدامها هنا لجلب الشعبة)
+if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+
+// 🌐 تحديد مسارات الـ JSON حسب الشعبة
+const JSON_URLS = {
+    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+    'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://plus-teal.vercel.app/organized_outputa.json", 
+    'أزهر': "https://plus-teal.vercel.app/organized_outpua.json",
+    'DEFAULT': "https://plus-teal.vercel.app/organized_output.json" 
+};
+
+
+// 🔥 الدالة الجديدة لجلب الشعبة وتحديد الـ URL 🔥
+async function getDataSourceURL() {
+    const activeCode = localStorage.getItem('activeCode');
+    if (!activeCode) {
+        // لو مفيش كود مفعل، رجّع اللينك الافتراضي أو حوّل لصفحة تسجيل الدخول
+        console.warn("No active code found. Using default URL.");
+        // إذا لم يكن هناك كود، يجب تحويله لصفحة تسجيل الدخول
+        window.location.href = 'index.html'; 
+        return JSON_URLS.DEFAULT;
+    }
+
+    try {
+        // التحقق من الشعبة من Firebase
+        const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+        const studentData = snapshot.val();
+
+        if (studentData && studentData.section) {
+            const studentSection = studentData.section.trim();
+            const url = JSON_URLS[studentSection] || JSON_URLS.DEFAULT;
+            showToast(`تم تحديد شعبتك: ${studentSection}`, "info");
+            return url;
+        } else {
+            showToast("لا يمكن تحديد الشعبة. استخدام المحتوى الافتراضي.", "warn");
+            return JSON_URLS.DEFAULT;
+        }
+    } catch (error) {
+        showToast("فشل الاتصال لتحديد الشعبة. استخدام المحتوى الافتراضي.", "error");
+        console.error("Error fetching student section from Firebase:", error);
+        return JSON_URLS.DEFAULT;
+    }
+}
+
+
+const subjectsList = document.getElementById('subjects-list');
 
 const subjectImages = {
    "أحياء": "1.jpg",
@@ -579,17 +635,23 @@ const subjectImages = {
     "تاريخ": "99.jpg",
     "جغرافيا": "9.jpg",
     "الإحصاء": "8.jpg",
-  
-  "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
+    "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
   };
 // **هذا الكود يحل المشكلة ويجب وضعه مكان loadSubjects() القديمة في subjects.html**
 
 async function loadSubjects() {
+  subjectsList.innerHTML = '<li class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>';
+
+  // 1. تحديد الـ URL بشكل ديناميكي قبل الجلب
+  const finalSourceURL = await getDataSourceURL(); 
+  
   try {
-    const res = await fetch(DATA_SOURCE_URL); 
+    const res = await fetch(finalSourceURL); 
+    if (!res.ok) throw new Error("Failed to fetch JSON data.");
+
     const allYearsData = await res.json();
 
-    // 💡 نستخدم Map لتخزين كل مادة مرة واحدة مع الاحتفاظ بأول سنة تظهر فيها (للتجربة)
+    // 💡 نستخدم Map لتخزين كل مادة مرة واحدة 
     const uniqueSubjects = new Map();
 
     (allYearsData || []).forEach(year => {
@@ -598,7 +660,7 @@ async function loadSubjects() {
         
         (year.subjects || []).forEach(sub => {
             if (!uniqueSubjects.has(sub.name)) {
-                // حفظ بيانات المادة مع ID السنة اللي ظهرت فيها
+                // حفظ بيانات المادة مع ID السنة اللي ظهرت فيها (لأغراض التوجيه)
                 uniqueSubjects.set(sub.name, {
                     name: sub.name,
                     id: sub.id, // ID المادة
@@ -612,7 +674,7 @@ async function loadSubjects() {
     subjectsList.innerHTML = '';
 
     if (uniqueSubjects.size === 0) {
-      subjectsList.innerHTML = '<li class="loading">⚠️ لا توجد مواد.</li>';
+      subjectsList.innerHTML = '<li class="loading">⚠️ لا توجد مواد متاحة لشعبتك.</li>';
       return;
     }
     
@@ -632,7 +694,7 @@ async function loadSubjects() {
       li.appendChild(circle);
       li.appendChild(span);
       
-      // 🚨 **التعديل الجذري هنا:** إرسال yearId و subjectId
+      // 🚨 التوجيه لصفحة المُعلمين مع الـ IDs
       li.onclick = () => {
           // نبعت yid (Year ID) و sid (Subject ID)
           const url = `teachers.html?yid=${subjectData.yearId}&sid=${subjectData.id}`;
@@ -644,13 +706,11 @@ async function loadSubjects() {
 
     showToast("✅ تم تحميل المواد بنجاح");
   } catch (err) {
-    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات من: ${DATA_SOURCE_URL}</li>`;
+    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات من الخادم.</li>`;
     console.error(err);
   }
 }
 
-// 🚀 تشغيل تحميل المواد
-// loadSubjects();
 // 🚀 تشغيل تحميل المواد
 loadSubjects();
 </script>
