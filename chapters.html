@@ -174,9 +174,9 @@
 </div>
 
 <script>
-const { createApp, ref, reactive } = Vue;
+const { createApp, ref, reactive, onMounted } = Vue; // ⚠️ إضافة onMounted
 
-// ** ⚠️ الـ Object الجديد لربط الشعبة بالـ URL ⚠️ **
+// الـ Object اللي بيربط الشعبة بالـ URL بتاعها
 const JSON_URLS = {
     'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
     'ادبي': "https://plus-teal.vercel.app/organized_output-a.json", 
@@ -184,8 +184,6 @@ const JSON_URLS = {
     'ازهر': "https://plus-teal.vercel.app/organized_outpua.json", 
     'DEFAULT': "https://plus-teal.vercel.app/organized_output.json"
 };
-
-// ** تم حذف DATA_SOURCE_URL الثابت **
 
 // دالة مساعده لقراءة الـ Parameters من الـ URL
 function getUrlParams() {
@@ -205,14 +203,12 @@ createApp({
         const expandedChapters = ref([]);
         const params = getUrlParams();
         
-        // بيانات مؤقتة لحد ما نجيب البيانات الحقيقية من الداتا بيز/الـ JSON
         const teacherData = reactive({ name: 'Loading Teacher', id: params.tid || null });
         const subjectData = reactive({ name: 'Loading Subject', id: params.sid || null });
 
-        // ** ⚠️ متغيرات جلب الشعبة ⚠️ **
-        let studentDivision = null; 
-        const STUDENT_CODE_KEY = "activeCode"; // مفتاح الكود في localStorage
-        const db = firebase.database(); // تهيئة Firebase
+        // ** تم إيقاف متغيرات Firebase/LocalStorage مؤقتاً للتأكد من تحميل Vue **
+        // const STUDENT_CODE_KEY = "activeCode";
+        // const db = firebase.database(); 
 
         // Toasts
         const toasts = ref([]);
@@ -243,49 +239,25 @@ createApp({
             window.location.href = 'player.html';
         }
 
-        // دالة جلب البيانات بناءً على الـ ID اللي في الـ URL (المُعدّلة)
+        // ⚠️ دالة جلب البيانات (تستخدم Default URL حالياً لغرض الـ Debugging)
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
                 loading.value = false;
-                showToast("Error: Missing year, subject, or teacher ID in URL.", "error");
+                showToast("Error: Missing required IDs in URL.", "error");
                 return;
             }
-
-            // 1. قراءة الـ activeCode من الـ localStorage
-            const activeCode = localStorage.getItem(STUDENT_CODE_KEY);
-            if (!activeCode) {
-                loading.value = false;
-                showToast("Error: Active code not found. Cannot determine division.", "error");
-                return;
-            }
-
 
             try {
-                // 2. جلب الشعبة من Firebase بالمسار الصحيح
-                showToast("Checking student division...", "info");
-                const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
-                const studentData = snapshot.val();
+                // ⚠️ (Debugging Mode) نستخدم الـ Default URL مباشرةً
+                const dynamicDataUrl = JSON_URLS.DEFAULT; 
+                showToast(`Fetching default data source for testing.`, "info");
                 
-                if (studentData && studentData.section) {
-                    // 3. قراءة الشعبة من section
-                    studentDivision = studentData.section.trim();
-                } else {
-                    showToast("Division not found in student data. Using default.", "warning");
-                    studentDivision = 'DEFAULT';
-                }
-
-                // 4. تحديد مصدر البيانات باستخدام الـ Object
-                const dynamicDataUrl = JSON_URLS[studentDivision] || JSON_URLS['DEFAULT'];
-
-                
-                // 5. جلب البيانات من الـ URL الجديد
-                showToast(`Fetching data source for division: ${studentDivision}`, "info");
                 const res = await fetch(dynamicDataUrl); 
                 
-                if (!res.ok) throw new Error(`Failed to fetch data source for ${studentDivision}`);
+                if (!res.ok) throw new Error(`Failed to fetch data source`);
                 const fullData = await res.json();
 
-                // 6. البحث عن المُعلّم المحدد باستخدام الـ IDs (باقي اللوجيك زي ما هو)
+                // البحث عن المُعلّم المحدد باستخدام الـ IDs
                 const year = fullData.find(y => y.id == params.yid);
                 if (!year) throw new Error("Year not found");
 
@@ -297,22 +269,23 @@ createApp({
                 if (!teacher) throw new Error("Teacher not found");
                 teacherData.name = teacher.name; 
                 
-                // 7. حفظ الشباتر
+                // حفظ الشباتر
                 chapters.value = teacher.chapters || [];
                 
                 showToast(`Loaded ${chapters.value.length} chapters for ${teacher.name}.`, "success");
 
             } catch (err) {
                 console.error("Data fetching error:", err);
-                showToast(`⚠ Failed to load data: ${err.message}`, "error");
+                showToast(`⚠ Fatal Error: ${err.message}`, "error");
             } finally {
                 loading.value = false;
             }
         }
 
-        fetchData();
+        // ⚠️ تشغيل الدالة بعد ما الـ Component يشتغل
+        onMounted(fetchData);
 
-        return { loading, chapters, expandedChapters, teacherData, subjectData, toasts, toggleChapter, playVideo };
+        return { loading, chapters, expandedChapters, teacherData, subjectData, toasts, toggleChapter, playVideo, params };
     }
 }).mount('#app');
 </script>
