@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>full mark teachers</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+      <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
+    <script type="module" src="devcheck.js"></script>
+  <script src="auth.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-main': '#020A07',     
+            'bg-card': '#0C241C',     
+            'accent': '#08402C',      
+            'glass-border': 'rgba(8, 64, 44, 0.4)', 
+            'text-primary': '#E6F0E8', 
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <style>
+    /* تطبيق الألوان والـ Glassmorphism */
+    body { 
+        font-family: 'Inter', sans-serif; 
+        background-color: #020A07; 
+        color: #E6F0E8; 
+        margin:0; 
+    }
+    .glass-panel {
+      background: rgba(12, 36, 28, 0.7); 
+      backdrop-filter: blur(15px);
+      border: 1px solid #08402C; 
+    }
+    .glass-card {
+      background: rgba(12, 36, 28, 0.5); 
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(8, 64, 44, 0.3); 
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+    }
+    .glass-card:hover {
+      background: rgba(8, 64, 44, 0.7); 
+      transform: translateY(-2px);
+      border-color: #08402C;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .accent-text { color: #08402C; }
+    .accent-bg { background-color: #08402C; }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out; }
+    @keyframes fadeIn { from {opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+
+    /* Toast Styles and Loading Dialog (مقتبس من صفحتك الأصلية) */
+    .toast {
+      min-width:200px; max-width:300px; padding:0.75rem 1rem; border-radius:0.5rem; color:white; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,0.3);
+    }
+    .toast.info { background-color: #08402C; } 
+    .toast.success { background-color: #10b981; }
+    .toast.error { background-color: #ef4444; }
+    .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
+    .toast-enter-from, .toast-leave-to { opacity:0; transform: translateY(20px); }
+    .loading-dialog {
+      position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;
+    }
+    </style>
+</head>
+
+<body class="h-screen overflow-hidden flex flex-col">
+
+<div id="app" class="flex-1 flex flex-col h-full overflow-hidden p-4 md:p-6 lg:p-8">
+
+    <header class="glass-panel h-16 flex items-center justify-between px-4 md:px-6 mb-8 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="accent-bg/20 p-2 rounded-lg accent-text flex items-center justify-center">
+                <i class="ph ph-list-numbers text-2xl"></i>
+            </div>
+            <h1 class="text-xl font-bold bg-gradient-to-r from-accent to-text-primary bg-clip-text text-transparent">
+                 {{ subjectData.name }} Teachers
+            </h1>
+        </div>
+
+        <a href="subjects.html" class="w-8 h-8 rounded-full accent-bg/50 flex items-center justify-center text-text-primary/80 hover:accent-bg transition-colors" title="Back to Subjects">
+            <i class="ph ph-x text-lg"></i>
+        </a>
+    </header>
+
+
+    <div v-if="loading" class="loading-dialog">
+        <i class="ph ph-spinner-gap animate-spin text-5xl mb-4 accent-text"></i>
+        <p class="text-lg">Loading teachers for {{ subjectData.name }}...</p>
+    </div>
+
+
+    <main v-else class="flex-1 overflow-y-auto">
+        
+        <div class="max-w-6xl mx-auto space-y-2 mb-6">
+            <h2 class="text-3xl font-bold text-text-primary">
+                Choose Your Teacher
+            </h2>
+            <p class="text-gray-400">
+                You are viewing teachers for **{{ subjectData.name }}** ({{ yearData.name }})
+            </p>
+        </div>
+
+
+        <div class="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            
+            <div v-for="teacher in teachers" :key="teacher.id" @click="selectTeacher(teacher)"
+                class="glass-card rounded-xl p-5 cursor-pointer group relative overflow-hidden animate-fade-in hover:scale-105 transition-transform duration-200">
+                
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-16 h-16 rounded-full accent-bg/50 overflow-hidden ring-2 ring-accent/50 group-hover:ring-accent transition-all">
+                        <img v-if="teacher.image_url" :src="teacher.image_url" class="w-full h-full object-cover">
+                        <div v-else class="w-full h-full flex items-center justify-center text-accent/80">
+                            <i class="ph ph-user text-2xl"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-text-primary group-hover:accent-text transition-colors">{{ teacher.name }}</h3>
+                        <p class="text-sm text-gray-500">{{ teacher.chapter_count || 0 }} Chapters Available</p>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div v-if="!teachers.length && !loading" class="text-center text-gray-500 p-10 glass-card mx-auto max-w-lg col-span-full">
+                <i class="ph ph-warning-circle text-4xl mb-3 accent-text"></i>
+                <p>No teachers found for this subject.</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div class="fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+        </div>
+
+</div>
+
+<script>
+const { createApp, ref, reactive } = Vue;
+
+const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+
+// دالة مساعده لقراءة الـ Parameters من الـ URL
+function getUrlParams() {
+    const params = {};
+    window.location.search.substring(1).split('&').forEach(pair => {
+        const [key, value] = pair.split('=');
+        if (key && value) params[key] = decodeURIComponent(value);
+    });
+    return params;
+}
+
+
+createApp({
+    setup() {
+        const loading = ref(true);
+        const teachers = ref([]);
+        const params = getUrlParams();
+        
+        // بيانات مؤقتة بيتم تحديثها بعد جلب البيانات
+        const yearData = reactive({ name: 'Year', id: params.yid || null });
+        const subjectData = reactive({ name: 'The Subject', id: params.sid || null });
+
+        // Toasts (... نفس منطق التوست في صفحتك الأصلية ...)
+        const toasts = ref([]);
+        const showToast = (message, type='info', duration=3000) => {
+             // ... (Toast implementation) ...
+             const id = Date.now() + Math.random();
+            toasts.value.push({ id, message, type });
+            setTimeout(() => {
+                const index = toasts.value.findIndex(t => t.id === id);
+                if(index !== -1) toasts.value.splice(index,1);
+            }, duration);
+        };
+        
+        // الدالة اللي بتنقل لصفحة الشباتر (chapters.html)
+        const selectTeacher = (teacher) => {
+            if (!yearData.id || !subjectData.id) {
+                showToast("Error in navigation data.", "error");
+                return;
+            }
+            // إرسال الـ 3 IDs (سنة، مادة، مُعلّم) لصفحة الشباتر
+            const url = `chapters.html?yid=${yearData.id}&sid=${subjectData.id}&tid=${teacher.id}`;
+            window.location.href = url;
+        }
+
+        // جلب البيانات بناءً على الـ IDs اللي في الـ URL
+        const fetchData = async () => {
+            if (!params.yid || !params.sid) {
+                loading.value = false;
+                showToast("Error: Missing Year or Subject ID in URL.", "error");
+                return;
+            }
+
+            try {
+                const res = await fetch(DATA_SOURCE_URL);
+                if (!res.ok) throw new Error("Failed to fetch data source");
+                const fullData = await res.json();
+
+                // 1. البحث عن السنة
+                const year = fullData.find(y => y.id == params.yid);
+                if (!year) throw new Error("Year not found");
+                yearData.name = year.name; 
+
+                // 2. البحث عن المادة داخل السنة
+                const subject = year.subjects.find(s => s.id == params.sid);
+                if (!subject) throw new Error("Subject not found");
+                subjectData.name = subject.name; 
+                
+                // 3. عرض المُعلّمين
+                teachers.value = subject.teachers || [];
+                
+                showToast(`Loaded ${teachers.value.length} teachers for ${subject.name}.`, "success");
+
+            } catch (err) {
+                console.error("Data fetching error:", err);
+                showToast(`⚠ Failed to load data: ${err.message}`, "error");
+            } finally {
+                loading.value = false;
+            }
+        }
+
+        fetchData();
+
+        return { loading, teachers, yearData, subjectData, selectTeacher, toasts };
+    }
+}).mount('#app');
+</script>
+
+</body>
+</html>
