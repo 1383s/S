@@ -7,93 +7,127 @@
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&display=swap');
+
+  /* 🟢 ثوابت الـ Green Theme */
+  :root {
+    --dark-black: #020A07;           /* الخلفية الأساسية (أسود فاحم) */
+    --main-green-bg: #08402C;        /* أخضر داكن (لون الكارد الرئيسي) */
+    --darker-green-bg: #0C241C;      /* أخضر أغمق (للكونتينرات) */
+    --neon-accent: #27d97e;          /* أخضر نيون ساطع (للمسات والإضاءة) */
+    --error: #ff4d4d;
+    --success: #00C896;
+    --light-text: #f0f0f5;
+  }
 
   body {
     font-family: 'Cairo', sans-serif;
-    background: radial-gradient(circle at top, #0a0a0a, #000);
-    color: #fff;
+    /* خلفية متدرجة بسيطة */
+    background: linear-gradient(180deg, var(--dark-black) 0%, #000 100%);
+    color: var(--light-text);
     margin: 0;
     text-align: center;
     overflow-x: hidden;
   }
 
+  /* ===== الشريط العلوي (Top Bar) ===== */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #111;
+    background: rgba(8, 64, 44, 0.4); /* خلفية شفافة من الأخضر الأساسي */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     padding: 14px 18px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.1);
+    /* ظل نيون خفيف */
+    box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
+    border-bottom: 2px solid var(--neon-accent);
   }
   .title {
-    color: #007bff;
+    color: var(--neon-accent); /* نيون أخضر */
     font-weight: 700;
     font-size: 18px;
-    text-shadow: 0 0 8px #007bff;
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 8px var(--neon-accent);
+    letter-spacing: 1px;
   }
   .back {
     font-size: 22px;
     cursor: pointer;
-    color: #007bff;
+    color: var(--neon-accent);
     transition: transform 0.3s;
     user-select: none;
   }
-  .back:hover { transform: translateX(-5px); }
+  .back:hover { 
+    transform: translateX(-5px) scale(1.1); 
+    text-shadow: 0 0 5px var(--neon-accent);
+  }
 
+  /* ===== Video Player Container ===== */
   #player {
     max-width: 950px;
     width: 100%;
-    height: 60vh;
+    /* 60vh كويس عشان الـ Notes تبان تحته */
+    height: 60vh; 
     border-radius: 18px;
     margin: 25px auto;
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
-    background: #000;
+    /* إضاءة نيون حول الفيديو */
+    box-shadow: 0 0 30px rgba(39, 217, 126, 0.4), 0 0 15px rgba(0, 0, 0, 0.8);
+    background: var(--dark-black);
+    border: 1px solid var(--neon-accent);
   }
 
   #hint {
     margin-top: 12px;
-    color: #007bff;
+    color: var(--neon-accent);
     font-size: 14px;
-    text-shadow: 0 0 4px #007bff;
+    text-shadow: 0 0 4px var(--neon-accent);
   }
 
   .error-msg {
     margin: 40px auto;
-    color: #ff4d4d;
+    color: var(--error);
     font-size: 20px;
     font-weight: 700;
-    text-shadow: 0 0 8px #ff0000;
+    text-shadow: 0 0 8px var(--error);
+    font-family: 'Orbitron', sans-serif;
   }
 
-  /* ستايلات الملاحظات الجديدة */
+  /* ===== ستايلات الملاحظات (Notes) ===== */
   .notes-container {
     max-width: 950px;
     width: 95%;
     margin: 30px auto;
-    padding: 20px;
-    background: #111;
+    padding: 25px;
+    /* خلفية من اللون الثانوي الداكن */
+    background: var(--darker-green-bg); 
     border-radius: 18px;
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+    /* ظل خفيف زي الـ Cards في الصفحات اللي فاتت */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(39, 217, 126, 0.2);
     text-align: right;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .notes-container h2 {
-    color: #ffd700;
+    color: var(--light-text);
     font-size: 20px;
     margin-bottom: 15px;
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
   }
 
   #video-notes {
     width: 100%;
     min-height: 200px;
     padding: 15px;
-    border: 2px solid #007bff;
+    /* إطار نيون واضح */
+    border: 2px solid var(--neon-accent); 
     border-radius: 12px;
-    background-color: #0a0a0a;
-    color: #fff;
+    background-color: var(--dark-black);
+    color: var(--light-text);
     font-size: 16px;
     resize: vertical;
     font-family: 'Cairo', sans-serif;
@@ -103,18 +137,56 @@
   }
 
   #video-notes:focus {
-    border-color: #ffd700;
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    /* توهج أقوى عند التركيز */
+    border-color: var(--success);
+    box-shadow: 0 0 15px var(--success);
   }
 
   #save-status {
     margin-top: 10px;
+    color: var(--success);
     font-size: 14px;
-    color: #28a745;
     text-align: center;
     opacity: 0;
     transition: opacity 0.5s;
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--success);
   }
+  
+  /* ===== Plyr Override Styles (عشان نضمن تحويل الأزرار للنيون) ===== */
+  /* الأزرار الرئيسية (Play/Pause/Rewind/Fast-Forward) */
+  .plyr--video .plyr__controls button.plyr__controls__item:hover {
+      background: var(--neon-accent) !important;
+      color: var(--dark-black) !important;
+      box-shadow: 0 0 10px var(--neon-accent);
+  }
+
+  /* لون شريط التقدم (Progress Bar) */
+  .plyr__progress--seek {
+      /* لون شريط التقدم يكون نيون أخضر */
+      background: var(--neon-accent) !important;
+  }
+  
+  /* لون الأزرار الداخلية والـ Tooltips */
+  .plyr__control {
+      color: var(--light-text);
+      transition: 0.2s;
+  }
+  .plyr__control:hover {
+      color: var(--neon-accent);
+  }
+
+  /* لون الـ Thumb (الدائرة المتحركة في شريط التقدم) */
+  .plyr__progress--seek input[type=range] {
+      color: var(--neon-accent);
+  }
+
+  /* لون الوقت الحالي والمدة الزمنية */
+  .plyr__time {
+      color: var(--neon-accent);
+      font-family: 'Orbitron', sans-serif;
+  }
+
 </style>
 </head>
 <body>
@@ -234,7 +306,6 @@ if (qualitySources.length > 0) {
     };
   }
 }
-
 
 
 setTimeout(() => document.getElementById('hint').style.display = 'none', 5000);
