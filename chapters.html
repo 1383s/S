@@ -220,9 +220,24 @@ createApp({
             else expandedChapters.value.splice(idx,1);
         }
 
+        // في chapters (1).html
         const playVideo = (video) => {
-            if(!video.stream_url) showToast("Stream not available. Contact the admin.", "error");
-            else window.open(video.stream_url,'_blank');
+    // 1. نتأكد إن فيه رابط تشغيل موجود
+            if (!video.stream_url) {
+                showToast("Stream not available. Contact the admin.", "error");
+                return;
+            }
+    
+    // 2. نحفظ بيانات الفيديو (الروابط والجودة) في localStorage
+    // الـ 'sources' هنا هي اللي هتحتاجها صفحة البلاير عشان تشغل HLS.
+    // ونحفظ الاسم كمان عشان يظهر في البلاير.
+            localStorage.setItem("video_sources", JSON.stringify(video.sources || [video.stream_url]));
+            localStorage.setItem("video_title", video.title || 'Lecture Video');
+    
+    // 3. ننقل لصفحة البلاير
+            window.location.href = 'player%20(1).html';
+    // أو لو عايز تفتح في تبويب جديد:
+    // window.open('player%20(1).html', '_blank');
         }
 
         // دالة جلب البيانات بناءً على الـ ID اللي في الـ URL
