@@ -17,12 +17,11 @@
       theme: {
         extend: {
           colors: {
-            // الألوان اللي أنت اخترتها
-            'bg-main': '#020A07',     // اللون الغامق للخلفية 
-            'bg-card': '#0C241C',     // لون أغمق للكارت 
-            'accent': '#08402C',      // لون التمييز
-            'glass-border': 'rgba(8, 64, 44, 0.4)', // حدود بتميل للأخضر 
-            'text-primary': '#E6F0E8', // لون فاتح للقراءة
+            'bg-main': '#020A07',     
+            'bg-card': '#0C241C',     
+            'accent': '#08402C',      
+            'glass-border': 'rgba(8, 64, 44, 0.4)', 
+            'text-primary': '#E6F0E8', 
           },
           fontFamily: { sans: ['Inter', 'sans-serif'] }
         }
@@ -38,25 +37,24 @@
     /* تطبيق الألوان والـ Glassmorphism */
     body { 
         font-family: 'Inter', sans-serif; 
-        background-color: #020A07; /* bg-main */
+        background-color: #020A07; 
         color: #E6F0E8; 
         margin:0; 
     }
     .glass-panel {
-      background: rgba(12, 36, 28, 0.7); /* bg-card شفاف */
+      background: rgba(12, 36, 28, 0.7); 
       backdrop-filter: blur(15px);
-      border: 1px solid #08402C; /* accent */
+      border: 1px solid #08402C; 
     }
     .glass-card {
-      background: rgba(12, 36, 28, 0.5); /* bg-card شفاف أكثر */
+      background: rgba(12, 36, 28, 0.5); 
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(8, 64, 44, 0.3); /* glass-border خفيف */
+      border: 1px solid rgba(8, 64, 44, 0.3); 
       transition: all 0.3s ease;
-      /* Box Shadow خفيف عشان يدي إحساس الشفافية */
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
     }
     .glass-card:hover {
-      background: rgba(8, 64, 44, 0.7); /* accent أغمق شوية مع هوفر */
+      background: rgba(8, 64, 44, 0.7); 
       transform: translateY(-2px);
       border-color: #08402C;
       box-shadow: 0 6px 20px rgba(0,0,0,0.3);
@@ -64,12 +62,10 @@
     .accent-text { color: #08402C; }
     .accent-bg { background-color: #08402C; }
     
-    /* باقي الـ CSS من الصفحة الأصلية للحفاظ على الشكل */
-    /* ... (Toast Styles, fadeIn, loading-dialog) ... */
     .toast {
       min-width:200px; max-width:300px; padding:0.75rem 1rem; border-radius:0.5rem; color:white; font-weight:500; box-shadow:0 4px 12px rgba(0,0,0,0.3);
     }
-    .toast.info { background-color: #08402C; } /* لون مميز */
+    .toast.info { background-color: #08402C; } 
     .toast.success { background-color: #10b981; }
     .toast.error { background-color: #ef4444; }
     .toast-enter-active, .toast-leave-active { transition: all 0.3s ease; }
@@ -98,7 +94,7 @@
              <span class="text-sm font-medium text-gray-400">
                 {{ teacherData.name }} - {{ subjectData.name }}
             </span>
-             <a :href="`teachers.html?yid=3&sid=${subjectData.id}`" 
+             <a :href="`teachers.html?yid=${params.yid}&sid=${subjectData.id}`" 
                class="w-8 h-8 rounded-full accent-bg/50 flex items-center justify-center text-text-primary/80 hover:accent-bg transition-colors"
                title="Back to Teachers">
                 <i class="ph ph-arrow-left text-lg"></i>
@@ -180,7 +176,16 @@
 <script>
 const { createApp, ref, reactive } = Vue;
 
-const DATA_SOURCE_URL = "https://plus-teal.vercel.app/organized_output.json";
+// ** ⚠️ الـ Object الجديد لربط الشعبة بالـ URL ⚠️ **
+const JSON_URLS = {
+    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+    'ادبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://plus-teal.vercel.app/organized_outputa.json", 
+    'ازهر': "https://plus-teal.vercel.app/organized_outpua.json", 
+    'DEFAULT': "https://plus-teal.vercel.app/organized_output.json"
+};
+
+// ** تم حذف DATA_SOURCE_URL الثابت **
 
 // دالة مساعده لقراءة الـ Parameters من الـ URL
 function getUrlParams() {
@@ -204,6 +209,11 @@ createApp({
         const teacherData = reactive({ name: 'Loading Teacher', id: params.tid || null });
         const subjectData = reactive({ name: 'Loading Subject', id: params.sid || null });
 
+        // ** ⚠️ متغيرات جلب الشعبة ⚠️ **
+        let studentDivision = null; 
+        const STUDENT_CODE_KEY = "activeCode"; // مفتاح الكود في localStorage
+        const db = firebase.database(); // تهيئة Firebase
+
         // Toasts
         const toasts = ref([]);
         const showToast = (message, type='info', duration=3000) => {
@@ -221,27 +231,19 @@ createApp({
             else expandedChapters.value.splice(idx,1);
         }
 
-        // في chapters (1).html
         const playVideo = (video) => {
-    // 1. نتأكد إن فيه رابط تشغيل موجود
             if (!video.stream_url) {
                 showToast("Stream not available. Contact the admin.", "error");
                 return;
             }
     
-    // 2. نحفظ بيانات الفيديو (الروابط والجودة) في localStorage
-    // الـ 'sources' هنا هي اللي هتحتاجها صفحة البلاير عشان تشغل HLS.
-    // ونحفظ الاسم كمان عشان يظهر في البلاير.
             localStorage.setItem("video_sources", JSON.stringify(video.sources || [video.stream_url]));
             localStorage.setItem("video_title", video.title || 'Lecture Video');
     
-    // 3. ننقل لصفحة البلاير
             window.location.href = 'player.html';
-    // أو لو عايز تفتح في تبويب جديد:
-    // window.open('player%20(1).html', '_blank');
         }
 
-        // دالة جلب البيانات بناءً على الـ ID اللي في الـ URL
+        // دالة جلب البيانات بناءً على الـ ID اللي في الـ URL (المُعدّلة)
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
                 loading.value = false;
@@ -249,24 +251,53 @@ createApp({
                 return;
             }
 
+            // 1. قراءة الـ activeCode من الـ localStorage
+            const activeCode = localStorage.getItem(STUDENT_CODE_KEY);
+            if (!activeCode) {
+                loading.value = false;
+                showToast("Error: Active code not found. Cannot determine division.", "error");
+                return;
+            }
+
+
             try {
-                const res = await fetch(DATA_SOURCE_URL);
-                if (!res.ok) throw new Error("Failed to fetch data source");
+                // 2. جلب الشعبة من Firebase بالمسار الصحيح
+                showToast("Checking student division...", "info");
+                const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+                const studentData = snapshot.val();
+                
+                if (studentData && studentData.section) {
+                    // 3. قراءة الشعبة من section
+                    studentDivision = studentData.section.trim();
+                } else {
+                    showToast("Division not found in student data. Using default.", "warning");
+                    studentDivision = 'DEFAULT';
+                }
+
+                // 4. تحديد مصدر البيانات باستخدام الـ Object
+                const dynamicDataUrl = JSON_URLS[studentDivision] || JSON_URLS['DEFAULT'];
+
+                
+                // 5. جلب البيانات من الـ URL الجديد
+                showToast(`Fetching data source for division: ${studentDivision}`, "info");
+                const res = await fetch(dynamicDataUrl); 
+                
+                if (!res.ok) throw new Error(`Failed to fetch data source for ${studentDivision}`);
                 const fullData = await res.json();
 
-                // البحث عن المُعلّم المحدد باستخدام الـ IDs
+                // 6. البحث عن المُعلّم المحدد باستخدام الـ IDs (باقي اللوجيك زي ما هو)
                 const year = fullData.find(y => y.id == params.yid);
                 if (!year) throw new Error("Year not found");
 
                 const subject = year.subjects.find(s => s.id == params.sid);
                 if (!subject) throw new Error("Subject not found");
-                subjectData.name = subject.name; // تحديث اسم المادة
+                subjectData.name = subject.name; 
 
                 const teacher = subject.teachers.find(t => t.id == params.tid);
                 if (!teacher) throw new Error("Teacher not found");
-                teacherData.name = teacher.name; // تحديث اسم المُعلّم
+                teacherData.name = teacher.name; 
                 
-                // حفظ الشباتر
+                // 7. حفظ الشباتر
                 chapters.value = teacher.chapters || [];
                 
                 showToast(`Loaded ${chapters.value.length} chapters for ${teacher.name}.`, "success");
