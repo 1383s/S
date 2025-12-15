@@ -12,7 +12,7 @@
     };
 
     // 🚨 2. عنوان صفحة الدخول اللي هترجع ليها
-    const LOGIN_PAGE_URL = "https://1383ss.vercel.app"; 
+    const LOGIN_PAGE_URL = "https://fulll-mark.vercel.app"; 
 
     // دالة التوجيه لصفحة الدخول
     function redirectToLogin(reason) {
