@@ -11,10 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
-    <script type="module">
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-analytics.js";
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js";
-    </script>
+
     <script type="module" src="devcheck.js"></script>
 
     <style>
@@ -442,15 +439,14 @@
         };
         
         // تشغيل الفايربيس وتفعيل الأداوت 
-        let app;
         if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
-            app = firebase.initializeApp(firebaseConfig);
-        } else {
-            app = firebase.app();
+
+            firebase.initializeApp(firebaseConfig);
+
         }
 
         // تفعيل جوجل أناليتكس 
-        const analytics = firebase.analytics(); 
+        
 
         const db = firebase.database();
 
@@ -700,6 +696,7 @@
     </script>
 </body>
 </html>
+
 
 
 
