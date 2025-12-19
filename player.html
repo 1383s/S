@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>Full Mark Player - Pro Edition</title>
+<title>Full Mark Player - Pro</title>
   
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -22,37 +22,23 @@
     --light-text: #f0f0f5;
   }
 
-  body { 
-    font-family: 'Cairo', sans-serif; 
-    background: linear-gradient(180deg, var(--dark-black) 0%, #000 100%); 
-    color: var(--light-text); 
-    margin: 0; 
-    text-align: center; 
-    overflow-x: hidden;
-  }
+  body { font-family: 'Cairo', sans-serif; background: #000; color: var(--light-text); margin: 0; text-align: center; overflow-x: hidden; }
 
-  /* الشريط العلوي */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
     background: rgba(8, 64, 44, 0.4); backdrop-filter: blur(5px);
-    padding: 14px 18px; position: sticky; top: 0; z-index: 100;
-    border-bottom: 2px solid var(--neon-accent);
+    padding: 14px 18px; border-bottom: 2px solid var(--neon-accent);
     box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
   }
-  .title { color: var(--neon-accent); font-weight: 700; font-size: 18px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 8px var(--neon-accent); }
-  .back { font-size: 22px; cursor: pointer; color: var(--neon-accent); transition: 0.3s; }
 
-  /* حاوية المشغل */
   .player-wrapper {
     max-width: 950px; width: 95%; margin: 25px auto; position: relative;
     border-radius: 18px; overflow: hidden; border: 1px solid var(--neon-accent);
     box-shadow: 0 0 30px rgba(39, 217, 126, 0.4);
-    background: var(--dark-black);
   }
 
-  #player { width: 100%; height: 60vh; }
+  #player { width: 100%; height: 60vh; background: #000; }
 
-  /* الفيدباك (زي اليوتيوب) */
   .v-feedback {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     background: rgba(39, 217, 126, 0.9); color: #000; padding: 12px 24px;
@@ -60,18 +46,8 @@
     pointer-events: none; font-family: 'Orbitron', sans-serif;
   }
 
-  /* الملاحظات */
-  .notes-container { 
-    max-width: 950px; width: 95%; margin: 30px auto; padding: 25px; 
-    background: var(--darker-green-bg); border-radius: 18px; text-align: right; 
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .notes-container h2 { margin-bottom: 15px; font-size: 20px; }
-  #video-notes { 
-    width: 100%; min-height: 200px; padding: 15px; border: 2px solid var(--neon-accent); 
-    border-radius: 12px; background: var(--dark-black); color: #fff; 
-    outline: none; box-sizing: border-box; font-family: 'Cairo', sans-serif;
-  }
+  .notes-container { max-width: 950px; width: 95%; margin: 30px auto; padding: 25px; background: var(--darker-green-bg); border-radius: 18px; text-align: right; }
+  #video-notes { width: 100%; min-height: 200px; padding: 15px; border: 2px solid var(--neon-accent); border-radius: 12px; background: var(--dark-black); color: #fff; outline: none; box-sizing: border-box; }
   #save-status { color: var(--success); opacity: 0; transition: 0.5s; text-align: center; margin-top: 10px; font-weight: bold; }
 </style>
 </head>
@@ -98,95 +74,79 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-// 1. استرجاع اللينكات من الـ LocalStorage (بنفس الأسلوب بتاعك)
+// 1. استرجاع البيانات
 let qualitySources = [];
 const savedSources = localStorage.getItem("video_sources");
 
 if (savedSources) {
-  try {
-    const links = JSON.parse(savedSources);
-    if (Array.isArray(links)) {
-      qualitySources = links.map(link => ({
-        src: link.url || link,
-        type: "application/x-mpegURL",
-        size: parseInt(link.label) || 720
-      }));
-    } else {
-      qualitySources = [{
-        src: savedSources.url || savedSources,
-        type: "application/x-mpegURL",
-        size: 720
-      }];
-    }
-  } catch (err) {
-    console.error("Error loading sources:", err);
-  }
-} else {
-  document.body.innerHTML += "<h2 style='color:red; margin-top:50px;'>لم يتم العثور على روابط للفيديو!</h2>";
+    try {
+        const links = JSON.parse(savedSources);
+        qualitySources = Array.isArray(links) 
+            ? links.map(l => ({ src: l.url || l, type: "application/x-mpegURL", size: parseInt(l.label) || 720 }))
+            : [{ src: links.url || links, type: "application/x-mpegURL", size: 720 }];
+    } catch (e) { console.error("Data error"); }
 }
 
-// 2. إعداد مشغل Plyr
-const player = new Plyr('#player', {
+// 2. تشغيل Plyr
+const videoElement = document.getElementById('player');
+const player = new Plyr(videoElement, {
     controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
     settings: ['quality', 'speed'],
-    clickToPlay: false // عطلناها عشان نتحكم في الـ Click اليدوي
+    clickToPlay: false 
 });
 
-const video = document.querySelector("video");
-const fb = document.getElementById('v-fb');
-const wrap = document.getElementById('p-wrap');
+// 3. لوجيك تحميل الفيديو (التعديل الجوهري هنا)
+if (qualitySources.length > 0) {
+    const sourceUrl = qualitySources[0].src;
 
-function showFb(txt) {
-    fb.textContent = txt; fb.style.display = 'block';
-    setTimeout(() => fb.style.display = 'none', 800);
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(sourceUrl);
+        hls.attachMedia(videoElement);
+        hls.on(Hls.Events.MANIFEST_PARSED, function() {
+            console.log("HLS Manifest parsed, video ready.");
+        });
+        // ربط الـ HLS بالـ Plyr عشان الجودات تظهر
+        player.on('ready', () => {
+             // هنا ممكن تضيف كود لو عايز تغير الجودة يدوي من الـ Hls
+        });
+    } 
+    else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+        videoElement.src = sourceUrl;
+    }
+} else {
+    document.body.innerHTML += "<h2 style='color:red;'>⚠️ مفيش لينك فيديو يا ريس!</h2>";
 }
 
-// 3. لوجيك اللمس والتحكم الذكي (Double Click / Long Press)
-let lastTap = 0;
-let tapTimeout;
-let longPressTimer;
-let isSpeeding = false;
+// 4. التحكم الذكي (Double Tap & Speed)
+const fb = document.getElementById('v-fb');
+const wrap = document.getElementById('p-wrap');
+let lastTap = 0, tapTimeout, longPressTimer, isSpeeding = false;
+
+function showFb(txt) { fb.textContent = txt; fb.style.display = 'block'; setTimeout(() => fb.style.display = 'none', 800); }
 
 const handleAction = (e) => {
-    if (e.type === 'touchstart') e.preventDefault(); // منع تداخل اللمس
-    
+    if (e.type === 'touchstart') e.preventDefault();
     const now = Date.now();
     const rect = wrap.getBoundingClientRect();
     const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
     const isRight = x > rect.width / 2;
 
     if (now - lastTap < 300) {
-        // Double Tap: تقديم أو تأخير
-        clearTimeout(tapTimeout);
-        clearTimeout(longPressTimer);
-        if (isRight) { video.currentTime += 10; showFb("+10s"); }
-        else { video.currentTime -= 10; showFb("-10s"); }
+        clearTimeout(tapTimeout); clearTimeout(longPressTimer);
+        if (isRight) { videoElement.currentTime += 10; showFb("+10s"); }
+        else { videoElement.currentTime -= 10; showFb("-10s"); }
         lastTap = 0;
     } else {
-        // Single Tap: تشغيل/إيقاف
         lastTap = now;
-        tapTimeout = setTimeout(() => {
-            if (!isSpeeding) {
-                if (video.paused) video.play(); else video.pause();
-            }
-        }, 300);
-
-        // Long Press: تسريع 2x
-        longPressTimer = setTimeout(() => {
-            isSpeeding = true;
-            video.playbackRate = 2.0;
-            showFb("⏩ 2x Speed");
-        }, 500);
+        tapTimeout = setTimeout(() => { if (!isSpeeding) { videoElement.paused ? videoElement.play() : videoElement.pause(); } }, 300);
+        longPressTimer = setTimeout(() => { isSpeeding = true; videoElement.playbackRate = 2.0; showFb("⏩ 2x Speed"); }, 500);
     }
 };
 
 const endAction = () => {
     clearTimeout(longPressTimer);
-    if (isSpeeding) {
-        video.playbackRate = 1.0;
-        isSpeeding = false;
-        showFb("1x Speed");
-    }
+    if (isSpeeding) { videoElement.playbackRate = 1.0; isSpeeding = false; showFb("1x Speed"); }
 };
 
 wrap.addEventListener('mousedown', handleAction);
@@ -194,33 +154,17 @@ wrap.addEventListener('mouseup', endAction);
 wrap.addEventListener('touchstart', handleAction, {passive: false});
 wrap.addEventListener('touchend', endAction);
 
-// 4. تحميل الفيديو باستخدام HLS
-if (qualitySources.length > 0) {
-    const firstSrc = qualitySources[0].src;
-    if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(firstSrc);
-        hls.attachMedia(video);
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = firstSrc;
-    }
-}
-
-// 5. الملاحظات (تلقائية بالكامل)
+// 5. الملاحظات
 const notesTextarea = document.getElementById('video-notes');
-const saveStatus = document.getElementById('save-status');
-
 if (qualitySources.length > 0) {
-    const videoID = btoa(qualitySources[0].src).substring(0, 20); // معرف فريد
-    notesTextarea.value = localStorage.getItem(`video_notes_${videoID}`) || "";
-
-    notesTextarea.addEventListener('input', () => {
-        localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
-        saveStatus.style.opacity = 1;
-        setTimeout(() => saveStatus.style.opacity = 0, 2000);
-    });
+    const vID = btoa(qualitySources[0].src).substring(0, 15);
+    notesTextarea.value = localStorage.getItem(`notes_${vID}`) || "";
+    notesTextarea.oninput = () => {
+        localStorage.setItem(`notes_${vID}`, notesTextarea.value);
+        document.getElementById('save-status').style.opacity = 1;
+        setTimeout(() => document.getElementById('save-status').style.opacity = 0, 1500);
+    };
 }
 </script>
-
 </body>
 </html>
