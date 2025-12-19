@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Full Mark Player - Pro Edition</title>
+<title>full mark player </title>
   
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script src="auth.js"></script>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
+    <script src="auth.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&display=swap');
@@ -33,110 +33,112 @@
     overflow-x: hidden;
   }
 
-  /* الشريط العلوي */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: rgba(8, 64, 44, 0.4);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
     padding: 14px 18px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 0 15px rgba(39, 217, 126, 0.2);
+    box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
     border-bottom: 2px solid var(--neon-accent);
   }
-
   .title {
     color: var(--neon-accent);
     font-weight: 700;
     font-size: 18px;
     font-family: 'Orbitron', sans-serif;
     text-shadow: 0 0 8px var(--neon-accent);
+    letter-spacing: 1px;
+  }
+  .back {
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--neon-accent);
+    transition: transform 0.3s;
+    user-select: none;
+  }
+  .back:hover { 
+    transform: translateX(-5px) scale(1.1); 
+    text-shadow: 0 0 5px var(--neon-accent);
   }
 
-  /* حاوية المشغل */
-  .player-wrapper {
+  /* Container Video */
+  .video-wrapper {
     position: relative;
     max-width: 950px;
+    width: 100%;
     margin: 25px auto;
     border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 0 30px rgba(39, 217, 126, 0.3);
+    box-shadow: 0 0 30px rgba(39, 217, 126, 0.4);
     border: 1px solid var(--neon-accent);
-    background: #000;
   }
 
   #player {
     width: 100%;
-    display: block;
+    height: 60vh; 
+    background: var(--dark-black);
   }
 
-  /* ===== أزرار التقديم والتأخير الشفافة (Overlay) ===== */
-  .video-touch-controls {
+  /* طبقة زراير التقديم والتاخير الشفافة */
+  .click-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: calc(100% - 50px); /* نترك مساحة بسيطة لشريط Plyr السفلي */
+    height: 100%;
     display: flex;
-    z-index: 5;
-    pointer-events: none; /* عشان ميعطلش المشغل في النص */
+    z-index: 2; /* فوق الفيديو وتحت الـ Controls الأصلية لما تظهر */
+    pointer-events: auto;
   }
 
-  .touch-zone {
+  .click-zone {
     flex: 1;
-    height: 100%;
-    pointer-events: auto;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: transparent;
+    cursor: pointer;
     position: relative;
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* منطقة الوسط الميتة (عشان ماتتداخلش مع الـ Play) */
+  .dead-zone {
+    width: 20%; 
+    height: 100%;
+    pointer-events: none; /* بتخلي الضغط يعدي للي تحته */
+  }
+
+  /* الأسهم الشفافة */
   .skip-icon {
-    font-size: 50px;
+    font-size: 40px;
     color: var(--neon-accent);
-    opacity: 0; /* مخفية */
-    background: rgba(0, 0, 0, 0.4);
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    transform: scale(0.8);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.2s;
     text-shadow: 0 0 15px var(--neon-accent);
-    border: 1px solid var(--neon-accent);
+    user-select: none;
+    pointer-events: none;
   }
 
-  /* التأثير عند الضغط */
-  .touch-zone:active .skip-icon {
-    opacity: 1;
-    transform: scale(1.1);
+  /* الأنيميشن لما تدوس */
+  .click-zone:active .skip-icon {
+    opacity: 0.6;
+    transform: scale(1.2);
   }
 
-  /* تخصيص الـ Plyr عشان النيون */
-  .plyr--video {
-    border-radius: 18px;
-  }
-  .plyr--full-ui.plyr--video .plyr__control--overlaid {
-    background: var(--neon-accent) !important;
-    color: var(--dark-black) !important;
-  }
-  .plyr__control:hover {
-    background: var(--neon-accent) !important;
-    color: var(--dark-black) !important;
-  }
-  .plyr__progress--seek input[type=range], .plyr__type--video .plyr__controls {
-    color: var(--neon-accent) !important;
+  #hint {
+    margin-top: 12px;
+    color: var(--neon-accent);
+    font-size: 14px;
+    text-shadow: 0 0 4px var(--neon-accent);
   }
 
-  /* الملاحظات */
   .notes-container {
     max-width: 950px;
     width: 95%;
@@ -144,52 +146,67 @@
     padding: 25px;
     background: var(--darker-green-bg); 
     border-radius: 18px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(39, 217, 126, 0.2);
     text-align: right;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   #video-notes {
     width: 100%;
-    min-height: 150px;
+    min-height: 200px;
     padding: 15px;
     border: 2px solid var(--neon-accent); 
     border-radius: 12px;
     background-color: var(--dark-black);
     color: var(--light-text);
-    resize: none;
+    resize: vertical;
     font-family: 'Cairo', sans-serif;
-    box-sizing: border-box;
     outline: none;
+    box-sizing: border-box;
   }
 
   #save-status {
+    margin-top: 10px;
     color: var(--success);
     font-size: 14px;
-    margin-top: 10px;
-    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.5s;
+    font-weight: 700;
   }
+
+  /* Plyr Customization */
+  .plyr--video .plyr__controls button.plyr__controls__item:hover {
+      background: var(--neon-accent) !important;
+      color: var(--dark-black) !important;
+  }
+  .plyr__progress--seek { background: var(--neon-accent) !important; }
+  .plyr__time { color: var(--neon-accent); font-family: 'Orbitron', sans-serif; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="back" onclick="history.back()">⬅</div>
-  <div class="title">𝑷𝑳𝑨𝒀𝑬𝑹 𝑿</div>
+  <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
   <div style="width:25px;"></div>
 </div>
 
-<div class="player-wrapper">
-    <div class="video-touch-controls">
-        <div class="touch-zone" id="rewind-zone">
-            <div class="skip-icon">❮</div>
-        </div>
-        <div class="touch-zone" id="forward-zone">
-            <div class="skip-icon">❯</div>
-        </div>
+<div class="video-wrapper">
+  <div class="click-overlay">
+    <div class="click-zone" id="rewind-zone">
+      <span class="skip-icon">⏪</span>
     </div>
-    
-    <video id="player" playsinline controls></video>
+    <div class="dead-zone"></div>
+    <div class="click-zone" id="forward-zone">
+      <span class="skip-icon">⏩</span>
+    </div>
+  </div>
+  
+  <video id="player" playsinline controls poster="poster.jpg"></video>
 </div>
+
+<div id="hint">💡 اضغط مرتين على جوانب الشاشة للتقديم والتأخير</div>
 
 <div class="notes-container">
   <h2>📝 ملاحظاتي</h2>
@@ -202,70 +219,133 @@
 
 <script>
 let qualitySources = [];
+let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
 const savedSources = localStorage.getItem("video_sources");
 
-// إعداد المصادر
 if (savedSources) {
   try {
     const links = JSON.parse(savedSources);
-    qualitySources = Array.isArray(links) ? links.map(l => ({src: l.url || l, type: "application/x-mpegURL", size: parseInt(l.label) || 720})) : [{src: links.url || links, type: "application/x-mpegURL", size: 720}];
-  } catch (err) { console.error(err); }
+    if (Array.isArray(links)) {
+      qualitySources = links.map(link => ({
+        src: link.url || link,
+        type: "application/x-mpegURL",
+        size: parseInt(link.label) || 720
+      }));
+    } else {
+      qualitySources = [{
+        src: links.url || links,
+        type: "application/x-mpegURL",
+        size: parseInt(links.label) || 720
+      }];
+    }
+  } catch (err) {
+    console.error("❌ Error parsing savedSources:", err);
+  }
+} else {
+  document.body.innerHTML = "<div class='error-msg'>لم يتم تحديد رابط الفيديو 😢</div>";
 }
 
 const player = new Plyr('#player', {
-  controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
-  settings: ['quality', 'speed'],
-  tooltips: { controls: true, seek: true }
+  controls: ['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'],
+  settings: ['quality','speed','loop']
 });
 
-const videoElement = document.querySelector("video");
+const video = document.querySelector("video");
 
-// وظائف اللمس في المناطق الشفافة
-document.getElementById('rewind-zone').addEventListener('click', () => {
-    videoElement.currentTime = Math.max(0, videoElement.currentTime - 10);
-    showControlsTemporarily();
+// --- منطق التقديم والتأخير الجديد باللمس/الضغط ---
+const forwardZone = document.getElementById('forward-zone');
+const rewindZone = document.getElementById('rewind-zone');
+
+forwardZone.addEventListener('dblclick', (e) => {
+  video.currentTime += 10;
 });
 
-document.getElementById('forward-zone').addEventListener('click', () => {
-    videoElement.currentTime = Math.min(videoElement.duration, videoElement.currentTime + 10);
-    showControlsTemporarily();
+rewindZone.addEventListener('dblclick', (e) => {
+  video.currentTime -= 10;
 });
 
-// وظيفة لإظهار شريط التحكم (Plyr) لما ندوس على المناطق الشفافة
-function showControlsTemporarily() {
-    const controls = document.querySelector('.plyr__controls');
-    if(controls) {
-        controls.style.opacity = '1';
-        controls.style.pointerEvents = 'auto';
-        setTimeout(() => {
-            // هيرجع لاختفاء Plyr التلقائي
-        }, 3000);
+// دعم التاتش للموبايل (Double Tap)
+let lastTap = 0;
+[forwardZone, rewindZone].forEach(zone => {
+  zone.addEventListener('touchend', function (e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    if (tapLength < 300 && tapLength > 0) {
+      if (this.id === 'forward-zone') video.currentTime += 10;
+      else video.currentTime -= 10;
+      e.preventDefault();
     }
-}
+    lastTap = currentTime;
+  });
+});
 
-// تشغيل الـ HLS
+// اللوجيك القديم بتاع الكيبورد (بدون تغيير)
+let spacePressed = false;
+let longPressTimeout = null;
+let isLongPress = false;
+document.addEventListener("keydown", function (e) {
+  if (e.code === "ArrowRight") video.currentTime += 5;
+  if (e.code === "ArrowLeft") video.currentTime -= 5;
+  if (e.code === "Space") {
+    if (!spacePressed) {
+      spacePressed = true;
+      longPressTimeout = setTimeout(() => {
+        isLongPress = true;
+        video.playbackRate = 2; 
+      }, 300);
+    }
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.code === "Space") {
+    clearTimeout(longPressTimeout);
+    if (isLongPress) video.playbackRate = 1;
+    else {
+      if (video.paused) video.play();
+      else video.pause();
+    }
+    spacePressed = false;
+    isLongPress = false;
+  }
+});
+
 if (qualitySources.length > 0) {
   const firstSrc = qualitySources[0].src;
-  if (Hls.isSupported()) {
+  if (firstSrc.endsWith(".m3u8") && Hls.isSupported()) {
     const hls = new Hls();
     hls.loadSource(firstSrc);
-    hls.attachMedia(videoElement);
+    hls.attachMedia(document.getElementById('player'));
+  } else {
+    player.source = {
+      type: 'video',
+      title: videoTitle,
+      sources: qualitySources
+    };
   }
 }
 
-// حفظ الملاحظات
+setTimeout(() => document.getElementById('hint').style.display = 'none', 5000);
+
+// كود الملاحظات
 const notesTextarea = document.getElementById('video-notes');
 const saveStatusDiv = document.getElementById('save-status');
-const videoID = qualitySources.length > 0 ? btoa(qualitySources[0].src) : 'default';
+let videoID = null;
 
-const savedNotes = localStorage.getItem(`video_notes_${videoID}`);
-if (savedNotes) notesTextarea.value = savedNotes;
+if (qualitySources.length > 0) {
+    videoID = btoa(qualitySources[0].src);
+    const savedNotes = localStorage.getItem(`video_notes_${videoID}`);
+    if (notesTextarea && savedNotes) notesTextarea.value = savedNotes;
 
-notesTextarea.addEventListener('input', () => {
-    localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
-    saveStatusDiv.textContent = '✅ تم الحفظ';
-    setTimeout(() => saveStatusDiv.textContent = '', 2000);
-});
+    if (notesTextarea) {
+        notesTextarea.addEventListener('input', () => {
+            localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
+            saveStatusDiv.textContent = '✅ تم الحفظ تلقائياً';
+            saveStatusDiv.style.opacity = 1;
+            setTimeout(() => { saveStatusDiv.style.opacity = 0; }, 2000);
+        });
+    }
+}
 </script>
 
 </body>
