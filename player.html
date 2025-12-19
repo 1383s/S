@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>full mark player </title>
+<title>Full Mark Player - Pro Edition</title>
   
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
-    <script src="auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="auth.js"></script>
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&display=swap');
@@ -33,91 +33,110 @@
     overflow-x: hidden;
   }
 
+  /* الشريط العلوي */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: rgba(8, 64, 44, 0.4);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 14px 18px;
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
+    box-shadow: 0 0 15px rgba(39, 217, 126, 0.2);
     border-bottom: 2px solid var(--neon-accent);
   }
+
   .title {
     color: var(--neon-accent);
     font-weight: 700;
     font-size: 18px;
     font-family: 'Orbitron', sans-serif;
     text-shadow: 0 0 8px var(--neon-accent);
-    letter-spacing: 1px;
-  }
-  .back {
-    font-size: 22px;
-    cursor: pointer;
-    color: var(--neon-accent);
-    transition: transform 0.3s;
-    user-select: none;
-  }
-  .back:hover { 
-    transform: translateX(-5px) scale(1.1); 
-    text-shadow: 0 0 5px var(--neon-accent);
   }
 
-  /* Container للحفاظ على الـ Aspect Ratio والـ Hints */
-  .video-wrapper {
+  /* حاوية المشغل */
+  .player-wrapper {
     position: relative;
     max-width: 950px;
     margin: 25px auto;
-    width: 95%;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(39, 217, 126, 0.3);
+    border: 1px solid var(--neon-accent);
+    background: #000;
   }
 
   #player {
     width: 100%;
-    border-radius: 18px;
-    box-shadow: 0 0 30px rgba(39, 217, 126, 0.4), 0 0 15px rgba(0, 0, 0, 0.8);
-    background: var(--dark-black);
-    border: 1px solid var(--neon-accent);
+    display: block;
   }
 
-  /* ستايل تلميحات الحركة (YouTube Overlay) */
-  #action-hint {
+  /* ===== أزرار التقديم والتأخير الشفافة (Overlay) ===== */
+  .video-touch-controls {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.7);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(100% - 50px); /* نترك مساحة بسيطة لشريط Plyr السفلي */
+    display: flex;
+    z-index: 5;
+    pointer-events: none; /* عشان ميعطلش المشغل في النص */
+  }
+
+  .touch-zone {
+    flex: 1;
+    height: 100%;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .skip-icon {
+    font-size: 50px;
     color: var(--neon-accent);
-    padding: 15px 25px;
-    border-radius: 30px;
-    pointer-events: none;
-    z-index: 1000;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity 0.3s;
+    opacity: 0; /* مخفية */
+    background: rgba(0, 0, 0, 0.4);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    transform: scale(0.8);
+    text-shadow: 0 0 15px var(--neon-accent);
     border: 1px solid var(--neon-accent);
   }
 
-  #hint {
-    margin-top: 12px;
-    color: var(--neon-accent);
-    font-size: 14px;
-    text-shadow: 0 0 4px var(--neon-accent);
+  /* التأثير عند الضغط */
+  .touch-zone:active .skip-icon {
+    opacity: 1;
+    transform: scale(1.1);
   }
 
-  .error-msg {
-    margin: 40px auto;
-    color: var(--error);
-    font-size: 20px;
-    font-weight: 700;
-    text-shadow: 0 0 8px var(--error);
-    font-family: 'Orbitron', sans-serif;
+  /* تخصيص الـ Plyr عشان النيون */
+  .plyr--video {
+    border-radius: 18px;
+  }
+  .plyr--full-ui.plyr--video .plyr__control--overlaid {
+    background: var(--neon-accent) !important;
+    color: var(--dark-black) !important;
+  }
+  .plyr__control:hover {
+    background: var(--neon-accent) !important;
+    color: var(--dark-black) !important;
+  }
+  .plyr__progress--seek input[type=range], .plyr__type--video .plyr__controls {
+    color: var(--neon-accent) !important;
   }
 
+  /* الملاحظات */
   .notes-container {
     max-width: 950px;
     width: 95%;
@@ -125,7 +144,6 @@
     padding: 25px;
     background: var(--darker-green-bg); 
     border-radius: 18px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(39, 217, 126, 0.2);
     text-align: right;
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
@@ -138,45 +156,40 @@
     border-radius: 12px;
     background-color: var(--dark-black);
     color: var(--light-text);
-    resize: vertical;
+    resize: none;
     font-family: 'Cairo', sans-serif;
-    outline: none;
     box-sizing: border-box;
+    outline: none;
   }
 
   #save-status {
-    margin-top: 10px;
     color: var(--success);
     font-size: 14px;
-    text-align: center;
-    opacity: 0;
-    transition: opacity 0.5s;
-    font-weight: 700;
+    margin-top: 10px;
+    font-weight: bold;
   }
-  
-  /* Plyr Theme Fixes */
-  .plyr--video .plyr__controls button.plyr__controls__item:hover {
-      background: var(--neon-accent) !important;
-      color: var(--dark-black) !important;
-  }
-  .plyr__progress--seek { background: var(--neon-accent) !important; }
-  .plyr__time { color: var(--neon-accent); font-family: 'Orbitron', sans-serif; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="back" onclick="history.back()">⬅</div>
-  <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
+  <div class="title">𝑷𝑳𝑨𝒀𝑬𝑹 𝑿</div>
   <div style="width:25px;"></div>
 </div>
 
-<div class="video-wrapper">
-  <video id="player" playsinline controls></video>
-  <div id="action-hint"></div>
+<div class="player-wrapper">
+    <div class="video-touch-controls">
+        <div class="touch-zone" id="rewind-zone">
+            <div class="skip-icon">❮</div>
+        </div>
+        <div class="touch-zone" id="forward-zone">
+            <div class="skip-icon">❯</div>
+        </div>
+    </div>
+    
+    <video id="player" playsinline controls></video>
 </div>
-
-<div id="hint">💡 اضغط مرتين للتقديم/التأخير | اضغط مطولاً للتسريع 2x</div>
 
 <div class="notes-container">
   <h2>📝 ملاحظاتي</h2>
@@ -188,118 +201,71 @@
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-// --- تهيئة البيانات ---
-let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
-const savedSources = localStorage.getItem("video_sources");
 let qualitySources = [];
+const savedSources = localStorage.getItem("video_sources");
 
+// إعداد المصادر
 if (savedSources) {
-    try {
-        const links = JSON.parse(savedSources);
-        qualitySources = Array.isArray(links) ? links : [links];
-    } catch (e) { console.error("Source error"); }
+  try {
+    const links = JSON.parse(savedSources);
+    qualitySources = Array.isArray(links) ? links.map(l => ({src: l.url || l, type: "application/x-mpegURL", size: parseInt(l.label) || 720})) : [{src: links.url || links, type: "application/x-mpegURL", size: 720}];
+  } catch (err) { console.error(err); }
 }
 
-const videoElement = document.getElementById('player');
-const actionHint = document.getElementById('action-hint');
-const firstSource = qualitySources.length > 0 ? (qualitySources[0].url || qualitySources[0]) : null;
+const player = new Plyr('#player', {
+  controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+  settings: ['quality', 'speed'],
+  tooltips: { controls: true, seek: true }
+});
 
-// دالة لإظهار التلميحات
-function showHint(msg) {
-    actionHint.textContent = msg;
-    actionHint.style.opacity = 1;
-    setTimeout(() => { actionHint.style.opacity = 0; }, 800);
-}
+const videoElement = document.querySelector("video");
 
-if (!firstSource) {
-    document.body.innerHTML = "<div class='error-msg'>لم يتم تحديد رابط الفيديو 😢</div>";
-} else {
-    // --- إعداد Plyr ---
-    const player = new Plyr(videoElement, {
-        controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
-        settings: ['quality', 'speed', 'loop']
-    });
+// وظائف اللمس في المناطق الشفافة
+document.getElementById('rewind-zone').addEventListener('click', () => {
+    videoElement.currentTime = Math.max(0, videoElement.currentTime - 10);
+    showControlsTemporarily();
+});
 
-    // --- دعم HLS (m3u8) ---
-    if (firstSource.endsWith(".m3u8") && Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(firstSource);
-        hls.attachMedia(videoElement);
-    } else {
-        videoElement.src = firstSource;
+document.getElementById('forward-zone').addEventListener('click', () => {
+    videoElement.currentTime = Math.min(videoElement.duration, videoElement.currentTime + 10);
+    showControlsTemporarily();
+});
+
+// وظيفة لإظهار شريط التحكم (Plyr) لما ندوس على المناطق الشفافة
+function showControlsTemporarily() {
+    const controls = document.querySelector('.plyr__controls');
+    if(controls) {
+        controls.style.opacity = '1';
+        controls.style.pointerEvents = 'auto';
+        setTimeout(() => {
+            // هيرجع لاختفاء Plyr التلقائي
+        }, 3000);
     }
-
-    // --- نظام التحكم الاحترافي (Touch Logic) ---
-    let lastTap = 0;
-    let longPressTimer;
-    let isSpeeding = false;
-
-    videoElement.addEventListener('touchstart', (e) => {
-        const now = Date.now();
-        const delay = now - lastTap;
-        const rect = videoElement.getBoundingClientRect();
-        const x = e.touches[0].clientX - rect.left;
-        
-        // منع القائمة الافتراضية للموبايل
-        if (e.touches.length === 1) {
-            longPressTimer = setTimeout(() => {
-                videoElement.playbackRate = 2.0;
-                isSpeeding = true;
-                showHint("⏩ 2x Speed");
-            }, 500);
-        }
-
-        if (delay < 300) {
-            clearTimeout(longPressTimer);
-            if (x > rect.width * 0.6) {
-                videoElement.currentTime += 10;
-                showHint("Forward +10s");
-            } else if (x < rect.width * 0.4) {
-                videoElement.currentTime -= 10;
-                showHint("Rewind -10s");
-            }
-            e.preventDefault();
-        }
-        lastTap = now;
-    });
-
-    videoElement.addEventListener('touchend', () => {
-        clearTimeout(longPressTimer);
-        if (isSpeeding) {
-            videoElement.playbackRate = 1.0;
-            isSpeeding = false;
-            showHint("1x Normal");
-        }
-    });
-
-    // --- تحكم الكيبورد ---
-    document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'TEXTAREA') return;
-        if (e.code === 'Space') {
-            e.preventDefault();
-            videoElement.paused ? videoElement.play() : videoElement.pause();
-        }
-        if (e.code === 'ArrowRight') videoElement.currentTime += 5;
-        if (e.code === 'ArrowLeft') videoElement.currentTime -= 5;
-    });
-
-    // --- نظام الملاحظات ---
-    const notesArea = document.getElementById('video-notes');
-    const saveStatus = document.getElementById('save-status');
-    const videoID = btoa(encodeURIComponent(firstSource)).substring(0, 15);
-
-    const savedNotes = localStorage.getItem(`notes_${videoID}`);
-    if (savedNotes) notesArea.value = savedNotes;
-
-    notesArea.addEventListener('input', () => {
-        localStorage.setItem(`notes_${videoID}`, notesArea.value);
-        saveStatus.style.opacity = 1;
-        saveStatus.textContent = "✅ تم الحفظ";
-        setTimeout(() => { saveStatus.style.opacity = 0; }, 1500);
-    });
 }
 
-setTimeout(() => document.getElementById('hint').style.display = 'none', 6000);
+// تشغيل الـ HLS
+if (qualitySources.length > 0) {
+  const firstSrc = qualitySources[0].src;
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(firstSrc);
+    hls.attachMedia(videoElement);
+  }
+}
+
+// حفظ الملاحظات
+const notesTextarea = document.getElementById('video-notes');
+const saveStatusDiv = document.getElementById('save-status');
+const videoID = qualitySources.length > 0 ? btoa(qualitySources[0].src) : 'default';
+
+const savedNotes = localStorage.getItem(`video_notes_${videoID}`);
+if (savedNotes) notesTextarea.value = savedNotes;
+
+notesTextarea.addEventListener('input', () => {
+    localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
+    saveStatusDiv.textContent = '✅ تم الحفظ';
+    setTimeout(() => saveStatusDiv.textContent = '', 2000);
+});
 </script>
 
 </body>
