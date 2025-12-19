@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-<title>full mark player</title>
+<title>Full Mark Player - Pro Edition</title>
   
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -16,23 +16,38 @@
 
   :root {
     --dark-black: #020A07;
+    --darker-green-bg: #0C241C;
     --neon-accent: #27d97e;
     --success: #00C896;
     --light-text: #f0f0f5;
   }
 
-  body { font-family: 'Cairo', sans-serif; background: #000; color: var(--light-text); margin: 0; text-align: center; }
+  body { 
+    font-family: 'Cairo', sans-serif; 
+    background: linear-gradient(180deg, var(--dark-black) 0%, #000 100%); 
+    color: var(--light-text); 
+    margin: 0; 
+    text-align: center; 
+    overflow-x: hidden;
+  }
 
+  /* الشريط العلوي */
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
     background: rgba(8, 64, 44, 0.4); backdrop-filter: blur(5px);
-    padding: 14px 18px; border-bottom: 2px solid var(--neon-accent);
+    padding: 14px 18px; position: sticky; top: 0; z-index: 100;
+    border-bottom: 2px solid var(--neon-accent);
+    box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
   }
+  .title { color: var(--neon-accent); font-weight: 700; font-size: 18px; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 8px var(--neon-accent); }
+  .back { font-size: 22px; cursor: pointer; color: var(--neon-accent); transition: 0.3s; }
 
-  /* الحاوية عشان نتحكم في اللمس */
+  /* حاوية المشغل */
   .player-wrapper {
-    max-width: 950px; width: 98%; margin: 20px auto; position: relative;
+    max-width: 950px; width: 95%; margin: 25px auto; position: relative;
     border-radius: 18px; overflow: hidden; border: 1px solid var(--neon-accent);
+    box-shadow: 0 0 30px rgba(39, 217, 126, 0.4);
+    background: var(--dark-black);
   }
 
   #player { width: 100%; height: 60vh; }
@@ -40,12 +55,24 @@
   /* الفيدباك (زي اليوتيوب) */
   .v-feedback {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(39, 217, 126, 0.85); color: #000; padding: 10px 20px;
-    border-radius: 25px; font-weight: bold; z-index: 100; display: none; pointer-events: none;
+    background: rgba(39, 217, 126, 0.9); color: #000; padding: 12px 24px;
+    border-radius: 30px; font-weight: bold; z-index: 100; display: none; 
+    pointer-events: none; font-family: 'Orbitron', sans-serif;
   }
 
-  .notes-container { max-width: 950px; width: 95%; margin: 30px auto; padding: 25px; background: #0C241C; border-radius: 18px; text-align: right; }
-  #video-notes { width: 100%; min-height: 200px; padding: 15px; border: 2px solid var(--neon-accent); border-radius: 12px; background: var(--dark-black); color: #fff; outline: none; box-sizing: border-box; }
+  /* الملاحظات */
+  .notes-container { 
+    max-width: 950px; width: 95%; margin: 30px auto; padding: 25px; 
+    background: var(--darker-green-bg); border-radius: 18px; text-align: right; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .notes-container h2 { margin-bottom: 15px; font-size: 20px; }
+  #video-notes { 
+    width: 100%; min-height: 200px; padding: 15px; border: 2px solid var(--neon-accent); 
+    border-radius: 12px; background: var(--dark-black); color: #fff; 
+    outline: none; box-sizing: border-box; font-family: 'Cairo', sans-serif;
+  }
+  #save-status { color: var(--success); opacity: 0; transition: 0.5s; text-align: center; margin-top: 10px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -64,27 +91,45 @@
 <div class="notes-container">
   <h2>📝 ملاحظاتي</h2>
   <textarea id="video-notes" placeholder="اكتب ملاحظاتك هنا..."></textarea>
-  <div id="save-status" style="color:var(--success); opacity:0; transition:0.5s; text-align:center;">✅ تم الحفظ</div>
+  <div id="save-status">✅ تم الحفظ تلقائياً</div>
 </div>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-// 1. استرجاع اللينكات (بنفس طريقتك الأصلية عشان متبوظش)
+// 1. استرجاع اللينكات من الـ LocalStorage (بنفس الأسلوب بتاعك)
 let qualitySources = [];
 const savedSources = localStorage.getItem("video_sources");
+
 if (savedSources) {
   try {
     const links = JSON.parse(savedSources);
-    qualitySources = Array.isArray(links) ? links.map(l => ({src: l.url || l, type: "application/x-mpegURL", size: parseInt(l.label) || 720})) : [{src: links.url || links, type: "application/x-mpegURL", size: 720}];
-  } catch (err) { console.error(err); }
+    if (Array.isArray(links)) {
+      qualitySources = links.map(link => ({
+        src: link.url || link,
+        type: "application/x-mpegURL",
+        size: parseInt(link.label) || 720
+      }));
+    } else {
+      qualitySources = [{
+        src: savedSources.url || savedSources,
+        type: "application/x-mpegURL",
+        size: 720
+      }];
+    }
+  } catch (err) {
+    console.error("Error loading sources:", err);
+  }
+} else {
+  document.body.innerHTML += "<h2 style='color:red; margin-top:50px;'>لم يتم العثور على روابط للفيديو!</h2>";
 }
 
-// 2. تشغيل Plyr
+// 2. إعداد مشغل Plyr
 const player = new Plyr('#player', {
-    controls: ['play-large','play','progress','current-time','duration','mute','volume','settings', 'fullscreen'],
-    clickToPlay: false // قفلنا دي عشان نهندل اللمس بمزاجنا
+    controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+    settings: ['quality', 'speed'],
+    clickToPlay: false // عطلناها عشان نتحكم في الـ Click اليدوي
 });
 
 const video = document.querySelector("video");
@@ -93,18 +138,17 @@ const wrap = document.getElementById('p-wrap');
 
 function showFb(txt) {
     fb.textContent = txt; fb.style.display = 'block';
-    setTimeout(() => fb.style.display = 'none', 700);
+    setTimeout(() => fb.style.display = 'none', 800);
 }
 
-// 3. لوجيك اللمس المحترف (Double Click & Long Press)
+// 3. لوجيك اللمس والتحكم الذكي (Double Click / Long Press)
 let lastTap = 0;
 let tapTimeout;
 let longPressTimer;
 let isSpeeding = false;
 
 const handleAction = (e) => {
-    // منع السلوك الافتراضي لو كان لمس بس سيب الماوس شغال للفول سكرين
-    if (e.type === 'touchstart') e.preventDefault();
+    if (e.type === 'touchstart') e.preventDefault(); // منع تداخل اللمس
     
     const now = Date.now();
     const rect = wrap.getBoundingClientRect();
@@ -112,14 +156,14 @@ const handleAction = (e) => {
     const isRight = x > rect.width / 2;
 
     if (now - lastTap < 300) {
-        // --- Double Tap ---
+        // Double Tap: تقديم أو تأخير
         clearTimeout(tapTimeout);
         clearTimeout(longPressTimer);
         if (isRight) { video.currentTime += 10; showFb("+10s"); }
         else { video.currentTime -= 10; showFb("-10s"); }
         lastTap = 0;
     } else {
-        // --- Single Tap / Start Long Press ---
+        // Single Tap: تشغيل/إيقاف
         lastTap = now;
         tapTimeout = setTimeout(() => {
             if (!isSpeeding) {
@@ -127,6 +171,7 @@ const handleAction = (e) => {
             }
         }, 300);
 
+        // Long Press: تسريع 2x
         longPressTimer = setTimeout(() => {
             isSpeeding = true;
             video.playbackRate = 2.0;
@@ -144,35 +189,38 @@ const endAction = () => {
     }
 };
 
-// تشغيل الأحداث على حاوية الفيديو
 wrap.addEventListener('mousedown', handleAction);
 wrap.addEventListener('mouseup', endAction);
 wrap.addEventListener('touchstart', handleAction, {passive: false});
 wrap.addEventListener('touchend', endAction);
 
-// 4. تشغيل الفيديو (HLS)
+// 4. تحميل الفيديو باستخدام HLS
 if (qualitySources.length > 0) {
-  const firstSrc = qualitySources[0].src;
-  if (Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(firstSrc);
-    hls.attachMedia(video);
-  } else {
-    video.src = firstSrc;
-  }
+    const firstSrc = qualitySources[0].src;
+    if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(firstSrc);
+        hls.attachMedia(video);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = firstSrc;
+    }
 }
 
-// 5. الملاحظات (طريقتك الأصلية)
+// 5. الملاحظات (تلقائية بالكامل)
 const notesTextarea = document.getElementById('video-notes');
+const saveStatus = document.getElementById('save-status');
+
 if (qualitySources.length > 0) {
-    const vID = btoa(qualitySources[0].src);
-    notesTextarea.value = localStorage.getItem(`video_notes_${vID}`) || "";
-    notesTextarea.oninput = () => {
-        localStorage.setItem(`video_notes_${vID}`, notesTextarea.value);
-        document.getElementById('save-status').style.opacity = 1;
-        setTimeout(() => document.getElementById('save-status').style.opacity = 0, 1500);
-    };
+    const videoID = btoa(qualitySources[0].src).substring(0, 20); // معرف فريد
+    notesTextarea.value = localStorage.getItem(`video_notes_${videoID}`) || "";
+
+    notesTextarea.addEventListener('input', () => {
+        localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
+        saveStatus.style.opacity = 1;
+        setTimeout(() => saveStatus.style.opacity = 0, 2000);
+    });
 }
 </script>
+
 </body>
 </html>
