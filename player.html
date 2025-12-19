@@ -67,7 +67,6 @@
     text-shadow: 0 0 5px var(--neon-accent);
   }
 
-  /* Container Video */
   .video-wrapper {
     position: relative;
     max-width: 950px;
@@ -77,6 +76,7 @@
     overflow: hidden;
     box-shadow: 0 0 30px rgba(39, 217, 126, 0.4);
     border: 1px solid var(--neon-accent);
+    background: #000;
   }
 
   #player {
@@ -85,16 +85,15 @@
     background: var(--dark-black);
   }
 
-  /* طبقة زراير التقديم والتاخير الشفافة */
   .click-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 50px); /* ترك مساحة للـ controls الأصلية */
     display: flex;
-    z-index: 2; /* فوق الفيديو وتحت الـ Controls الأصلية لما تظهر */
-    pointer-events: auto;
+    z-index: 10; 
+    pointer-events: none; /* جعلها تمرر الضغطات للأسفل افتراضياً */
   }
 
   .click-zone {
@@ -105,17 +104,16 @@
     background: transparent;
     cursor: pointer;
     position: relative;
+    pointer-events: auto; /* تفعيل الضغط على الأجناب فقط */
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* منطقة الوسط الميتة (عشان ماتتداخلش مع الـ Play) */
   .dead-zone {
-    width: 20%; 
+    width: 30%; 
     height: 100%;
-    pointer-events: none; /* بتخلي الضغط يعدي للي تحته */
+    pointer-events: none; 
   }
 
-  /* الأسهم الشفافة */
   .skip-icon {
     font-size: 40px;
     color: var(--neon-accent);
@@ -126,10 +124,9 @@
     pointer-events: none;
   }
 
-  /* الأنيميشن لما تدوس */
   .click-zone:active .skip-icon {
-    opacity: 0.6;
-    transform: scale(1.2);
+    opacity: 0.8;
+    transform: scale(1.3);
   }
 
   #hint {
@@ -175,7 +172,6 @@
     font-weight: 700;
   }
 
-  /* Plyr Customization */
   .plyr--video .plyr__controls button.plyr__controls__item:hover {
       background: var(--neon-accent) !important;
       color: var(--dark-black) !important;
@@ -222,76 +218,84 @@ let qualitySources = [];
 let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
 const savedSources = localStorage.getItem("video_sources");
 
+// تحليل الروابط
 if (savedSources) {
   try {
     const links = JSON.parse(savedSources);
-    if (Array.isArray(links)) {
-      qualitySources = links.map(link => ({
-        src: link.url || link,
-        type: "application/x-mpegURL",
-        size: parseInt(link.label) || 720
-      }));
-    } else {
-      qualitySources = [{
-        src: links.url || links,
-        type: "application/x-mpegURL",
-        size: parseInt(links.label) || 720
-      }];
-    }
+    const linksArray = Array.isArray(links) ? links : [links];
+    qualitySources = linksArray.map(link => ({
+      src: typeof link === 'string' ? link : link.url,
+      type: "application/x-mpegURL",
+      size: parseInt(link.label) || 720
+    }));
   } catch (err) {
     console.error("❌ Error parsing savedSources:", err);
   }
 } else {
-  document.body.innerHTML = "<div class='error-msg'>لم يتم تحديد رابط الفيديو 😢</div>";
+  document.body.innerHTML = "<div style='padding:50px;'>لم يتم تحديد رابط الفيديو 😢</div>";
 }
 
-const player = new Plyr('#player', {
+const videoElement = document.getElementById('player');
+const player = new Plyr(videoElement, {
   controls: ['play-large','play','progress','current-time','duration','mute','volume','settings','fullscreen'],
   settings: ['quality','speed','loop']
 });
 
-const video = document.querySelector("video");
+// تشغيل HLS
+if (qualitySources.length > 0) {
+  const sourceUrl = qualitySources[0].src;
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(sourceUrl);
+    hls.attachMedia(videoElement);
+    window.hls = hls;
+  } else if (videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+    videoElement.src = sourceUrl;
+  }
+}
 
-// --- منطق التقديم والتأخير الجديد باللمس/الضغط ---
+// منطق التقديم والتأخير (Double Click & Double Tap)
 const forwardZone = document.getElementById('forward-zone');
 const rewindZone = document.getElementById('rewind-zone');
 
-forwardZone.addEventListener('dblclick', (e) => {
-  video.currentTime += 10;
-});
+const handleSkip = (direction) => {
+  if (direction === 'forward') videoElement.currentTime += 10;
+  else videoElement.currentTime -= 10;
+};
 
-rewindZone.addEventListener('dblclick', (e) => {
-  video.currentTime -= 10;
-});
+forwardZone.addEventListener('dblclick', (e) => { e.preventDefault(); handleSkip('forward'); });
+rewindZone.addEventListener('dblclick', (e) => { e.preventDefault(); handleSkip('backward'); });
 
-// دعم التاتش للموبايل (Double Tap)
 let lastTap = 0;
 [forwardZone, rewindZone].forEach(zone => {
-  zone.addEventListener('touchend', function (e) {
+  zone.addEventListener('touchstart', (e) => {
     const currentTime = new Date().getTime();
     const tapLength = currentTime - lastTap;
     if (tapLength < 300 && tapLength > 0) {
-      if (this.id === 'forward-zone') video.currentTime += 10;
-      else video.currentTime -= 10;
+      handleSkip(zone.id === 'forward-zone' ? 'forward' : 'backward');
       e.preventDefault();
     }
     lastTap = currentTime;
   });
 });
 
-// اللوجيك القديم بتاع الكيبورد (بدون تغيير)
+// الكيبورد
 let spacePressed = false;
 let longPressTimeout = null;
 let isLongPress = false;
-document.addEventListener("keydown", function (e) {
-  if (e.code === "ArrowRight") video.currentTime += 5;
-  if (e.code === "ArrowLeft") video.currentTime -= 5;
+
+document.addEventListener("keydown", (e) => {
+  if (document.activeElement === notesTextarea) return; // منع التداخل مع الكتابة
+  
+  if (e.code === "ArrowRight") videoElement.currentTime += 5;
+  if (e.code === "ArrowLeft") videoElement.currentTime -= 5;
   if (e.code === "Space") {
+    e.preventDefault();
     if (!spacePressed) {
       spacePressed = true;
       longPressTimeout = setTimeout(() => {
         isLongPress = true;
-        video.playbackRate = 2; 
+        videoElement.playbackRate = 2; 
       }, 300);
     }
   }
@@ -300,51 +304,36 @@ document.addEventListener("keydown", function (e) {
 document.addEventListener("keyup", (e) => {
   if (e.code === "Space") {
     clearTimeout(longPressTimeout);
-    if (isLongPress) video.playbackRate = 1;
-    else {
-      if (video.paused) video.play();
-      else video.pause();
+    if (isLongPress) {
+      videoElement.playbackRate = 1;
+    } else {
+      player.togglePlay();
     }
     spacePressed = false;
     isLongPress = false;
   }
 });
 
-if (qualitySources.length > 0) {
-  const firstSrc = qualitySources[0].src;
-  if (firstSrc.endsWith(".m3u8") && Hls.isSupported()) {
-    const hls = new Hls();
-    hls.loadSource(firstSrc);
-    hls.attachMedia(document.getElementById('player'));
-  } else {
-    player.source = {
-      type: 'video',
-      title: videoTitle,
-      sources: qualitySources
-    };
-  }
-}
+// إخفاء التلميح
+setTimeout(() => {
+  const hint = document.getElementById('hint');
+  if(hint) hint.style.opacity = '0';
+}, 5000);
 
-setTimeout(() => document.getElementById('hint').style.display = 'none', 5000);
-
-// كود الملاحظات
+// الملاحظات
 const notesTextarea = document.getElementById('video-notes');
 const saveStatusDiv = document.getElementById('save-status');
-let videoID = null;
-
 if (qualitySources.length > 0) {
-    videoID = btoa(qualitySources[0].src);
+    const videoID = btoa(qualitySources[0].src).substring(0, 20);
     const savedNotes = localStorage.getItem(`video_notes_${videoID}`);
-    if (notesTextarea && savedNotes) notesTextarea.value = savedNotes;
+    if (savedNotes) notesTextarea.value = savedNotes;
 
-    if (notesTextarea) {
-        notesTextarea.addEventListener('input', () => {
-            localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
-            saveStatusDiv.textContent = '✅ تم الحفظ تلقائياً';
-            saveStatusDiv.style.opacity = 1;
-            setTimeout(() => { saveStatusDiv.style.opacity = 0; }, 2000);
-        });
-    }
+    notesTextarea.addEventListener('input', () => {
+        localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
+        saveStatusDiv.textContent = '✅ تم الحفظ تلقائياً';
+        saveStatusDiv.style.opacity = 1;
+        setTimeout(() => { saveStatusDiv.style.opacity = 0; }, 1500);
+    });
 }
 </script>
 
