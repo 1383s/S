@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Full Mark Player - Ultra Fix</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>full mark player</title>
   
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -14,7 +14,13 @@
   @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
   @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&display=swap');
 
-  :root { --dark-black: #020A07; --neon-accent: #27d97e; --success: #00C896; --light-text: #f0f0f5; }
+  :root {
+    --dark-black: #020A07;
+    --neon-accent: #27d97e;
+    --success: #00C896;
+    --light-text: #f0f0f5;
+  }
+
   body { font-family: 'Cairo', sans-serif; background: #000; color: var(--light-text); margin: 0; text-align: center; }
 
   .topbar {
@@ -23,154 +29,150 @@
     padding: 14px 18px; border-bottom: 2px solid var(--neon-accent);
   }
 
-  .player-container {
-    max-width: 950px; width: 100%; margin: 20px auto; position: relative;
-    border-radius: 15px; overflow: hidden; background: #000;
-    touch-action: none; /* لمنع الزوم الافتراضي للموبايل */
+  /* الحاوية عشان نتحكم في اللمس */
+  .player-wrapper {
+    max-width: 950px; width: 98%; margin: 20px auto; position: relative;
+    border-radius: 18px; overflow: hidden; border: 1px solid var(--neon-accent);
   }
 
   #player { width: 100%; height: 60vh; }
 
-  /* الطبقة المسئولة عن اللمس فقط */
-  #touch-handler {
-    position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 60px);
-    z-index: 10; cursor: pointer;
-  }
-
-  .video-feedback {
+  /* الفيدباك (زي اليوتيوب) */
+  .v-feedback {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(39, 217, 126, 0.9); color: #000; padding: 12px 25px;
-    border-radius: 30px; font-weight: bold; z-index: 20; display: none; pointer-events: none;
-    font-family: 'Orbitron', sans-serif;
+    background: rgba(39, 217, 126, 0.85); color: #000; padding: 10px 20px;
+    border-radius: 25px; font-weight: bold; z-index: 100; display: none; pointer-events: none;
   }
 
-  .notes-container { max-width: 950px; width: 92%; margin: 20px auto; padding: 20px; background: #0C241C; border-radius: 15px; text-align: right; }
-  #video-notes { width: 100%; min-height: 150px; background: #020A07; color: #fff; border: 2px solid var(--neon-accent); border-radius: 10px; padding: 15px; box-sizing: border-box; outline: none; }
+  .notes-container { max-width: 950px; width: 95%; margin: 30px auto; padding: 25px; background: #0C241C; border-radius: 18px; text-align: right; }
+  #video-notes { width: 100%; min-height: 200px; padding: 15px; border: 2px solid var(--neon-accent); border-radius: 12px; background: var(--dark-black); color: #fff; outline: none; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="back" onclick="history.back()">⬅</div>
-  <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐</div>
+  <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
   <div style="width:25px;"></div>
 </div>
 
-<div class="player-container" id="main-container">
-    <div id="touch-handler"></div>
+<div class="player-wrapper" id="p-wrap">
     <video id="player" playsinline controls></video>
-    <div id="feedback" class="video-feedback"></div>
+    <div id="v-fb" class="v-feedback"></div>
 </div>
 
 <div class="notes-container">
   <h2>📝 ملاحظاتي</h2>
   <textarea id="video-notes" placeholder="اكتب ملاحظاتك هنا..."></textarea>
-  <div id="save-status" style="color: var(--success); opacity:0; transition:0.5s;">✅ تم الحفظ</div>
+  <div id="save-status" style="color:var(--success); opacity:0; transition:0.5s; text-align:center;">✅ تم الحفظ</div>
 </div>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-const video = document.getElementById('player');
-const touchHandler = document.getElementById('touch-handler');
-const feedback = document.getElementById('feedback');
-
-// تشغيل Plyr مع تعطيل الكليك الافتراضي
-const player = new Plyr('#player', {
-    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
-    clickToPlay: false 
-});
-
-let timer = null;
-let longPressTimer = null;
-let isLongPress = false;
-
-function showMsg(txt) {
-    feedback.textContent = txt;
-    feedback.style.display = 'block';
-    setTimeout(() => feedback.style.display = 'none', 800);
-}
-
-// دالة التعامل مع اللمس (موبايل وكمبيوتر)
-function onTouchStart(e) {
-    e.preventDefault();
-    const rect = touchHandler.getBoundingClientRect();
-    const clientX = e.clientX || e.touches[0].clientX;
-    const x = clientX - rect.left;
-    const isRight = x > rect.width / 2;
-
-    // تحضير الضغطة المطولة
-    longPressTimer = setTimeout(() => {
-        isLongPress = true;
-        video.playbackRate = 2.0;
-        showMsg("⏩ 2x Speed");
-    }, 500);
-
-    // الكشف عن Double Click
-    if (e.detail === 2 || (timer !== null)) {
-        // Double Click
-        clearTimeout(timer);
-        clearTimeout(longPressTimer);
-        timer = null;
-        if (isRight) {
-            video.currentTime += 10;
-            showMsg("+10s");
-        } else {
-            video.currentTime -= 10;
-            showMsg("-10s");
-        }
-    } else {
-        // Single Click (انتظار التأكيد)
-        timer = setTimeout(() => {
-            if (!isLongPress) {
-                if (video.paused) video.play(); else video.pause();
-            }
-            timer = null;
-        }, 300);
-    }
-}
-
-function onTouchEnd() {
-    clearTimeout(longPressTimer);
-    if (isLongPress) {
-        video.playbackRate = 1.0;
-        isLongPress = false;
-        showMsg("1x Speed");
-    }
-}
-
-// ربط الأحداث
-touchHandler.addEventListener('mousedown', onTouchStart);
-touchHandler.addEventListener('mouseup', onTouchEnd);
-touchHandler.addEventListener('touchstart', onTouchStart, {passive: false});
-touchHandler.addEventListener('touchend', onTouchEnd);
-
-// تشغيل الفيديو HLS
+// 1. استرجاع اللينكات (بنفس طريقتك الأصلية عشان متبوظش)
+let qualitySources = [];
 const savedSources = localStorage.getItem("video_sources");
 if (savedSources) {
-    try {
-        const links = JSON.parse(savedSources);
-        const url = Array.isArray(links) ? (links[0].url || links[0]) : (links.url || links);
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(url);
-            hls.attachMedia(video);
-        } else {
-            video.src = url;
-        }
-    } catch(e) { console.error("URL Error"); }
+  try {
+    const links = JSON.parse(savedSources);
+    qualitySources = Array.isArray(links) ? links.map(l => ({src: l.url || l, type: "application/x-mpegURL", size: parseInt(l.label) || 720})) : [{src: links.url || links, type: "application/x-mpegURL", size: 720}];
+  } catch (err) { console.error(err); }
 }
 
-// الملاحظات
-const videoID = btoa(window.location.href);
-const notes = document.getElementById('video-notes');
-notes.value = localStorage.getItem(`n_${videoID}`) || "";
-notes.oninput = () => {
-    localStorage.setItem(`n_${videoID}`, notes.value);
-    document.getElementById('save-status').style.opacity = 1;
-    setTimeout(() => document.getElementById('save-status').style.opacity = 0, 1000);
+// 2. تشغيل Plyr
+const player = new Plyr('#player', {
+    controls: ['play-large','play','progress','current-time','duration','mute','volume','settings', 'fullscreen'],
+    clickToPlay: false // قفلنا دي عشان نهندل اللمس بمزاجنا
+});
+
+const video = document.querySelector("video");
+const fb = document.getElementById('v-fb');
+const wrap = document.getElementById('p-wrap');
+
+function showFb(txt) {
+    fb.textContent = txt; fb.style.display = 'block';
+    setTimeout(() => fb.style.display = 'none', 700);
+}
+
+// 3. لوجيك اللمس المحترف (Double Click & Long Press)
+let lastTap = 0;
+let tapTimeout;
+let longPressTimer;
+let isSpeeding = false;
+
+const handleAction = (e) => {
+    // منع السلوك الافتراضي لو كان لمس بس سيب الماوس شغال للفول سكرين
+    if (e.type === 'touchstart') e.preventDefault();
+    
+    const now = Date.now();
+    const rect = wrap.getBoundingClientRect();
+    const x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+    const isRight = x > rect.width / 2;
+
+    if (now - lastTap < 300) {
+        // --- Double Tap ---
+        clearTimeout(tapTimeout);
+        clearTimeout(longPressTimer);
+        if (isRight) { video.currentTime += 10; showFb("+10s"); }
+        else { video.currentTime -= 10; showFb("-10s"); }
+        lastTap = 0;
+    } else {
+        // --- Single Tap / Start Long Press ---
+        lastTap = now;
+        tapTimeout = setTimeout(() => {
+            if (!isSpeeding) {
+                if (video.paused) video.play(); else video.pause();
+            }
+        }, 300);
+
+        longPressTimer = setTimeout(() => {
+            isSpeeding = true;
+            video.playbackRate = 2.0;
+            showFb("⏩ 2x Speed");
+        }, 500);
+    }
 };
+
+const endAction = () => {
+    clearTimeout(longPressTimer);
+    if (isSpeeding) {
+        video.playbackRate = 1.0;
+        isSpeeding = false;
+        showFb("1x Speed");
+    }
+};
+
+// تشغيل الأحداث على حاوية الفيديو
+wrap.addEventListener('mousedown', handleAction);
+wrap.addEventListener('mouseup', endAction);
+wrap.addEventListener('touchstart', handleAction, {passive: false});
+wrap.addEventListener('touchend', endAction);
+
+// 4. تشغيل الفيديو (HLS)
+if (qualitySources.length > 0) {
+  const firstSrc = qualitySources[0].src;
+  if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(firstSrc);
+    hls.attachMedia(video);
+  } else {
+    video.src = firstSrc;
+  }
+}
+
+// 5. الملاحظات (طريقتك الأصلية)
+const notesTextarea = document.getElementById('video-notes');
+if (qualitySources.length > 0) {
+    const vID = btoa(qualitySources[0].src);
+    notesTextarea.value = localStorage.getItem(`video_notes_${vID}`) || "";
+    notesTextarea.oninput = () => {
+        localStorage.setItem(`video_notes_${vID}`, notesTextarea.value);
+        document.getElementById('save-status').style.opacity = 1;
+        setTimeout(() => document.getElementById('save-status').style.opacity = 0, 1500);
+    };
+}
 </script>
 </body>
 </html>
