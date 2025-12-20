@@ -6,24 +6,21 @@
 <title>full mark subjects</title>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-      <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
-    <script type="module" src="devcheck.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
+  <script type="module" src="devcheck.js"></script>
   <script src="auth.js"></script>
   <style>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@200..900&display=swap'); 
-/* خط إضافي لـ Cyber/Tech Feel */
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap');
 
-
 :root {
-  /* 🟢 ثوابت الـ Cyber Green والـ Dark Tech */
-  --dark-black: #020A07;           /* الخلفية الأساسية - أسود فاحم */
-  --main-green-bg: #08402C;        /* أخضر داكن للـ Cards - اللون الرئيسي المطلوب */
-  --darker-green-bg: #0C241C;      /* أخضر أغمق للـ Topbar/Hover */
-  --neon-accent: #27d97e;          /* أخضر نيون ساطع */
-  --light-text: #f0f0f5;           /* نص فاتح */
-  --gray-text: #8e8e8e;            /* نص ثانوي */
+  --dark-black: #020A07;
+  --main-green-bg: #08402C;
+  --darker-green-bg: #0C241C;
+  --neon-accent: #27d97e;
+  --light-text: #f0f0f5;
+  --gray-text: #8e8e8e;
 }
 
 body {
@@ -35,457 +32,112 @@ body {
   background: var(--dark-black);
   color: var(--light-text);
   margin: 0;
-  transition: background 0.4s, color 0.4s;
   overflow-x: hidden;
 }
 
-/* ===== الشريط العلوي (Top Bar) - تأثير الزجاج الثلجي/Frosted Glass ===== */
 .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  /* خلفية شفافة من اللون الأساسي + زجاج ثلجي */
   background: rgba(8, 64, 44, 0.4); 
   backdrop-filter: blur(10px); 
-  -webkit-backdrop-filter: blur(10px);
   padding: 10px 15px;
-  color: var(--light-text);
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+  top: 0; right: 0; left: 0;
   z-index: 1000;
-  transition: background 0.3s, color 0.3s;
-  border-bottom: 2px solid var(--neon-accent); /* خط أخضر نيون */
+  border-bottom: 2px solid var(--neon-accent);
   box-shadow: 0 4px 15px rgba(39, 217, 126, 0.2);
-}
-
-.menu-btn {
-  font-size: 24px;
-  cursor: pointer;
 }
 
 .title {
   font-size: 16px;
-  color: var(--neon-accent); /* نيون لافت */
-  font-family: 'Orbitron', sans-serif; /* خط تقني */
+  color: var(--neon-accent);
+  font-family: 'Orbitron', sans-serif;
   font-weight: 700;
   letter-spacing: 2px;
-  text-shadow: 0 0 8px rgba(39, 217, 126, 0.7);
 }
 
-.icons {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
+.icons { display: flex; align-items: center; gap: 15px; }
+.icons img { width: 28px; height: 28px; filter: invert(1) drop-shadow(0 0 6px var(--neon-accent)); cursor: pointer; }
 
-.icons img {
-  width: 28px;
-  height: 28px;
-  /* فلتر عشان تبقى شكلها نيون أخضر */
-  filter: invert(1) drop-shadow(0 0 6px var(--neon-accent)); 
-  cursor: pointer;
-  transition: 0.3s;
-}
-.icons img:hover {
-    filter: invert(1) drop-shadow(0 0 12px var(--neon-accent));
-    transform: scale(1.1);
-}
-
-/* تحديث الـ Toggle - Cyber Switch */
-.toggle-dark {
-  background: var(--dark-black);
-  border: 2px solid var(--neon-accent);
-  border-radius: 20px;
-  width: 50px;
-  height: 25px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.toggle-dark::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  right: 3px; 
-  width: 15px;
-  height: 15px;
-  background: var(--neon-accent);
-  border-radius: 50%;
-  transition: 0.3s;
-  box-shadow: 0 0 8px var(--neon-accent);
-}
-
-.toggle-dark.active::after {
-  right: 27px;
-  background: var(--light-text);
-  box-shadow: 0 0 8px var(--light-text);
-}
-
-/* ===== باقي التنسيقات ===== */
 h1 {
   color: var(--neon-accent);
   text-align: center;
   font-size: 3rem;
   margin-bottom: 50px;
-  text-shadow: 0 0 15px rgba(39, 217, 126, 0.8); /* ظل نيون أخضر قوي */
+  text-shadow: 0 0 15px rgba(39, 217, 126, 0.8);
   font-family: 'Orbitron', sans-serif;
   font-weight: 900;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  /* تأثير الـ Glitch الخفيف ممكن إضافته لزيادة الجاذبية */
 }
 
 ul {
   padding: 0 10px;
   list-style: none;
-  
-  /* ⭐️ عرض أكبر للقائمة عشان تشتغل على التابلت والديسكتوب */
-  max-width: 1200px; 
-  
-  margin: 0 auto; 
-  
-  /* 🛠️ Grid Layout اللي بيتجاوب */
-  display: grid; 
-  /* Default: 3 أو 4 أعمدة بحد أدنى 250px للعرض */
-  grid-template-columns: repeat(3, minmax(250px, 1fr)); 
-  gap: 30px; 
-  transform: none; 
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  gap: 30px;
 }
 
 li {
-  /* بطاقة المادة - تستخدم اللون الأساسي المطلوب #08402C */
-  background: var(--main-green-bg); 
+  background: var(--main-green-bg);
   border-radius: 15px;
-  padding: 30px 25px 30px;
+  padding: 30px 25px;
   cursor: pointer;
   border: 1px solid rgba(39, 217, 126, 0.2);
-  /* ظل خفيف مع إحساس الـ Depth */
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7); 
-  transition: background-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
-  
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+  transition: all 0.4s ease;
   display: flex;
   flex-direction: column;
-  align-items: center; 
-  text-align: center;  
-  justify-content: space-between;
-  user-select: none;
-  /* شلنا الـ width: 100% عشان الـ Grid يحدد العرض صح */
-  min-height: 250px; 
+  align-items: center;
+  min-height: 250px;
 }
 
 li:hover {
-  /* خلفية أغمق للـ Hover من اللون الثانوي #0C241C */
-  background: var(--darker-green-bg); 
-  color: #fff;
-  transform: translateY(-8px) scale(1.03); /* رفع أقل وأكثر انسيابية */
+  background: var(--darker-green-bg);
+  transform: translateY(-8px) scale(1.03);
   border-color: var(--neon-accent);
-  /* ظل نيون أخضر قوي جدا */
-  box-shadow: 0 15px 40px rgba(39, 217, 126, 0.5); 
-}
-
-li:active {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(39, 217, 126, 0.4);
+  box-shadow: 0 15px 40px rgba(39, 217, 126, 0.5);
 }
 
 .circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: var(--darker-green-bg); /* خلفية الدائرة أغمق */
-  overflow: hidden;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: var(--darker-green-bg);
   margin-bottom: 25px;
   border: 4px solid var(--neon-accent);
   box-shadow: 0 0 15px var(--neon-accent);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.4s;
-}
-li:hover .circle {
-  border-color: var(--light-text);
-  box-shadow: 0 0 20px var(--light-text);
+  display: flex; justify-content: center; align-items: center;
 }
 
-.circle img {
-  width: 80%;
-  height: 80%;
-  object-fit: contain;
-  /* فلتر لـ Cyber Glow */
-  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); 
-  transition: all 0.4s;
-}
+.circle img { width: 80%; height: 80%; object-fit: contain; filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); }
 
-li span {
-  font-weight: 700;
-  font-size: 1.4rem;
-  text-align: center;
-  color: var(--light-text);
-  transition: color 0.3s;
-  text-shadow: 0 0 5px rgba(0,0,0,0.5);
-  font-family: 'Tajawal', sans-serif;
-}
-li:hover span {
-    color: var(--neon-accent); 
-    text-shadow: 0 0 10px var(--neon-accent);
-}
+li span { font-weight: 700; font-size: 1.4rem; font-family: 'Tajawal', sans-serif; }
 
-li.loading {
-  cursor: default;
-  color: var(--gray-text);
-  background: var(--dark-black);
-  box-shadow: none;
-  font-weight: 500;
-  font-size: 1.3rem;
-  /* تخليها تمتد على كل الأعمدة */
-  grid-column: 1 / -1; 
-  text-align: center;
-  margin-top: 30px;
-}
-
+li.loading { grid-column: 1 / -1; text-align: center; color: var(--gray-text); font-size: 1.3rem; }
 li.loading::after {
-  content: "";
-  width: 35px;
-  height: 35px;
-  border: 4px solid var(--neon-accent);
-  border-top: 4px solid transparent;
-  border-radius: 50%;
-  display: inline-block;
-  margin-right: 15px;
-  vertical-align: middle;
-  animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite; 
+  content: ""; width: 35px; height: 35px; border: 4px solid var(--neon-accent);
+  border-top: 4px solid transparent; border-radius: 50%; display: inline-block;
+  margin-right: 15px; animation: spin 1s linear infinite;
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ===== وضع الفاتح (Light Mode) - تناغم الألوان (تم تعديلها للأخضر) ===== */
-body.light-mode {
-  background: #f8fcf8; /* أبيض فاتح مع لمسة خضراء */
-  color: #1a1a1a;
-}
-body.light-mode .topbar {
-  background: rgba(255, 255, 255, 0.9);
-  color: #1a1a1a;
-  border-bottom-color: var(--main-green-bg);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-body.light-mode li {
-  background: #fff;
-  color: #1a1a1a;
-  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
-  border-color: #eee;
-}
-body.light-mode li:hover {
-  background: var(--main-green-bg);
-  color: #fff;
-  box-shadow: 0 15px 40px rgba(8, 64, 44, 0.4);
-}
-body.light-mode li span {
-  color: #1a1a1a;
-}
-body.light-mode li:hover span {
-  color: var(--neon-accent);
-  text-shadow: none;
-}
-body.light-mode .circle {
-  background: #eee;
-  border-color: var(--main-green-bg);
-  box-shadow: none;
-}
-body.light-mode li:hover .circle {
-  border-color: var(--neon-accent);
-  box-shadow: 0 0 20px rgba(39, 217, 126, 0.3);
-}
-body.light-mode .toggle-dark {
-  border-color: var(--main-green-bg);
-  background: #fff;
-}
-body.light-mode .toggle-dark::after {
-  background: var(--main-green-bg);
-  box-shadow: 0 0 8px var(--main-green-bg);
-}
-body.light-mode .toggle-dark.active::after {
-  background: var(--neon-accent);
-  box-shadow: 0 0 8px var(--neon-accent);
-}
-body.light-mode .icons img {
-    filter: none; /* إزالة الـ filter في الـ light mode */
-}
-
-/* ===== Toast إشعار (أخضر تقني) ===== */
-#toast {
-  visibility: hidden;
-  min-width: 300px;
-  background: var(--darker-green-bg);
-  color: var(--neon-accent);
-  text-align: center;
-  border-radius: 10px;
-  padding: 15px;
-  position: fixed;
-  z-index: 2000;
-  left: 50%;
-  bottom: 30px;
-  transform: translateX(-50%);
-  font-size: 1.1rem;
-  border: 1px solid var(--neon-accent);
-  box-shadow: 0 0 12px var(--neon-accent), 0 6px 20px rgba(0,0,0,0.7);
-  opacity: 0;
-  transition: opacity 0.4s, bottom 0.4s;
-}
-#toast.show {
-  visibility: visible;
-  opacity: 1;
-  bottom: 40px;
-}
-body.light-mode #toast {
-  background: #fff;
-  color: var(--main-green-bg);
-  border-color: var(--main-green-bg);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-/* ✅ زر البروفايل العائم (أخضر تقني) */
 .profile-float-btn {
-  position: fixed;
-  bottom: 30px;
-  left: 30px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--darker-green-bg);
-  border: 3px solid var(--neon-accent);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  box-shadow: 0 0 15px var(--neon-accent);
-  transition: 0.3s;
-  z-index: 1200;
+  position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
+  border-radius: 50%; background: var(--darker-green-bg); border: 3px solid var(--neon-accent);
+  display: flex; justify-content: center; align-items: center; z-index: 1200;
 }
-.profile-float-btn:hover {
-  transform: scale(1.1) rotate(5deg);
-  background: var(--main-green-bg);
-  box-shadow: 0 0 25px var(--neon-accent); 
-}
+.profile-float-btn img { width: 30px; height: 30px; filter: invert(1); }
 
-.profile-float-btn img {
-    width: 30px;
-    height: 30px;
-    filter: invert(1) drop-shadow(0 0 5px var(--neon-accent)); /* عشان أيقونة البروفايل تبان نيون */
-}
-body.light-mode .profile-float-btn {
-  background: var(--main-green-bg);
-  border: 3px solid #fff;
-}
-body.light-mode .profile-float-btn:hover {
-  background: var(--neon-accent);
-  border-color: var(--main-green-bg); 
-}
-body.light-mode .profile-float-btn img {
-    filter: invert(0);
-}
-
-/* ✅ تنسيق زر الصفحة الرئيسية */
-.home-button {
-    background: linear-gradient(90deg, var(--neon-accent), var(--main-green-bg));
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1.05rem;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1100;
-    box-shadow: 0 6px 20px rgba(39, 217, 126, 0.4);
-    transition: transform 0.3s, opacity 0.3s;
-}
-.home-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(39, 217, 126, 0.7);
-}
-
-/* ===== Media Queries لتجاوبية أفضل (تم تحديثها) ===== */
-
-/* ⭐️ New Media Query for Large Tablets/Small Desktops */
-@media (max-width: 1024px) {
-    ul {
-        /* 2 أو 3 أعمدة كحد أدنى */
-        grid-template-columns: repeat(3, minmax(200px, 1fr));
-        gap: 25px;
-    }
-}
-
-@media (max-width: 768px) {
-  h1 {
-    font-size: 2.5rem;
-  }
-  ul {
-    /* شاشات الـ Tablet العمودي */
-    grid-template-columns: repeat(4, minmax(180px, 1fr));
-    gap: 20px;
-  }
-  .circle {
-    width: 100px;
-    height: 100px;
-  }
-  li span {
-    font-size: 1.2rem;
-  }
-  .profile-float-btn {
-    width: 50px;
-    height: 50px;
-    bottom: 20px;
-    left: 20px;
-  }
-}
 @media (max-width: 480px) {
-    h1 {
-        font-size: 1.8rem;
-    }
-    ul {
-        /* الموبايل - عمود واحد عريض ومريح */
-        grid-template-columns: 1fr; 
-        gap: 15px;
-    }
-    li {
-        min-height: 180px;
-        padding: 25px 20px; 
-    }
-    .circle {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 15px;
-    }
-    .home-button {
-        padding: 8px 15px;
-        font-size: 0.9rem;
-        top: 15px;
-        right: 15px;
-    }
-    body {
-        padding-top: 70px;
-    }
-}
-
-/* تنسيقات إضافية (لم يتم استخدامها في الـ HTML لكن تم تعديل ألوانها لتناسب الثيم الجديد) */
-.activation-info-container, .fixed-bottom-bar, .info-label, .activation-code-box, .return-btn, .bottom-label, .bottom-code {
-    background: var(--darker-green-bg);
-    color: var(--light-text);
-    border: 1px solid var(--neon-accent);
+    ul { grid-template-columns: 1fr; }
+    h1 { font-size: 1.8rem; }
 }
   </style>
 </head>
 <body>
 
   <div class="topbar">
-    
     <div class="title">By ELGIZAWY</div>
     <div class="icons">
       <div class="toggle-dark" id="darkToggle"></div>
@@ -495,8 +147,6 @@ body.light-mode .profile-float-btn img {
       <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
     </div>
   </div>
-
-  <div id="toast">الإشعارات هتتفعل قريبًا 🔔✨</div>
 
   <h1> SUBJECTS 2026 </h1>
   <ul id="subjects-list">
@@ -508,125 +158,39 @@ body.light-mode .profile-float-btn img {
   </a>
 
 <script>
-// ✅ Toast احترافية — نسخة واحدة فقط
+// ✅ Toast احترافية
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `custom-toast ${type}`;
   toast.innerHTML = `<span>${message}</span>`;
-
   const style = document.createElement("style");
-  // ** تم تعديل الـ CSS بتاع الـ Toast عشان الـ Neon Green/Dark Theme **
   style.textContent = `
-    .custom-toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      padding: 14px 22px;
-      border-radius: 14px;
-      font-family: "Cairo", sans-serif;
-      font-weight: 600;
-      font-size: 15px;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-      animation: slideIn 0.5s ease, fadeOut 0.5s ease 2.5s forwards;
-      z-index: 9999;
-      border: 1px solid #27d97e;
-    }
-    .custom-toast.info { background: linear-gradient(135deg, #08402C, #0C241C); }
-    .custom-toast.success { background: linear-gradient(135deg, #27d97e, #1a8f54); }
-    .custom-toast.error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
-    @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-    @keyframes fadeOut { to { opacity: 0; transform: translateX(120%); } }
+    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid #27d97e; display:flex; align-items:center; animation: slideIn 0.5s ease; }
+    .custom-toast.info { background: #08402C; }
+    .custom-toast.success { background: #27d97e; }
+    @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
   `;
   document.head.appendChild(style);
   document.body.appendChild(toast);
   setTimeout(() => toast.remove(), 3000);
 }
-
-// ✅ متغير لتتبع حالة التحقق
-window.authPassed = false;
-// ✅ التحقق المعدل: تخطي تسجيل الدخول والرجوع للصفحة الرئيسية
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // ⬅️ نعتبر إن التحقق نجح على طول عشان نتخطى الفحص
-  window.authPassed = true;
-  
-  // تشغيل حدث authReady عشان باقي الأكواد تشتغل
-  document.dispatchEvent(new Event("authReady")); 
-  
-  // ممكن تحطي رسالة بسيطة للتأكد، أو تلغي السطر دا لو مش عايزة إشعار يظهر
-  // showToast("✅ تم تخطي التحقق والدخول بنجاح", "success"); 
-});
 </script>
 
 <script type="module">
-// 🚨 كونفيج Firebase (تحتاج للتأكد من بياناتك هنا)
+// 🌐 تهيئة الفايربيز (استخدم بياناتك الحقيقية من الكود المرفق)
 const firebaseConfig = {
     apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
     authDomain: "thanawy-1383.firebaseapp.com",
     databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
     projectId: "thanawy-1383",
-    // ...
 };
-
-// 💡 تهيئة Firebase (نحتاج لاستخدامها هنا لجلب الشعبة)
-if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
-    firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
-
-// 🌐 تحديد مسارات الـ JSON حسب الشعبة
-// ** الـ Object اللي بيربط الشعبة بالـ URL بتاعها **
-const JSON_URLS = {
-    'علمي علوم': " https://plus-teal.vercel.app/organized_output.json ",
-    'أدبي': " https://plus-teal.vercel.app/organized_output-a.json ", 
-    'علمي رياضة': " https://plus-teal.vercel.app/organized_output.json ", 
-    'أزهر': " https://plus-teal.vercel.app/organized_output.json ", 
-    'الافتراضي': " https://plus-teal.vercel.app/organized_output.json "
-};
-
-
-// 🔥 الدالة الجديدة لجلب الشعبة وتحديد الـ URL 🔥
-async function getDataSourceURL() {
-    const activeCode = localStorage.getItem('activeCode');
-    if (!activeCode) {
-        // لو مفيش كود مفعل، رجّع اللينك الافتراضي أو حوّل لصفحة تسجيل الدخول
-        console.warn("No active code found. Using default URL.");
-        // إذا لم يكن هناك كود، يجب تحويله لصفحة تسجيل الدخول
-        window.location.href = 'index.html'; 
-        return JSON_URLS.DEFAULT;
-    }
-
-    try {
-        // التحقق من الشعبة من Firebase
-        const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
-        const studentData = snapshot.val();
-
-        if (studentData && studentData.section) {
-            const studentSection = studentData.section.trim();
-            const url = JSON_URLS[studentSection] || JSON_URLS.DEFAULT;
-            showToast(`تم تحديد شعبتك: ${studentSection}`, "info");
-            return url;
-        } else {
-            showToast("لا يمكن تحديد الشعبة. استخدام المحتوى الافتراضي.", "warn");
-            return JSON_URLS.DEFAULT;
-        }
-    } catch (error) {
-        showToast("فشل الاتصال لتحديد الشعبة. استخدام المحتوى الافتراضي.", "error");
-        console.error("Error fetching student section from Firebase:", error);
-        return JSON_URLS.DEFAULT;
-    }
-}
-
 
 const subjectsList = document.getElementById('subjects-list');
 
 const subjectImages = {
-   "أحياء": "1.jpg",
+    "أحياء": "1.jpg",
     "فيزياء": "2.jpg",
     "كيمياء": "3.jpg",
     "لغة عربية": "5.jpg",
@@ -637,82 +201,83 @@ const subjectImages = {
     "جغرافيا": "9.jpg",
     "الإحصاء": "8.jpg",
     "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
-  };
-// **هذا الكود يحل المشكلة ويجب وضعه مكان loadSubjects() القديمة في subjects.html**
+};
+
+const JSON_URLS = {
+    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+    'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://plus-teal.vercel.app/organized_output.json", 
+    'أزهر': "https://plus-teal.vercel.app/organized_output.json", 
+    'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
+};
+
+async function getDataSourceURL() {
+    const activeCode = localStorage.getItem('activeCode');
+    if (!activeCode) return JSON_URLS['الافتراضي'];
+
+    try {
+        const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+        const studentData = snapshot.val();
+        if (studentData && studentData.section) {
+            return JSON_URLS[studentData.section.trim()] || JSON_URLS['الافتراضي'];
+        }
+        return JSON_URLS['الافتراضي'];
+    } catch (error) {
+        console.error("Firebase Error:", error);
+        return JSON_URLS['الافتراضي'];
+    }
+}
 
 async function loadSubjects() {
-  subjectsList.innerHTML = '<li class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>';
-
-  // 1. تحديد الـ URL بشكل ديناميكي قبل الجلب
-  const finalSourceURL = await getDataSourceURL(); 
-  
   try {
-    const res = await fetch(finalSourceURL); 
-    if (!res.ok) throw new Error("Failed to fetch JSON data.");
+    // 1. تحديد اللينك بناءً على الشعبة
+    const finalSourceURL = await getDataSourceURL();
+    
+    // 2. جلب البيانات من اللينك المختار
+    const res = await fetch(finalSourceURL);
+    if (!res.ok) throw new Error("Failed to fetch data");
+    const data = await res.json();
 
-    const allYearsData = await res.json();
+    // 3. البحث عن سنة 3 في الملف المختار
+    const year = data.find(y => y.id === 3 || y.id === "3" || y.name === "3");
 
-    // 💡 نستخدم Map لتخزين كل مادة مرة واحدة 
-    const uniqueSubjects = new Map();
-
-    (allYearsData || []).forEach(year => {
-        const yearId = year.id; 
-        const yearName = year.name; 
-        
-        (year.subjects || []).forEach(sub => {
-            if (!uniqueSubjects.has(sub.name)) {
-                // حفظ بيانات المادة مع ID السنة اللي ظهرت فيها (لأغراض التوجيه)
-                uniqueSubjects.set(sub.name, {
-                    name: sub.name,
-                    id: sub.id, // ID المادة
-                    yearId: yearId, // ID السنة
-                    yearName: yearName
-                });
-            }
-        });
-    });
-
-    subjectsList.innerHTML = '';
-
-    if (uniqueSubjects.size === 0) {
-      subjectsList.innerHTML = '<li class="loading">⚠️ لا توجد مواد متاحة لشعبتك.</li>';
+    if (!year) {
+      subjectsList.innerHTML = `<li class="loading">⚠️ لا توجد مواد متاحة حالياً</li>`;
       return;
     }
-    
-    // تحويل الـ Map لقائمة عشان نقدر نعمل عليها Loop
-    const sortedSubjects = Array.from(uniqueSubjects.values()).sort((a, b) => a.name.localeCompare(b.name));
 
+    subjectsList.innerHTML = "";
 
-    sortedSubjects.forEach(subjectData => {
-      const li = document.createElement('li');
-      const circle = document.createElement('div');
-      circle.className = 'circle';
-      const img = document.createElement('img');
-      img.src = subjectImages[subjectData.name] || 'https://img.icons8.com/ios-filled/100/ffd700/book.png';
+    // 4. عرض المواد
+    year.subjects.forEach(subject => {
+      const li = document.createElement("li");
+      const circle = document.createElement("div");
+      circle.className = "circle";
+      const img = document.createElement("img");
+      img.src = subjectImages[subject.name] || "https://img.icons8.com/ios-filled/100/ffd700/book.png";
       circle.appendChild(img);
-      const span = document.createElement('span');
-      span.textContent = subjectData.name;
-      li.appendChild(circle);
-      li.appendChild(span);
-      
-      // 🚨 التوجيه لصفحة المُعلمين مع الـ IDs
+
+      const span = document.createElement("span");
+      span.textContent = subject.name;
+
+      li.append(circle, span);
+
+      // التوجيه لصفحة المدرسين
       li.onclick = () => {
-          // نبعت yid (Year ID) و sid (Subject ID)
-          const url = `teachers.html?yid=${subjectData.yearId}&sid=${subjectData.id}`;
-          window.location.href = url;
+        window.location.href = `teachers.html?yid=${year.id}&sid=${subject.id}`;
       };
-      
+
       subjectsList.appendChild(li);
     });
 
-    showToast("✅ تم تحميل المواد بنجاح");
+    showToast("✅ تم تحميل المواد بنجاح", "success");
+
   } catch (err) {
-    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات من الخادم.</li>`;
     console.error(err);
+    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات</li>`;
   }
 }
 
-// 🚀 تشغيل تحميل المواد
 loadSubjects();
 </script>
 
