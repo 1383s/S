@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>شاتي - المواد الدراسية</title>
+<title>ثانوي بلس بريميوم</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -144,9 +144,7 @@ body { font-family: 'Inter', sans-serif; background-color:#020617; color:#f8fafc
   </div>
 
   <main class="flex-1 overflow-y-auto">
-    <div v-if="showFallbackWarning" class="warning-message animate-fade-in">
-        ⚠️ **ملحوظة:** لم يتم العثور على مواد مطابقة لـ "{{ userData.section }}". يتم عرض جميع المواد المتاحة.
-    </div>
+    
 
     <div v-if="stage===0" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
       <div v-for="year in filteredData" :key="year.id" @click="selectYear(year)"
