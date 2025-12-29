@@ -409,25 +409,29 @@ createApp({
             }
         };
 
-        const playVideo = (video) => {
-            if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
-                showToast("رابط الفيديو غير متاح", "error");
-                return;
-            }
+const playVideo = (video) => {
+    // 1. التأكد من وجود رابط
+    const videoUrl = video.stream_url || (video.sources && video.sources[0] ? video.sources[0].url : null);
     
-    // تأكد إننا بنخزن بأسماء يفهمها ملف player.html
-            localStorage.setItem("video_url", video.stream_url || ""); 
-            localStorage.setItem("video_title", video.title); 
+    if (!videoUrl) {
+        showToast("رابط الفيديو غير متاح 🚫", "error");
+        return;
+    }
     
-    // لو فيه جودات متعددة خزنها عشان الـ Player يقرأها
-            if(video.sources) {
-                localStorage.setItem("video_sources", JSON.stringify(video.sources));
-            } else {
-                localStorage.removeItem("video_sources"); // امسح القديم لو مفيش جودات
-            }
- 
-            window.location.href = 'player.html';
-        };
+    // 2. تخزين البيانات بالأسماء اللي بيفهمها الـ Player
+    localStorage.setItem("video_url", videoUrl); 
+    localStorage.setItem("video_title", video.title || "درس جديد");
+
+    // 3. لو فيه جودات (Array) لازم نخزنها كـ JSON string
+    if (video.sources && video.sources.length > 0) {
+        localStorage.setItem("video_sources", JSON.stringify(video.sources));
+    } else {
+        localStorage.removeItem("video_sources"); // نمسح أي جودات قديمة لمدرس تاني
+    }
+
+    // 4. الانتقال لصفحة المشغل
+    window.location.href = 'player.html';
+};
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
                 loading.value = false;
