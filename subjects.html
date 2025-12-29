@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* 🔵 الثيم الأساسي (الحوت الأزرق - Default) */
+    /* 🔵 الثيم الافتراضي (الحوت الأزرق - Dark) */
     :root {
       --bg-deep: #020617;          
       --cyan-neon: #00f3ff;      
@@ -25,28 +25,28 @@
       --glass-border: rgba(0, 243, 255, 0.2); 
       --card-hover: rgba(15, 23, 42, 0.9);
       
-      /* خلفية الصفحة (أزرق) */
+      /* خلفية الصفحة للوضع الليلي */
       --page-bg-image: 
           radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
           linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
           linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
     }
 
-    /* 🟣 الثيم الثاني (المجرة البنفسجية - Purple Galaxy) */
-    [data-theme="purple"] {
-      --bg-deep: #0f0518;          /* بنفسجي غامق جداً */
-      --cyan-neon: #d946ef;        /* فوشيا نيون */
-      --cyan-dim: #7c3aed;         /* بنفسجي متوسط */
-      --text-white: #f3e8ff;       /* أبيض مائل للوردي */
-      --glass-bg: rgba(30, 10, 45, 0.6); 
-      --glass-border: rgba(217, 70, 239, 0.2); 
-      --card-hover: rgba(40, 15, 60, 0.9);
+    /* ☀️ الثيم النهاري (Light Mode) */
+    [data-theme="light"] {
+      --bg-deep: #f0f9ff;          /* خلفية فاتحة جداً */
+      --cyan-neon: #0284c7;        /* أزرق واضح للكتابة */
+      --cyan-dim: #bae6fd;         /* أزرق سماوي فاتح */
+      --text-white: #0f172a;       /* نص غامق */
+      --glass-bg: rgba(255, 255, 255, 0.65); 
+      --glass-border: rgba(2, 132, 199, 0.2); 
+      --card-hover: rgba(255, 255, 255, 0.9);
 
-      /* خلفية الصفحة (بنفسجي) */
+      /* خلفية الصفحة للوضع النهاري */
       --page-bg-image: 
-          radial-gradient(circle at 50% 0%, #4c1d95 0%, #0f0518 80%),
-          linear-gradient(0deg, rgba(217, 70, 239, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(217, 70, 239, 0.03) 1px, transparent 1px);
+          radial-gradient(circle at 50% 0%, #e0f2fe 0%, #f0f9ff 80%),
+          linear-gradient(0deg, rgba(2,132,199,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(2,132,199,0.05) 1px, transparent 1px);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -72,13 +72,7 @@
       position: fixed;
       top: 0; left: 0; width: 100%;
       height: 70px;
-      background: rgba(2, 6, 23, 0.8); 
-      /* في حالة الثيم البنفسجي نغير لون الهيدر */
-      transition: background 0.5s;
-    }
-    [data-theme="purple"] .topbar { background: rgba(15, 5, 24, 0.8); }
-
-    .topbar {
+      background: var(--glass-bg); /* أصبح يأخذ لون الثيم */
       backdrop-filter: blur(15px);
       border-bottom: 1px solid var(--cyan-neon);
       display: flex;
@@ -87,6 +81,7 @@
       padding: 0 20px;
       z-index: 1000;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      transition: all 0.5s ease;
     }
 
     .title {
@@ -95,7 +90,7 @@
       font-weight: 700;
       color: var(--cyan-neon);
       letter-spacing: 1px;
-      text-shadow: 0 0 5px var(--cyan-neon);
+      text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
     }
 
     .icons {
@@ -105,29 +100,30 @@
     }
     
     .icon-btn {
-      width: 38px; height: 38px;
+      width: 35px; height: 35px;
       border-radius: 50%;
       display: flex; justify-content: center; align-items: center;
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.1);
       cursor: pointer;
       transition: 0.3s;
-      border: 1px solid var(--glass-border);
+      border: 1px solid transparent;
     }
     
     .icon-btn:hover {
         background: var(--cyan-neon);
-        box-shadow: 0 0 15px var(--cyan-neon);
-        border-color: var(--cyan-neon);
+        box-shadow: 0 0 10px var(--cyan-neon);
     }
     
-    .icon-btn i, .icon-btn img {
-        font-size: 1.1rem;
+    .icon-btn img, .icon-btn i {
+        width: 20px; height: 20px;
         color: var(--text-white);
-        transition: 0.3s;
+        /* فلتر لتغيير لون الأيقونات السوداء للأبيض والعكس */
+        filter: drop-shadow(0 0 2px var(--cyan-neon)); 
     }
-    .icon-btn img { width: 22px; height: 22px; filter: invert(1); }
     
-    .icon-btn:hover i, .icon-btn:hover img { color: #000; filter: brightness(0); }
+    /* تعديل للأيقونات في الوضع النهاري عشان تبان */
+    [data-theme="light"] .icon-btn i { color: #0284c7; }
+    [data-theme="light"] .icon-btn:hover i { color: #fff; }
 
     /* --- العنوان --- */
     h1 {
@@ -135,10 +131,10 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 2.5rem;
       font-weight: 900;
-      background: linear-gradient(to bottom, #fff, var(--cyan-neon));
+      background: linear-gradient(to bottom, var(--text-white), var(--cyan-neon));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px var(--glass-border);
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
       text-align: center;
     }
 
@@ -164,36 +160,36 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
       position: relative;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       min-height: 240px;
     }
 
     li:hover {
       background: var(--card-hover);
       transform: translateY(-10px);
-      box-shadow: 0 15px 50px rgba(0,0,0,0.3), 0 0 20px var(--glass-border);
+      box-shadow: 0 15px 50px rgba(0, 243, 255, 0.15);
       border-color: var(--cyan-neon);
     }
 
     /* دائرة الصورة */
     .circle {
       width: 110px; height: 110px;
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(100, 100, 100, 0.1);
       border-radius: 50%;
       display: flex; justify-content: center; align-items: center;
       border: 2px solid var(--cyan-dim);
-      box-shadow: 0 0 15px var(--glass-border);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
       margin-bottom: 20px;
       transition: 0.3s;
     }
     
     li:hover .circle {
         border-color: var(--cyan-neon);
-        box-shadow: 0 0 25px var(--cyan-neon);
-        transform: scale(1.05) rotate(5deg);
+        box-shadow: 0 0 25px rgba(0, 243, 255, 0.6);
+        transform: scale(1.05);
     }
 
     .circle img {
@@ -208,7 +204,6 @@
       font-weight: 700;
       color: var(--text-white);
       z-index: 2;
-      text-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
     /* كلمة دخول المادة */
@@ -220,13 +215,11 @@
         transform: translateY(15px);
         transition: 0.3s;
         font-weight: bold;
-        letter-spacing: 1px;
     }
     
     li:hover .enter-text {
         opacity: 1;
         transform: translateY(0);
-        text-shadow: 0 0 10px var(--cyan-neon);
     }
 
     /* التحميل */
@@ -262,22 +255,21 @@
       border: 2px solid var(--cyan-neon);
       border-radius: 50%;
       display: flex; justify-content: center; align-items: center;
-      box-shadow: 0 0 20px var(--glass-border);
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
       z-index: 1200;
       transition: 0.3s;
       backdrop-filter: blur(5px);
     }
     .profile-float-btn:hover {
         transform: scale(1.1) rotate(10deg);
-        box-shadow: 0 0 35px var(--cyan-neon);
-        background: var(--cyan-neon);
+        box-shadow: 0 0 35px rgba(0, 243, 255, 0.8);
     }
     .profile-float-btn img {
       width: 32px; height: 32px;
       filter: invert(1);
-      transition: 0.3s;
     }
-    .profile-float-btn:hover img { filter: brightness(0); }
+    /* تعديل لون أيقونة البروفايل في الوضع النهاري */
+    [data-theme="light"] .profile-float-btn img { filter: none; }
 
     @media (max-width: 480px) {
       h1 { font-size: 2rem; }
@@ -294,9 +286,8 @@
   <div class="topbar">
     <div class="title">By ELGIZAWY</div>
     <div class="icons">
-      <div class="icon-btn" id="themeToggle" title="تغيير الألوان">
-        <i class="fas fa-palette"></i>
-      </div>
+      <div class="icon-btn" id="themeToggle" title="تغيير المظهر">
+        <i class="fas fa-sun"></i> </div>
 
       <a href="" target="_blank" class="icon-btn">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
@@ -350,28 +341,30 @@ function showToast(message, type = "info") {
   }, 3000);
 }
 
-// 🎨 كود تغيير الثيم (Theme Switcher)
+// 🌓 كود تغيير الثيم (Theme Switcher)
 const themeBtn = document.getElementById('themeToggle');
+const themeIcon = themeBtn.querySelector('i');
 const body = document.body;
 
 // 1. فحص الثيم المحفوظ
 const savedTheme = localStorage.getItem('theme');
-if (savedTheme === 'purple') {
-    body.setAttribute('data-theme', 'purple');
+if (savedTheme === 'light') {
+    body.setAttribute('data-theme', 'light');
+    themeIcon.classList.replace('fa-sun', 'fa-moon'); // لو نهاري اظهر قمر
 }
 
 // 2. وظيفة التبديل
 themeBtn.onclick = () => {
-    if (body.getAttribute('data-theme') === 'purple') {
-        // العودة للأزرق
+    if (body.getAttribute('data-theme') === 'light') {
+        // التحويل لليلي
         body.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'blue');
-        showToast("تم تفعيل وضع الحوت الأزرق 🐳", "success");
+        localStorage.setItem('theme', 'dark');
+        themeIcon.classList.replace('fa-moon', 'fa-sun');
     } else {
-        // التحويل للبنفسجي
-        body.setAttribute('data-theme', 'purple');
-        localStorage.setItem('theme', 'purple');
-        showToast("تم تفعيل وضع المجرة البنفسجية 🌌", "success");
+        // التحويل للنهاري
+        body.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.classList.replace('fa-sun', 'fa-moon');
     }
 };
 </script>
@@ -402,95 +395,4 @@ const subjectImages = {
     "جغرافيا": "9.jpg",
     "الإحصاء": "8.jpg",
     "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
-    "Le français": "data:image/jpeg;base64,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"
-
-};
-  
-// روابط ملفات JSON
-const JSON_URLS = {
-    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
-    'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
-    'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json", 
-    'أزهر': "https://plus-teal.vercel.app/organized_output.json", 
-    'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
-};
-  
-// دالة جلب رابط البيانات بناءً على الشعبة
-async function getDataSourceURL() {
-    const activeCode = localStorage.getItem('activeCode');
-    if (!activeCode) return JSON_URLS['الافتراضي'];
-
-    try {
-        const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
-        const studentData = snapshot.val();
-        if (studentData && studentData.section) {
-            return JSON_URLS[studentData.section.trim()] || JSON_URLS['الافتراضي'];
-        }
-        return JSON_URLS['الافتراضي'];
-    } catch (error) {
-        console.error("Firebase Error:", error);
-        return JSON_URLS['الافتراضي'];
-    }
-}
-
-async function loadSubjects() {
-  try {
-    // 1. تحديد اللينك
-    const finalSourceURL = await getDataSourceURL();
-    
-    // 2. جلب البيانات
-    const res = await fetch(finalSourceURL);
-    if (!res.ok) throw new Error("Failed to fetch data");
-    const data = await res.json();
-
-    // 3. البحث عن سنة 3
-    const year = data.find(y => y.id === 3 || y.id === "3" || y.name === "3");
-
-    if (!year) {
-      subjectsList.innerHTML = `<li class="loading">⚠️ لا توجد مواد متاحة حالياً</li>`;
-      return;
-    }
-
-    subjectsList.innerHTML = "";
-
-    // 4. عرض المواد
-    year.subjects.forEach(subject => {
-      const li = document.createElement("li");
-      
-      const circle = document.createElement("div");
-      circle.className = "circle";
-      const img = document.createElement("img");
-      img.src = subjectImages[subject.name] || "https://img.icons8.com/ios-filled/100/ffd700/book.png";
-      circle.appendChild(img);
-
-      const span = document.createElement("span");
-      span.textContent = subject.name;
-
-      // إضافة كلمة "دخول المادة"
-      const enterText = document.createElement("div");
-      enterText.className = "enter-text";
-      enterText.textContent = "دخول المادة";
-
-      li.append(circle, span, enterText);
-
-      // التوجيه لصفحة المدرسين
-      li.onclick = () => {
-        window.location.href = `teachers.html?yid=${year.id}&sid=${subject.id}`;
-      };
-
-      subjectsList.appendChild(li);
-    });
-
-    showToast("✅ تم تحميل المواد بنجاح", "success");
-
-  } catch (err) {
-    console.error(err);
-    subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات</li>`;
-  }
-}
-
-loadSubjects();
-</script>
-
-</body>
-</html>
+    "Le français": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAAFAAMEBgcBAgj/xABCEAACAQMDAgQEAwUFBQkBAAABAgMABBEFEiEGMRNBUWEUInGBBzKRFSNCobEWUtHh8CRicoLBJjM2Y5KistLxJf/EABsBAAIDAQEBAAAAAAAAAAAAAAMEAQIFBgcA/8QAKREAAgICAgEEAQMFAAAAAAAAAQIAEQMhBBIxEyJBUTIFYcEjNFKBof/aAAwDAQACEQMRAD8Aq00jJtRNu9+c98CkqkNhiS3fOaW1TK7YA9/pT0UMfgT3E91FDHEBkyNyxPkB510LuqDsx1OexYmyEIg3G8ADA7e5zXcA15hminj3xOGXPlROWGyXSUlMiwyplpJGJO7/AHQPWidhV/EC1q3UjcFlQPLFWX8NXSLq22d8hVjlJ4zxtNVkyRyKDG4YEA5FWX8M
