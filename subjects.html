@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>المواد الدراسية | Full Mark</title>
+<title>full mark subjects</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -16,53 +16,29 @@
 
   <style>
     /* -------------------------------------------
-       1. إعدادات الألوان (CSS Variables)
+       إعدادات ثيم الحوت الأزرق (Blue Whale Theme)
        ------------------------------------------- */
     :root {
-      /* 🔵 الوضع الافتراضي (الحوت الأزرق - Dark) */
-      --bg-deep: #020617;
-      --glass-bg: rgba(15, 23, 42, 0.7);
-      --glass-border: rgba(0, 243, 255, 0.2);
+      --bg-deep: #020617;          
+      --glass-bg: rgba(15, 23, 42, 0.7); 
+      --glass-border: rgba(0, 243, 255, 0.2); 
       --card-hover: rgba(15, 23, 42, 0.95);
       --accent-neon: #00f3ff;  /* سماوي نيون */
       --accent-dim: #0099a0;
-      --text-main: #e2e8f0;
+      --text-main: #e2e8f0;       
       --text-sec: #94a3b8;
-      
-      /* خلفية الصفحة (الليلي) */
-      --page-bg-image: 
-          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
-          linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
     }
 
-    /* ☀️ الوضع النهاري (Light Mode) */
-    [data-theme="light"] {
-      --bg-deep: #f0f9ff;
-      --glass-bg: rgba(255, 255, 255, 0.85);
-      --glass-border: rgba(2, 132, 199, 0.2);
-      --card-hover: #ffffff;
-      --accent-neon: #0284c7;  /* أزرق غامق واضح */
-      --accent-dim: #bae6fd;
-      --text-main: #0f172a;
-      --text-sec: #475569;
-
-      /* خلفية الصفحة (النهاري) */
-      --page-bg-image: 
-          radial-gradient(circle at 50% 0%, #bae6fd 0%, #f0f9ff 80%),
-          linear-gradient(0deg, rgba(2,132,199,0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(2,132,199,0.05) 1px, transparent 1px);
-    }
-
-    /* -------------------------------------------
-       2. التنسيقات العامة
-       ------------------------------------------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Cairo', sans-serif;
+      /* خلفية المحيط الغامقة */
       background-color: var(--bg-deep);
-      background-image: var(--page-bg-image);
+      background-image: 
+          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
+          linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
       background-size: 100% 100%, 50px 50px, 50px 50px;
       color: var(--text-main);
       min-height: 100vh;
@@ -72,7 +48,6 @@
       padding-top: 90px;
       padding-bottom: 70px;
       overflow-x: hidden;
-      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* البار العلوي */
@@ -89,7 +64,6 @@
       padding: 0 20px;
       z-index: 1000;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      transition: background 0.3s;
     }
 
     .title {
@@ -103,33 +77,27 @@
 
     .icons { display: flex; align-items: center; gap: 15px; }
 
-    /* زر تغيير الثيم */
-    .theme-toggle {
-        width: 35px; height: 35px;
-        border-radius: 50%;
-        display: flex; justify-content: center; align-items: center;
-        cursor: pointer;
-        transition: 0.3s;
-        color: var(--text-main);
-        background: rgba(128,128,128,0.1);
-        border: 1px solid var(--glass-border);
+    .icon-btn {
+      width: 35px; height: 35px;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer;
+      transition: 0.3s;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid transparent;
     }
-    .theme-toggle:hover {
+    
+    .icon-btn:hover {
         background: var(--accent-neon);
-        color: var(--bg-deep);
         box-shadow: 0 0 10px var(--accent-neon);
     }
-
-    .icons img { 
-        width: 28px; height: 28px; 
-        filter: drop-shadow(0 0 2px var(--accent-neon)); 
-        cursor: pointer; 
-        transition: 0.3s;
-    }
-    .icons img:hover { transform: scale(1.1); }
-    /* تعديل الصور في الوضع النهاري */
-    [data-theme="light"] .icons img { filter: none; }
     
+    .icon-btn img { 
+        width: 24px; height: 24px; 
+        filter: drop-shadow(0 0 1px var(--accent-neon)); 
+    }
+    .icon-btn:hover img { filter: brightness(0); }
+
     /* العنوان الرئيسي */
     h1 {
       color: var(--accent-neon);
@@ -249,13 +217,13 @@
         width: 30px; height: 30px; 
         filter: invert(1);
     }
-    [data-theme="light"] .profile-float-btn img { filter: none; }
 
     /* تعديل ستايل التوست */
     .custom-toast {
         background: var(--glass-bg) !important;
         border: 1px solid var(--accent-neon) !important;
         color: var(--text-main) !important;
+        backdrop-filter: blur(10px);
     }
 
     @media (max-width: 480px) {
@@ -269,14 +237,12 @@
   <div class="topbar">
     <div class="title">By ELGIZAWY</div>
     <div class="icons">
-      <div class="theme-toggle" id="themeToggle" title="تغيير المظهر">
-        <i class="fas fa-sun"></i> 
-      </div>
-
-      <a href="" target="_blank">
+      <a href="" target="_blank" class="icon-btn">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
       </a>
-      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
+      <div class="icon-btn" id="shareBtn">
+        <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
+      </div>
     </div>
   </div>
 
@@ -291,57 +257,31 @@
   </a>
 
 <script>
-  const themeBtn = document.getElementById('themeToggle');
-  const themeIcon = themeBtn.querySelector('i');
-  const body = document.body;
-
-  // استرجاع الثيم
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'light') {
-      body.setAttribute('data-theme', 'light');
-      themeIcon.classList.replace('fa-sun', 'fa-moon');
-  }
-
-  // التبديل عند الضغط
-  themeBtn.onclick = () => {
-      if (body.getAttribute('data-theme') === 'light') {
-          body.removeAttribute('data-theme');
-          localStorage.setItem('theme', 'dark');
-          themeIcon.classList.replace('fa-moon', 'fa-sun');
-      } else {
-          body.setAttribute('data-theme', 'light');
-          localStorage.setItem('theme', 'light');
-          themeIcon.classList.replace('fa-sun', 'fa-moon');
-      }
-  };
-</script>
-
-<script>
 // ✅ Toast احترافية
 function showToast(message, type = "info") {
-  const toast = document.createElement("div");
-  toast.className = `custom-toast ${type}`;
-  toast.innerHTML = `<span>${message}</span>`;
-  const style = document.createElement("style");
-  style.textContent = `
-    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid #27d97e; display:flex; align-items:center; animation: slideIn 0.5s ease; }
-    .custom-toast.info { background: #08402C; }
-    .custom-toast.success { background: #27d97e; }
-    @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
-  `;
-  document.head.appendChild(style);
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  const toast = document.createElement("div");
+  toast.className = `custom-toast ${type}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  const style = document.createElement("style");
+  style.textContent = `
+    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid #27d97e; display:flex; align-items:center; animation: slideIn 0.5s ease; }
+    .custom-toast.info { background: #08402C; }
+    .custom-toast.success { background: #27d97e; }
+    @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
+  `;
+  document.head.appendChild(style);
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
 }
 </script>
 
 <script type="module">
 // 🌐 تهيئة الفايربيز (استخدم بياناتك الحقيقية من الكود المرفق)
 const firebaseConfig = {
-    apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
-    authDomain: "thanawy-1383.firebaseapp.com",
-    databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
-    projectId: "thanawy-1383",
+    apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+    authDomain: "thanawy-1383.firebaseapp.com",
+    databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+    projectId: "thanawy-1383",
 };
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -349,18 +289,18 @@ const db = firebase.database();
 const subjectsList = document.getElementById('subjects-list');
 
 const subjectImages = {
-    "أحياء": "1.jpg",
-    "فيزياء": "2.jpg",
-    "كيمياء": "3.jpg",
-    "لغة عربية": "5.jpg",
-    "English": "6.jpg",
-    "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
-    "الرياضيات": "4.jpg",
-    "تاريخ": "99.jpg",
-    "جغرافيا": "9.jpg",
-    "الإحصاء": "8.jpg",
-    "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
-    "Le français": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAAFAAMEBgcBAgj/xABCEAACAQMDAgQEAwUFBQkBAAABAgMABBEFEiEGMRNBUWEUInGBBzKRFSNCobEWUtHh8CRicoLBJjM2Y5KistLxJf/EABsBAAIDAQEBAAAAAAAAAAAAAAMEAQIFBgcA/8QAKREAAgICAgEEAQMFAAAAAAAAAQIAEQMhBBIxEyJBUTIFYcEjNFKBof/aAAwDAQACEQMRAD8Aq00jJtRNu9+c98CkqkNhiS3fOaW1TK7YA9/pT0UMfgT3E91FDHEBkyNyxPkB510LuqDsx1OexYmyEIg3G8ADA7e5zXcA15hminj3xOGXPlROWGyXSUlMiwyplpJGJO7/AHQPWidhV/EC1q3UjcFlQPLFWX8NXSLq22d8hVjlJ4zxtNVkyRyKDG4YEA5FWX8MtzdXQBDhhFIQf+U0DMwbCSDG8eNkzBWFG5t6OJI1YZAYAgMMED3rv1qu9T2Wtz3On3GjXaxpBKGngbgSL9R7eVH0YlQWGD51ztzoCtAG5648u9KoTWH/APUW/WeYHwjG0RPyMO+frXiz1a1vNQvbCJ8XFmU8RCecMoZT9OT+lVBPzIIk4gHuM0sADA4oNf8AUlnYa7aaRcLIJroEo+PlHoD9eaM5qZJUrV/Mpv4o5Xpj5mJ/2lOSPrWTAhgMGtH/ABWupBbW9m53K534z32kVnl1cG6ujO0UUWVC7Il2jgd8UpmPunX/AKIGXjDWiTPFKu0qXubnWeW7dq8EZFOEV4PFWBgHWo0RzXK6/BH0pVaoCdTAzjuSc1D1ayS6tyTneowvPapMZ4zU/TdPutUnaCyhMsqxtIVHfaO9duwUqe3ieOozKwK+ZVNOjmtH+aTKZ/LRO/iF1b5AXI/Wu3FuY5DlNpU4KkYIpRMw3AjJPlQhjATofEMczdw48iCrVbmK4y/5cbQBV6/Dy+Ww6ngnlUFRFIDg+q5/Xy+9VuK2adn8MJ8qF23MBwKL9EAS9QWyA4DK4BHn8poPRUxsgMM2R8rrlYeT5n0MfSuCgOoWetf2mtL20vE/ZoUrPbtn9R6+X0o8O3PesKbJUDwZX+pOqNK0pZbO5vFiunibYMZwccZ9KzbpnXHk6/vtUmZktvCUXDY4xsG3PvkcVedY6G0u81641q6iNyJISJLZ+V3AfmXHOTiqD0do+lavr2o6ZdxyOIY91ssgOFYjBJ7EsAFH2qlG4RSKmu2dxp+s2sF/atFcRHJjk28qc4PfkHjBqZG6OD4bKwBxkHPIqtdEdNy9NWL2j3PjhpC2QMYzUzprpy26cS4isZZGhmffsfyPqT5n3PPAogArcASb1Kz+KtvlbW5GMhSjcc/mGP61mrErz3Y/yrVvxNtXn9MOHauqxUgqSCPMHFec43Y12RNip5ZW5zqayhtbZJ7Vdp8Xk5J/vf4CpPTlmdWZkMvh7I9/ChiTkAcZHGSMnyp3qIvNpEi8kqA4B9mU/0Y/wCu
+    "أحياء": "1.jpg",
+    "فيزياء": "2.jpg",
+    "كيمياء": "3.jpg",
+    "لغة عربية": "5.jpg",
+    "English": "6.jpg",
+    "جيولوجيا": "https://www2.0zz0.com/2025/11/03/22/343667596.jpg",
+    "الرياضيات": "4.jpg",
+    "تاريخ": "99.jpg",
+    "جغرافيا": "9.jpg",
+    "الإحصاء": "8.jpg",
+    "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
+    "Le français": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBIgACEQEDEQH/xAAcAAABBQEBAQAAAAAAAAAAAAAFAAMEBgcBAgj/xABCEAACAQMDAgQEAwUFBQkBAAABAgMABBEFEiEGMRNBUWEUInGBBzKRFSNCobEWUtHh8CRicoLBJjM2Y5KistLxJf/EABsBAAIDAQEBAAAAAAAAAAAAAAMEAQIFBgcA/8QAKREAAgICAgEEAQMFAAAAAAAAAQIAEQMhBBIxEyJBUTIFYcEjNFKBof/aAAwDAQACEQMRAD8Aq00jJtRNu9+c98CkqkNhiS3fOaW1TK7YA9/pT0UMfgT3E91FDHEBkyNyxPkB510LuqDsx1OexYmyEIg3G8ADA7e5zXcA15hminj3xOGXPlROWGyXSUlMiwyplpJGJO7/AHQPWidhV/EC1q3UjcFlQPLFWX8NXSLq22d8hVjlJ4zxtNVkyRyKDG4YEA5FWX8MtzdXQBDhhFIQf+U0DMwbCSDG8eNkzBWFG5t6OJI1YZAYAgMMED3rv1qu9T2Wtz3On3GjXaxpBKGngbgSL9R7eVH0YlQWGD51ztzoCtAG5648u9KoTWH/APUW/WeYHwjG0RPyMO+frXiz1a1vNQvbCJ8XFmU8RCecMoZT9OT+lVBPzIIk4gHuM0sADA4oNf8AUlnYa7aaRcLIJroEo+PlHoD9eaM5qZJUrV/Mpv4o5Xpj5mJ/2lOSPrWTAhgMGtH/ABWupBbW9m53K534z32kVnl1cG6ujO0UUWVC7Il2jgd8UpmPunX/AKIGXjDWiTPFKu0qXubnWeW7dq8EZFOEV4PFWBgHWo0RzXK6/BH0pVaoCdTAzjuSc1D1ayS6tyTneowvPapMZ4zU/TdPutUnaCyhMsqxtIVHfaO9duwUqe3ieOozKwK+ZVNOjmtH+aTKZ/LRO/iF1b5AXI/Wu3FuY5DlNpU4KkYIpRMw3AjJPlQhjATofEMczdw48iCrVbmK4y/5cbQBV6/Dy+Ww6ngnlUFRFIDg+q5/Xy+9VuK2adn8MJ8qF23MBwKL9EAS9QWyA4DK4BHn8poPRUxsgMM2R8rrlYeT5n0MfSuCgOoWetf2mtL20vE/ZoUrPbtn9R6+X0o8O3PesKbJUDwZX+pOqNK0pZbO5vFiunibYMZwccZ9KzbpnXHk6/vtUmZktvCUXDY4xsG3PvkcVedY6G0u81641q6iNyJISJLZ+V3AfmXHOTiqD0do+lavr2o6ZdxyOIY91ssgOFYjBJ7EsAFH2qlG4RSKmu2dxp+s2sF/atFcRHJjk28qc4PfkHjBqZG6OD4bKwBxkHPIqtdEdNy9NWL2j3PjhpC2QMYzUzprpy26cS4isZZGhmffsfyPqT5n3PPAogArcASb1Kz+KtvlbW5GMhSjcc/mGP61mrErz3Y/yrVvxNtXn9MOHauqxUgqSCPMHFec43Y12RNip5ZW5zqayhtbZJ7Vdp8Xk5J/vf4CpPTlmdWZkMvh7I9/ChiTkAcZHGSMnyp3qIvNpEi8kqA4B9mU/0Y/wCu
 };
   
 const JSON_URLS = {
