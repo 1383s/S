@@ -33,7 +33,6 @@
 
   body {
     font-family: 'Cairo', sans-serif;
-    /* خلفية المحيط */
     background-color: var(--bg-deep);
     background-image: 
         radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
@@ -47,7 +46,6 @@
     min-height: 100vh;
   }
 
-  /* ===== الشريط العلوي (Top Bar) ===== */
   .topbar {
     display: flex;
     align-items: center;
@@ -80,7 +78,6 @@
     background: var(--cyan-neon); color: #000; box-shadow: 0 0 15px var(--cyan-neon);
   }
 
-  /* ===== حاوية الفيديو ===== */
   .video-wrapper {
       position: relative;
       max-width: 950px;
@@ -93,9 +90,7 @@
       background: #000;
   }
 
-  #player {
-    width: 100%; height: 100%;
-  }
+  #player { width: 100%; height: 100%; }
 
   #hint {
     margin-top: 10px;
@@ -104,6 +99,7 @@
     background: rgba(0, 243, 255, 0.05);
     display: inline-block; padding: 5px 15px; border-radius: 20px;
     border: 1px solid rgba(0, 243, 255, 0.1);
+    transition: opacity 0.5s;
   }
 
   .error-msg {
@@ -119,7 +115,6 @@
     display: inline-block;
   }
 
-  /* ===== منطقة الملاحظات (Notes) ===== */
   .notes-container {
     max-width: 950px;
     width: 95%;
@@ -133,17 +128,13 @@
     backdrop-filter: blur(10px);
   }
 
-  .notes-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;
-  }
+  .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
   .notes-container h2 {
     color: #fff; font-size: 1.1rem; margin: 0; font-weight: 700;
     display: flex; align-items: center; gap: 8px;
   }
-  .notes-container h2::before {
-      content: '📝'; font-size: 1.2rem;
-  }
+  .notes-container h2::before { content: '📝'; font-size: 1.2rem; }
 
   #video-notes {
     width: 100%;
@@ -161,10 +152,7 @@
     box-sizing: border-box;
   }
 
-  #video-notes:focus {
-    border-color: var(--cyan-neon);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
-  }
+  #video-notes:focus { border-color: var(--cyan-neon); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
 
   #save-status {
     font-size: 0.85rem;
@@ -175,27 +163,12 @@
     text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
   }
   
-  /* ===== تخصيص ألوان Plyr (نيون أزرق) ===== */
-  .plyr--full-ui input[type=range] {
-      color: var(--cyan-neon);
-  }
-  .plyr__control--overlaid {
-      background: rgba(0, 243, 255, 0.8);
-      color: #000;
-  }
-  .plyr__control--overlaid:hover {
-      background: var(--cyan-neon);
-  }
+  .plyr--full-ui input[type=range] { color: var(--cyan-neon); }
+  .plyr__control--overlaid { background: rgba(0, 243, 255, 0.8); color: #000; }
+  .plyr__control--overlaid:hover { background: var(--cyan-neon); }
   .plyr--video .plyr__controls .plyr__control.plyr__tab-focus, 
   .plyr--video .plyr__controls .plyr__control:hover, 
-  .plyr--video .plyr__controls .plyr__control[aria-expanded=true] {
-      background: var(--cyan-neon);
-      color: #000;
-  }
-  .plyr__menu__container .plyr__control[role=menuitemradio][aria-checked=true]::before {
-      background: var(--cyan-neon);
-  }
-
+  .plyr--video .plyr__controls .plyr__control[aria-expanded=true] { background: var(--cyan-neon); color: #000; }
 </style>
 </head>
 <body>
@@ -210,7 +183,7 @@
     <video id="player" playsinline controls crossorigin></video>
 </div>
 
-<div id="hint">💡 اضغط مرتين على الجوانب للتقديم/التأخير (موبايل) | المسطرة للإيقاف (PC)</div>
+<div id="hint">💡 اضغط مرتين على الجوانب للتقديم/التأخير | المسطرة للإيقاف</div>
 
 <div class="notes-container">
   <div class="notes-header">
@@ -220,158 +193,86 @@
   <textarea id="video-notes" placeholder="سجل أفكارك وملاحظاتك هنا..."></textarea>
 </div>
 
-
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-// استرجاع البيانات المحفوظة
+// 1. استرجاع البيانات المحفوظة
 let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
+let savedDirectUrl = localStorage.getItem("video_url");
+let savedSources = localStorage.getItem("video_sources");
+
 document.getElementById('page-title').textContent = videoTitle;
 document.title = videoTitle + " | Player";
 
-// التحقق من المصدر (مباشر أو جودات متعددة)
-const savedSources = localStorage.getItem("video_sources");
-const savedDirectUrl = localStorage.getItem("video_url");
+const playerElement = document.getElementById('player');
 
-let qualitySources = [];
-let sourceUrl = "";
-
-if (savedSources) {
-  try {
-    const data = JSON.parse(savedSources);
-    // لو المصدر عبارة عن رابط وجودة
-    if (data.url || data.file) {
-        sourceUrl = data.url || data.file;
-        qualitySources = [{
-            src: sourceUrl,
-            type: sourceUrl.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4',
-            size: parseInt(data.label) || 720
-        }];
-    } 
-    // لو مصفوفة جودات
-    else if (Array.isArray(data)) {
-        qualitySources = data.map(link => ({
-            src: link.url || link.file || link,
-            type: (link.url || link).includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4',
-            size: parseInt(link.label) || 720
-        }));
-        sourceUrl = qualitySources[0].src;
-    }
-  } catch (e) { console.error("JSON Error", e); }
-} 
-
-// لو مفيش sources نشوف الرابط المباشر
-if (!sourceUrl && savedDirectUrl) {
-    sourceUrl = savedDirectUrl;
-    qualitySources = [{
-        src: sourceUrl,
-        type: sourceUrl.includes('.m3u8') ? 'application/x-mpegURL' : 'video/mp4',
-    }];
+// 2. تحديد رابط الفيديو النهائي
+let finalUrl = "";
+if (savedDirectUrl) {
+    finalUrl = savedDirectUrl;
+} else if (savedSources) {
+    try {
+        const data = JSON.parse(savedSources);
+        if (Array.isArray(data) && data.length > 0) {
+            finalUrl = data[0].url || data[0].file || data[0];
+        } else {
+            finalUrl = data.url || data.file;
+        }
+    } catch (e) { console.error("JSON Error", e); }
 }
 
-if (!sourceUrl) {
-  document.querySelector('.video-wrapper').innerHTML = "<div class='error-msg'>عذراً، رابط الفيديو غير متوفر 🚫</div>";
+// 3. تشغيل المشغل
+if (!finalUrl) {
+    document.querySelector('.video-wrapper').innerHTML = "<div class='error-msg'>عذراً، رابط الفيديو غير متوفر 🚫</div>";
 } else {
-    // إعداد المشغل
-    const playerElement = document.getElementById('player');
-    
-    // دعم HLS (للفيديوهات m3u8)
-    if (sourceUrl.includes('.m3u8') && Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(sourceUrl);
-        hls.attachMedia(playerElement);
-        window.hls = hls;
-    }
-
+    // إعداد Plyr مع الخصائص الأساسية
     const player = new Plyr(playerElement, {
-        controls: [
-            'play-large', 'play', 'rewind', 'fast-forward', 'progress',
-            'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'
-        ],
+        controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
         settings: ['quality', 'speed', 'loop'],
         speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
         i18n: { speed: 'السرعة', quality: 'الجودة' }
     });
 
-    if (!sourceUrl.includes('.m3u8')) {
+    // دعم فيديوهات m3u8 (HLS)
+    if (finalUrl.includes('.m3u8')) {
+        if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(finalUrl);
+            hls.attachMedia(playerElement);
+            window.hls = hls;
+        } else if (playerElement.canPlayType('application/vnd.apple.mpegurl')) {
+            playerElement.src = finalUrl;
+        }
+    } else {
+        // فيديوهات MP4 عادية
         player.source = {
             type: 'video',
-            title: videoTitle,
-            sources: qualitySources
+            sources: [{ src: finalUrl, type: 'video/mp4' }]
         };
     }
 }
 
-// إخفاء التلميح بعد فترة
+// --- إخفاء التلميح ---
 setTimeout(() => {
     const hint = document.getElementById('hint');
     if(hint) hint.style.opacity = '0';
-}, 7000);
+}, 5000);
 
-
-// --- كود اختصارات الكيبورد (تسريع/تقديم) ---
-const videoElement = document.querySelector("video");
-let spacePressed = false;
-let longPressTimer;
-
-document.addEventListener("keydown", (e) => {
-    if(!videoElement) return;
-    
-    // تقديم وتأخير بالأسهم
-    if (e.code === "ArrowRight") videoElement.currentTime += 5;
-    if (e.code === "ArrowLeft") videoElement.currentTime -= 5;
-
-    // ضغطة مطولة على المسافة للتسريع (زي يوتيوب)
-    if (e.code === "Space" && !spacePressed) {
-        spacePressed = true;
-        longPressTimer = setTimeout(() => {
-            videoElement.playbackRate = 2.0;
-            showSpeedOverlay(true);
-        }, 400); // بعد 400ملي ثانية يعتبرها ضغطة مطولة
-    }
-});
-
-document.addEventListener("keyup", (e) => {
-    if (e.code === "Space") {
-        clearTimeout(longPressTimer);
-        spacePressed = false;
-        videoElement.playbackRate = 1.0; // رجوع للسرعة العادية
-        showSpeedOverlay(false);
-        
-        // لو مكنتش ضغطة مطولة، شغل/وقف الفيديو
-        // (Plyr بيعمل ده لوحده غالباً، بس ده تأكيد)
-    }
-});
-
-function showSpeedOverlay(show) {
-    // ممكن تضيف هنا عنصر يظهر على الشاشة يقول "2x Speed"
-}
-
-
-// --- نظام الملاحظات (Local Storage) ---
+// --- نظام الملاحظات ---
 const notesArea = document.getElementById('video-notes');
 const saveMsg = document.getElementById('save-status');
-const uniqueVideoID = btoa(encodeURIComponent(videoTitle + sourceUrl)).slice(0, 32); // ID فريد للفيديو
+const uniqueID = btoa(encodeURIComponent(videoTitle)).slice(0, 16);
 
 if (notesArea) {
-    // استرجاع الملاحظات
-    const savedNotes = localStorage.getItem(`notes_${uniqueVideoID}`);
-    if (savedNotes) notesArea.value = savedNotes;
-
-    // الحفظ التلقائي عند الكتابة
+    notesArea.value = localStorage.getItem(`notes_${uniqueID}`) || "";
     notesArea.addEventListener('input', () => {
-        localStorage.setItem(`notes_${uniqueVideoID}`, notesArea.value);
-        
-        // إظهار رسالة الحفظ
+        localStorage.setItem(`notes_${uniqueID}`, notesArea.value);
         saveMsg.style.opacity = '1';
         clearTimeout(window.saveTimer);
-        window.saveTimer = setTimeout(() => {
-            saveMsg.style.opacity = '0';
-        }, 2000);
+        window.saveTimer = setTimeout(() => { saveMsg.style.opacity = '0'; }, 2000);
     });
 }
-
 </script>
 
 </body>
