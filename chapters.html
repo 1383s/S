@@ -414,19 +414,20 @@ createApp({
                 showToast("رابط الفيديو غير متاح", "error");
                 return;
             }
-            
-            const videoData = {
-                title: video.title,
-                source: video.stream_url, 
-                sources: video.sources 
-            };
-            
-            localStorage.setItem("video_url", video.stream_url); 
-            localStorage.setItem("current_video", JSON.stringify(videoData));
-
+    
+    // تأكد إننا بنخزن بأسماء يفهمها ملف player.html
+            localStorage.setItem("video_url", video.stream_url || ""); 
+            localStorage.setItem("video_title", video.title); 
+    
+    // لو فيه جودات متعددة خزنها عشان الـ Player يقرأها
+            if(video.sources) {
+                localStorage.setItem("video_sources", JSON.stringify(video.sources));
+            } else {
+                localStorage.removeItem("video_sources"); // امسح القديم لو مفيش جودات
+            }
+ 
             window.location.href = 'player.html';
         };
-
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
                 loading.value = false;
