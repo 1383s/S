@@ -14,22 +14,22 @@
 <style>
   /* 🔵 ثوابت ثيم "الحوت الأزرق" (Deep Ocean Theme) */
   :root {
-    --bg-deep: #020617;          /* أزرق ليلي غامق (قاع المحيط) */
-    --bg-surface: #0f172a;       /* أزرق كحلي */
-    --accent-cyan: #38bdf8;      /* سماوي مضيء (Primary) */
-    --accent-glow: #0ea5e9;      /* درجة أغمق للتوهج */
-    --text-light: #e2e8f0;       /* أبيض مائل للرمادي */
-    --text-gray: #94a3b8;        /* رمادي للنصوص الفرعية */
-    --glass-bg: rgba(15, 23, 42, 0.7); /* خلفية زجاجية */
-    --glass-border: rgba(56, 189, 248, 0.2); /* حدود زجاجية */
-    --danger: #ef4444;           /* أحمر للخروج */
+    --bg-deep: #020617;          
+    --bg-surface: #0f172a;       
+    --accent-cyan: #38bdf8;      
+    --accent-glow: #0ea5e9;      
+    --text-light: #e2e8f0;       
+    --text-gray: #94a3b8;        
+    --glass-bg: rgba(15, 23, 42, 0.7); 
+    --glass-border: rgba(56, 189, 248, 0.2); 
+    --danger: #ef4444;           
+    --success-money: #22c55e;    /* لون أخضر للدفع */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Cairo', 'Tajawal', sans-serif;
-    /* خلفية المحيط المتدرجة */
     background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 85%);
     background-color: var(--bg-deep);
     color: var(--text-light);
@@ -38,12 +38,11 @@
     justify-content: center;
     align-items: center;
     padding: 15px;
-    padding-bottom: 90px; /* مسافة للبار السفلي */
+    padding-bottom: 90px;
     position: relative;
     overflow-x: hidden;
   }
    
-  /* تأثير الشبكة الخلفية الخفيفة */
   body::before {
       content: '';
       position: absolute;
@@ -55,7 +54,6 @@
       pointer-events: none;
   }
 
-  /* التوقيع */
   .header-signature {
       position: absolute;
       top: 25px;
@@ -69,14 +67,12 @@
       opacity: 0.8;
   }
 
-  /* كارت البروفايل */
   .profile-container {
     background: var(--glass-bg);
     border-radius: 20px;
     padding: 35px 25px;
     width: 100%;
     max-width: 420px;
-    /* الظل والإطار المضيء */
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05); 
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(15px);
@@ -92,7 +88,6 @@
       to { opacity: 1; transform: translateY(0); }
   }
 
-  /* صورة البروفايل */
   .profile-avatar {
     width: 100px;
     height: 100px;
@@ -125,7 +120,6 @@
       border: 2px solid var(--bg-deep);
   }
 
-  /* الاسم والكود */
   .profile-name {
     font-family: 'Cairo', sans-serif;
     font-size: 1.8rem;
@@ -148,7 +142,6 @@
     border: 1px solid rgba(56, 189, 248, 0.2);
   }
 
-  /* كارت المعلومات */
   .info-card {
     background: rgba(2, 6, 23, 0.6);
     padding: 15px 20px;
@@ -161,7 +154,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 5px 0;
+    margin: 8px 0; /* مسافة بين العناصر */
+    padding-bottom: 5px;
+  }
+  
+  /* خط فاصل خفيف بين المعلومات */
+  .info-item:not(:last-child) {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding-bottom: 8px;
   }
 
   .info-label { color: var(--text-gray); font-size: 0.9rem; }
@@ -175,11 +175,30 @@
       gap: 5px;
   }
   .status-value.expired { color: var(--danger); }
+  
+  /* ستايل الدفع الجديد */
+  .payment-price {
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.1rem;
+  }
+  .payment-badge {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success-money);
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      margin-right: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+  }
 
-  /* ⏱️ العداد الرقمي (تصحيح الترتيب) */
+  /* ⏱️ العداد الرقمي */
   .timer-container {
       margin: 25px 0;
-      direction: ltr; /* مهم جداً عشان الأرقام تترتب صح */
+      direction: ltr; 
   }
 
   .timer-digits {
@@ -194,7 +213,6 @@
     gap: 5px;
   }
   
-  /* فواصل الوقت : */
   .timer-separator {
       color: var(--text-gray);
       animation: blink 1s infinite;
@@ -206,13 +224,13 @@
     color: var(--text-gray);
     display: flex;
     justify-content: center;
-    gap: 15px; /* مسافات عشان تكون تحت الأرقام */
+    gap: 15px;
     margin-top: 5px;
-    direction: ltr; /* نفس اتجاه الأرقام */
+    direction: ltr;
   }
   
   .timer-labels span {
-      width: 60px; /* عرض ثابت عشان يظبط تحت الرقم */
+      width: 60px; 
       text-align: center;
   }
 
@@ -324,10 +342,12 @@
              نشط <i class="fas fa-check-square"></i>
         </span>
       </div>
+      
       <div class="info-item">
-        <span class="info-label">الجهاز المفعل</span>
-        <span class="info-label" style="color:var(--text-light)">
-            <i class="fas fa-mobile-alt" style="color:var(--accent-cyan)"></i> Verified Device
+        <span class="info-label">التحقق من الدفع</span>
+        <span>
+            <span class="payment-price">100 ج</span>
+            <span class="payment-badge">تم الدفع <i class="fas fa-check-circle"></i></span>
         </span>
       </div>
     </div>
@@ -423,18 +443,20 @@
       });
   }
 
-  // 3. منطق العداد (الترتيب الصحيح)
+  // 3. منطق العداد وشريط التقدم التنازلي
   function startCountdown(expiryTimestamp, statusEl, progressEl) {
+      // 🟢 هنا افترضت مدة الاشتراك 30 يوم عشان احسب النسبة
+      // لو اشتراكاتك مختلفة (مثلاً سنة) غير الرقم 30 لـ 365
+      const totalDuration = 30 * 24 * 60 * 60 * 1000; 
+
       const updateTimer = () => {
           const now = Date.now();
           const distance = expiryTimestamp - now;
 
           if (distance < 0) {
               clearInterval(interval);
-              document.getElementById('days').textContent = "00";
-              document.getElementById('hours').textContent = "00";
-              document.getElementById('minutes').textContent = "00";
-              document.getElementById('seconds').textContent = "00";
+              // تصفير العداد
+              ['days', 'hours', 'minutes', 'seconds'].forEach(id => document.getElementById(id).textContent = "00");
               
               statusEl.innerHTML = "❌ منتهي الصلاحية";
               statusEl.className = "status-value expired";
@@ -447,19 +469,19 @@
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-          // توزيع الأرقام في العناصر الصحيحة
-          // الترتيب في الـ HTML هو LTR يعني:
-          // Element 1 (Left) = Days
-          // Element 2 = Hours
-          // Element 3 = Minutes
-          // Element 4 (Right) = Seconds
-          
           document.getElementById('days').textContent = String(days).padStart(2,'0');
           document.getElementById('hours').textContent = String(hours).padStart(2,'0');
           document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
           document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
           
-          progressEl.style.width = "100%"; 
+          // 🟢 حساب شريط التقدم (كل ما الوقت يقل، الشريط يقل)
+          let percentage = (distance / totalDuration) * 100;
+          
+          // تأكيد إن النسبة متزيدش عن 100 ومتقلش عن 0
+          if (percentage > 100) percentage = 100;
+          if (percentage < 0) percentage = 0;
+
+          progressEl.style.width = percentage + "%"; 
       };
 
       updateTimer();
