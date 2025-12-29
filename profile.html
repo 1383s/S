@@ -3,386 +3,399 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>الملف الشخصي | Full Mark</title>
+<title>الملف الشخصي | Dashboard</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;800&family=Orbitron:wght@600;700;900&family=Cairo:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
-  /* 🔵 ثوابت ثيم "الحوت الأزرق" (Deep Ocean Theme) */
+  /* 🔵 ثوابت ثيم "الحوت الأزرق" المطور */
   :root {
-    --bg-deep: #020617;          
-    --bg-surface: #0f172a;       
-    --accent-cyan: #38bdf8;      
-    --accent-glow: #0ea5e9;      
-    --text-light: #e2e8f0;       
+    --bg-dark: #020617;          
+    --bg-panel: #0f172a;       
+    --cyan-neon: #00f3ff;      /* سماوي نيون قوي */
+    --cyan-dim: #0099a0;       
+    --text-white: #ffffff;       
     --text-gray: #94a3b8;        
-    --glass-bg: rgba(15, 23, 42, 0.7); 
-    --glass-border: rgba(56, 189, 248, 0.2); 
-    --danger: #ef4444;           
-    --success-money: #22c55e;    /* لون أخضر للدفع */
+    --glass-bg: rgba(15, 23, 42, 0.65); 
+    --glass-border: rgba(0, 243, 255, 0.15); 
+    --danger: #ff3333;           
+    --success: #00ff88;    
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Cairo', 'Tajawal', sans-serif;
-    background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 85%);
-    background-color: var(--bg-deep);
-    color: var(--text-light);
+    background-color: var(--bg-dark);
+    background-image: 
+        radial-gradient(circle at 50% 0%, #112240 0%, var(--bg-dark) 70%),
+        linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    color: var(--text-white);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 15px;
+    padding: 20px;
     padding-bottom: 90px;
-    position: relative;
     overflow-x: hidden;
   }
-   
-  body::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-image: linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-                        linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      z-index: -1;
-      pointer-events: none;
-  }
 
-  .header-signature {
-      position: absolute;
-      top: 25px;
-      right: 25px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: var(--accent-cyan);
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
-      letter-spacing: 2px;
-      opacity: 0.8;
-  }
-
-  .profile-container {
+  /* الكارد الرئيسي - تصميم جديد */
+  .profile-card {
     background: var(--glass-bg);
-    border-radius: 20px;
-    padding: 35px 25px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(56, 189, 248, 0.05); 
     border: 1px solid var(--glass-border);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px;
+    padding: 40px 25px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 30px rgba(0, 243, 255, 0.05);
+    backdrop-filter: blur(12px);
     text-align: center;
     position: relative;
-    z-index: 10;
-    animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    animation: fadeInUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
-  @keyframes slideUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .profile-avatar {
-    width: 100px;
-    height: 100px;
+  /* التوقيع العلوي */
+  .dev-badge {
+    position: absolute;
+    top: -12px;
+    right: 50%;
+    transform: translateX(50%);
+    background: var(--bg-dark);
+    border: 1px solid var(--cyan-neon);
+    padding: 5px 20px;
+    border-radius: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.75rem;
+    color: var(--cyan-neon);
+    letter-spacing: 2px;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+  }
+
+  /* الأفاتار العائم */
+  .avatar-container {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 10px auto 20px;
+    animation: float 4s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+  }
+
+  .avatar-img {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    margin: 0 auto 15px;
-    border: 2px solid var(--accent-cyan);
+    border: 3px solid var(--cyan-neon);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 3rem;
-    background: linear-gradient(135deg, var(--bg-surface), var(--bg-deep));
-    color: var(--text-light);
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.3);
+    font-size: 3.5rem;
+    background: radial-gradient(circle, #1a2c4e, #020617);
+    color: var(--text-white);
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.25);
+    z-index: 2;
     position: relative;
   }
   
-  .verified-badge {
+  /* الحلقات خلف الأفاتار */
+  .avatar-ring {
       position: absolute;
-      bottom: 5px;
-      right: 5px;
-      background: var(--accent-cyan);
-      color: #000;
-      width: 25px;
-      height: 25px;
+      top: -10px; left: -10px; right: -10px; bottom: -10px;
+      border: 1px dashed rgba(0, 243, 255, 0.3);
       border-radius: 50%;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border: 2px solid var(--bg-deep);
+      animation: spin 10s linear infinite;
+      z-index: 1;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
+  .student-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    background: linear-gradient(to bottom, #fff, #b4e6ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
   }
 
-  .profile-name {
-    font-family: 'Cairo', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+  .student-id {
+    font-family: 'Orbitron', monospace;
+    color: var(--cyan-neon);
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    opacity: 0.9;
+  }
+
+  /* 🧊 Grid System - التصميم الجديد للإحصائيات */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+
+  .stat-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+  }
+  
+  .stat-box:hover {
+      background: rgba(255, 255, 255, 0.07);
+      transform: translateY(-2px);
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    color: var(--text-gray);
     margin-bottom: 5px;
   }
 
-  .profile-code-display {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    color: var(--accent-cyan);
-    margin-bottom: 25px;
-    letter-spacing: 2px;
-    background: rgba(56, 189, 248, 0.1);
-    display: inline-block;
-    padding: 5px 15px;
-    border-radius: 20px;
-    border: 1px solid rgba(56, 189, 248, 0.2);
-  }
-
-  .info-card {
-    background: rgba(2, 6, 23, 0.6);
-    padding: 15px 20px;
-    border-radius: 12px;
-    margin: 15px 0;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-  }
-
-  .info-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 8px 0; /* مسافة بين العناصر */
-    padding-bottom: 5px;
-  }
-  
-  /* خط فاصل خفيف بين المعلومات */
-  .info-item:not(:last-child) {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding-bottom: 8px;
-  }
-
-  .info-label { color: var(--text-gray); font-size: 0.9rem; }
-  
-  .status-value.active { 
-      color: var(--accent-cyan); 
-      font-weight: bold; 
-      text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
-      display: flex;
-      align-items: center;
-      gap: 5px;
-  }
-  .status-value.expired { color: var(--danger); }
-  
-  /* ستايل الدفع الجديد */
-  .payment-price {
-      font-weight: bold;
-      color: #fff;
-      font-size: 1.1rem;
-  }
-  .payment-badge {
-      background: rgba(34, 197, 94, 0.15);
-      color: var(--success-money);
-      padding: 3px 8px;
-      border-radius: 5px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-      margin-right: 5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-  }
-
-  /* ⏱️ العداد الرقمي */
-  .timer-container {
-      margin: 25px 0;
-      direction: ltr; 
-  }
-
-  .timer-digits {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
+  .stat-value {
+    font-size: 1rem;
     font-weight: 700;
-    color: var(--accent-cyan);
-    letter-spacing: 3px;
-    text-shadow: 0 0 15px rgba(56, 189, 248, 0.8);
     display: flex;
-    justify-content: center;
+    align-items: center;
     gap: 5px;
   }
-  
-  .timer-separator {
-      color: var(--text-gray);
-      animation: blink 1s infinite;
-  }
-  @keyframes blink { 50% { opacity: 0.3; } }
 
-  .timer-labels {
-    font-size: 0.8rem;
-    color: var(--text-gray);
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 5px;
-    direction: ltr;
+  .text-success { color: var(--success); text-shadow: 0 0 10px rgba(0, 255, 136, 0.3); }
+  .text-price { color: #fff; font-size: 1.2rem; }
+
+  /* ⏳ العداد الرقمي داخل صناديق */
+  .timer-section {
+    margin-bottom: 25px;
   }
-  
-  .timer-labels span {
-      width: 60px; 
-      text-align: center;
+  .timer-title {
+      font-size: 0.9rem;
+      color: var(--text-gray);
+      margin-bottom: 10px;
+      text-align: right;
+  }
+
+  .timer-wrapper {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      direction: ltr; /* الترتيب إنجليزي */
+  }
+
+  .timer-unit {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      width: 65px;
+      padding: 8px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  .timer-num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      text-shadow: 0 0 8px var(--cyan-neon);
+  }
+
+  .timer-txt {
+      font-size: 0.7rem;
+      color: var(--text-gray);
+      margin-top: 2px;
   }
 
   /* شريط التقدم */
-  .progress-container {
-    background: rgba(255,255,255,0.05);
+  .progress-section { margin-bottom: 30px; }
+  
+  .progress-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+      color: var(--text-gray);
+  }
+
+  .progress-track {
+    background: rgba(255, 255, 255, 0.05);
+    height: 10px;
     border-radius: 10px;
     overflow: hidden;
-    height: 8px;
-    margin: 10px 0 30px;
+    position: relative;
     box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
   }
 
-  .progress-bar {
+  .progress-fill {
     height: 100%;
-    width: 100%;
-    /* تدرج أزرق سماوي */
-    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-glow));
-    transition: width 1s linear;
-    border-radius: 10px; 
-    box-shadow: 0 0 10px var(--accent-cyan);
+    width: 100%; /* سيتم تغييره بالجافاسكربت */
+    background: linear-gradient(90deg, var(--cyan-dim), var(--cyan-neon));
+    border-radius: 10px;
+    box-shadow: 0 0 15px var(--cyan-neon);
+    transition: width 1s ease;
   }
 
-  /* زر الخروج */
-  .logout-btn {
-    padding: 12px;
-    border: 1px solid rgba(239, 68, 68, 0.5);
-    border-radius: 12px;
-    background: rgba(239, 68, 68, 0.1);
-    color: #fca5a5;
-    font-size: 1rem;
-    cursor: pointer;
-    width: 100%;
-    font-weight: 700;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+  /* الأزرار */
+  .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
   }
 
-  .logout-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: #fff;
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-  }
-
-  .back-btn {
-      margin-top: 15px;
-      text-decoration: none;
-      color: var(--text-gray);
-      display: block;
-      font-size: 0.9rem;
-      transition: 0.3s;
-  }
-  .back-btn:hover { color: var(--accent-cyan); }
-   
-  /* البار السفلي الثابت */
-  .fixed-bottom-bar {
-    position: fixed; 
-    bottom: 0;       
-    left: 0;         
-    width: 100%;
-    background: rgba(2, 6, 23, 0.9);
-    border-top: 1px solid var(--accent-cyan);
-    color: var(--text-light);
-    text-align: center;
-    padding: 15px 0;
-    z-index: 999; 
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    backdrop-filter: blur(10px);
-  }
-
-  .bottom-label {
-      color: var(--text-gray);
-      font-size: 0.9rem;
-      margin-left: 10px; 
-  }
-
-  .bottom-code {
-      color: var(--accent-cyan); 
-      font-size: 1.3rem; 
+  .btn {
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 1rem;
       font-weight: 700;
-      font-family: 'Orbitron', monospace; 
-      letter-spacing: 2px;
-      text-shadow: 0 0 8px var(--accent-cyan);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: 0.3s;
+      text-decoration: none;
   }
+
+  .btn-logout {
+      background: rgba(255, 51, 51, 0.1);
+      color: #ff8888;
+      border: 1px solid rgba(255, 51, 51, 0.3);
+  }
+  .btn-logout:hover {
+      background: rgba(255, 51, 51, 0.2);
+      box-shadow: 0 0 15px rgba(255, 51, 51, 0.2);
+      color: #fff;
+  }
+
+  .btn-back {
+      background: var(--cyan-neon);
+      color: #000;
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+  }
+  .btn-back:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 25px rgba(0, 243, 255, 0.6);
+  }
+
+  /* البار السفلي */
+  .bottom-bar {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      background: rgba(2, 6, 23, 0.95);
+      border-top: 1px solid var(--cyan-neon);
+      padding: 12px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+  }
+  .code-text { font-family: 'Orbitron'; color: var(--cyan-neon); font-size: 1.2rem; letter-spacing: 2px; font-weight: bold; }
+  .label-text { color: var(--text-gray); font-size: 0.9rem; }
+
 </style>
 </head>
 <body>
-    
-  <div class="header-signature">ELGIZAWY</div>
 
-  <div class="profile-container">
-    <div class="profile-avatar">
-        <i class="fas fa-user-astronaut"></i>
-        <div class="verified-badge"><i class="fas fa-check"></i></div>
-    </div>
-    
-    <h2 class="profile-name" id="profileName">...</h2>
-    <div class="profile-code-display" id="profileCodeSub">ID: ------</div>
+  <div class="profile-card">
+    <div class="dev-badge">ELGIZAWY</div>
 
-    <div class="info-card">
-      <div class="info-item">
-        <span class="info-label">حالة الاشتراك</span>
-        <span id="profileStatus" class="status-value active">
-             نشط <i class="fas fa-check-square"></i>
-        </span>
-      </div>
-      
-      <div class="info-item">
-        <span class="info-label">التحقق من الدفع</span>
-        <span>
-            <span class="payment-price">100 ج</span>
-            <span class="payment-badge">تم الدفع <i class="fas fa-check-circle"></i></span>
-        </span>
-      </div>
-    </div>
-    
-    <div class="timer-container">
-        <div class="timer-digits">
-            <span id="days">00</span><span class="timer-separator">:</span>
-            <span id="hours">00</span><span class="timer-separator">:</span>
-            <span id="minutes">00</span><span class="timer-separator">:</span>
-            <span id="seconds">00</span>
-        </div>
-        <div class="timer-labels">
-            <span>يوم</span>
-            <span>ساعة</span>
-            <span>دقيقة</span>
-            <span>ثانية</span>
+    <div class="avatar-container">
+        <div class="avatar-ring"></div>
+        <div class="avatar-img">
+            <i class="fas fa-user-astronaut"></i>
         </div>
     </div>
 
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
+    <h1 class="student-name" id="profileName">...</h1>
+    <div class="student-id" id="profileCodeSub">ID: ------</div>
+
+    <div class="stats-grid">
+        <div class="stat-box">
+            <span class="stat-label">حالة الاشتراك</span>
+            <div class="stat-value text-success" id="profileStatus">
+                نشط <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">التحقق من الدفع</span>
+            <div class="stat-value">
+                <span class="text-price">100 ج</span>
+                <i class="fas fa-check-circle" style="color:var(--success); font-size:0.8rem; margin-right:5px;"></i>
+            </div>
+        </div>
     </div>
 
-    <button class="logout-btn" onclick="logout()">
-        تسجيل خروج وحذف الكود <i class="fas fa-sign-out-alt"></i> 
-    </button>
-    
-    <a href="subjects.html" class="back-btn">العودة للمواد الدراسية</a>
+    <div class="timer-section">
+        <div class="timer-title">الوقت المتبقي للصلاحية:</div>
+        <div class="timer-wrapper">
+            <div class="timer-unit">
+                <span class="timer-num" id="days">00</span>
+                <span class="timer-txt">يوم</span>
+            </div>
+            <div class="timer-unit">
+                <span class="timer-num" id="hours">00</span>
+                <span class="timer-txt">ساعة</span>
+            </div>
+            <div class="timer-unit">
+                <span class="timer-num" id="minutes">00</span>
+                <span class="timer-txt">دقيقة</span>
+            </div>
+            <div class="timer-unit">
+                <span class="timer-num" id="seconds">00</span>
+                <span class="timer-txt">ثانية</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-header">
+            <span>استهلاك الباقة</span>
+            <span id="progressText">Checking...</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="btn-group">
+        <button class="btn btn-logout" onclick="logout()">
+            تسجيل خروج وحذف الكود <i class="fas fa-trash-alt"></i>
+        </button>
+        <a href="subjects.html" class="btn btn-back">
+            العودة للمواد الدراسية <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
   </div>
-    
-  <div class="fixed-bottom-bar">
-      <span class="bottom-label">كود تفعيلك الحالي:</span>
-      <span id="displayActivationCodeBottom" class="bottom-code">------</span>
+
+  <div class="bottom-bar">
+      <span class="label-text">كود التفعيل:</span>
+      <span class="code-text" id="displayActivationCodeBottom">------</span>
   </div>
-  
+
 <script>
   // 🚨 Firebase Config
   const firebaseConfig = {
@@ -401,53 +414,43 @@
   }
   const db = firebase.database();
 
-  // 1. التحقق من الكود
+  // التحقق من الكود
   const activeCode = localStorage.getItem('activeCode');
-  const bottomCodeEl = document.getElementById('displayActivationCodeBottom');
-  const subCodeEl = document.getElementById('profileCodeSub');
-
+  
   if (!activeCode) {
       window.location.href = 'index.html'; 
   } else {
-      bottomCodeEl.textContent = activeCode;
-      subCodeEl.textContent = `ID: ${activeCode}`;
+      document.getElementById('displayActivationCodeBottom').textContent = activeCode;
+      document.getElementById('profileCodeSub').textContent = `ID: ${activeCode}`;
       loadRealProfileData(activeCode);
   }
 
-  // 2. جلب البيانات
   function loadRealProfileData(code) {
-      const nameEl = document.getElementById('profileName');
-      const statusEl = document.getElementById('profileStatus');
-      const progressBar = document.getElementById('progressBar');
-
       db.ref('approvedStudents/' + code).once('value').then((snapshot) => {
           const data = snapshot.val();
-
           if (data) {
-              const realName = data.studentName || data.name || "طالب مميز";
-              nameEl.textContent = realName;
-
+              document.getElementById('profileName').textContent = data.studentName || data.name || "Student";
+              
               if (data.expiry) {
-                  startCountdown(data.expiry, statusEl, progressBar);
+                  startCountdown(data.expiry);
               } else {
-                  // اشتراك مفتوح
+                  // اشتراك دائم
                   document.getElementById('days').textContent = "∞";
-                  statusEl.textContent = "✅ مفتوح مدى الحياة";
-                  progressBar.style.width = "100%";
+                  document.getElementById('profileStatus').innerHTML = 'مفتوح <i class="fas fa-infinity"></i>';
+                  document.getElementById('progressBar').style.width = "100%";
+                  document.getElementById('progressText').textContent = "100%";
               }
           } else {
               logout();
           }
-      }).catch((error) => {
-          console.error("Error:", error);
       });
   }
 
-  // 3. منطق العداد وشريط التقدم التنازلي
-  function startCountdown(expiryTimestamp, statusEl, progressEl) {
-      // 🟢 هنا افترضت مدة الاشتراك 30 يوم عشان احسب النسبة
-      // لو اشتراكاتك مختلفة (مثلاً سنة) غير الرقم 30 لـ 365
-      const totalDuration = 30 * 24 * 60 * 60 * 1000; 
+  function startCountdown(expiryTimestamp) {
+      const totalDuration = 30 * 24 * 60 * 60 * 1000; // 30 يوم
+      const statusEl = document.getElementById('profileStatus');
+      const progressEl = document.getElementById('progressBar');
+      const progressText = document.getElementById('progressText');
 
       const updateTimer = () => {
           const now = Date.now();
@@ -455,33 +458,30 @@
 
           if (distance < 0) {
               clearInterval(interval);
-              // تصفير العداد
-              ['days', 'hours', 'minutes', 'seconds'].forEach(id => document.getElementById(id).textContent = "00");
-              
-              statusEl.innerHTML = "❌ منتهي الصلاحية";
-              statusEl.className = "status-value expired";
+              ['days','hours','minutes','seconds'].forEach(id => document.getElementById(id).textContent = "00");
+              statusEl.innerHTML = 'منتهي <i class="fas fa-times-circle" style="color:red"></i>';
+              statusEl.className = "stat-value"; 
+              statusEl.style.color = "red";
               progressEl.style.width = "0%";
+              progressText.textContent = "0%";
               return;
           }
 
-          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const s = Math.floor((distance % (1000 * 60)) / 1000);
 
-          document.getElementById('days').textContent = String(days).padStart(2,'0');
-          document.getElementById('hours').textContent = String(hours).padStart(2,'0');
-          document.getElementById('minutes').textContent = String(minutes).padStart(2,'0');
-          document.getElementById('seconds').textContent = String(seconds).padStart(2,'0');
-          
-          // 🟢 حساب شريط التقدم (كل ما الوقت يقل، الشريط يقل)
-          let percentage = (distance / totalDuration) * 100;
-          
-          // تأكيد إن النسبة متزيدش عن 100 ومتقلش عن 0
-          if (percentage > 100) percentage = 100;
-          if (percentage < 0) percentage = 0;
+          document.getElementById('days').textContent = String(d).padStart(2,'0');
+          document.getElementById('hours').textContent = String(h).padStart(2,'0');
+          document.getElementById('minutes').textContent = String(m).padStart(2,'0');
+          document.getElementById('seconds').textContent = String(s).padStart(2,'0');
 
-          progressEl.style.width = percentage + "%"; 
+          // تحديث البروجرس
+          let percent = (distance / totalDuration) * 100;
+          if (percent > 100) percent = 100;
+          progressEl.style.width = percent + "%";
+          progressText.textContent = Math.round(percent) + "% متبقي";
       };
 
       updateTimer();
