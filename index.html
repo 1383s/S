@@ -30,23 +30,25 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
     <script type="module" src="devcheck.js"></script>
+    
     <style>
-        /* تعريف الألوان والثيم لرسائل الحالة */
+        /* --------------------------
+           1. تعريف الألوان (ثيم المحيط الأزرق)
+           -------------------------- */
         :root {
-            --light-text: #FFFFFF;
-            --green-active: #00F5C4; /* لون النجاح */
-            --red-error: #FF4F4F;     /* لون الخطأ */
-            --pending: #ffb347;       /* لون الانتظار */
-            /* 💡 التغييرات لثيم الأخضر الداكن (Dark Forest Green) */
-            --main-light-green: #08402C; /* لون الخلفية والزرار الأساسي */
-            --main-dark-green: #042016;  /* درجة أغمق للخلفية لعمل تدرج */
-            --wave-color-1: #0C241C;    /* لون الموجة 1 */
-            --wave-color-2: #020A07;    /* لون الموجة 2 */
+            --light-text: #e2e8f0;       /* أبيض مائل للرمادي الفاتح للقراءة المريحة */
+            --accent-color: #38bdf8;     /* أزرق سماوي مضيء (Primary Color) */
+            --accent-glow: #0ea5e9;      /* درجة أغمق قليلاً للتوهج */
+            
+            --red-error: #ef4444;        /* لون الخطأ */
+            --pending: #f59e0b;          /* لون الانتظار */
+            
+            /* خلفيات المحيط */
+            --bg-deep: #020617;          /* أزرق أسود (قاع المحيط) */
+            --bg-surface: #0f172a;       /* كحلي غامق (سطح الماء ليلاً) */
+            --card-glass: rgba(15, 23, 42, 0.7); /* لون الكارت الزجاجي */
         }
 
-        /* --------------------------
-           1. CSS Reset & Base Styles
-           -------------------------- */
         * {
             margin: 0;
             padding: 0;
@@ -55,7 +57,7 @@
         }
 
         /* --------------------------
-           2. Body & Background (Glassmorphism Base)
+           2. الخلفية وتأثيرات الصفحة
            -------------------------- */
         body {
             display: flex;
@@ -63,16 +65,19 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            /* خلفية متدرجة أخضر داكن (باستخدام 08402C ودرجة أغمق) */
-            background: linear-gradient(180deg, var(--main-light-green) 0%, var(--main-dark-green) 100%);
+            
+            /* تدرج لوني دائري يوحي بالعمق */
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%);
+            background-color: var(--bg-deep);
+            
             overflow: hidden;
             position: relative;
             color: var(--light-text);
             padding: 20px;
-            padding-bottom: 100px; /* مسافة 80 بيكسل لحجز مساحة للـ Footer اللي ثابت تحت */
+            padding-bottom: 100px; 
         }
 
-        /* تمويجات سفلية (Waves Effect) - تم تحديث ألوان الموجة هنا */
+        /* تأثير شبكة خفيفة جداً في الخلفية */
         body::before {
             content: '';
             position: absolute;
@@ -80,18 +85,16 @@
             left: 0;
             width: 100%;
             height: 100%;
-            /* استخدام خلفية التمويجات - تم تعديل الألوان لدرجات الأخضر الجديدة */
-            /* الخلفية: 08402C | الموجة 1: 0C241C | الموجة 2: 020A07 */
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600"><rect fill="%2308402C" width="1000" height="600"/><g fill="%230C241C"><path d="M0 450c100-50 200-50 300 0s200 50 300 0 200-50 400 0v150H0z"/><path d="M0 480c100-30 200-30 300 0s200 30 300 0 200-30 400 0v120H0z"/></g><g fill="%23020A07"><path d="M0 500c100-20 200-20 300 0s200 20 300 0 200-20 400 0v90H0z"/><path d="M0 540c100-10 200-10 300 0s200 10 300 0 200-10 400 0v60H0z"/></g></svg>');
-            background-repeat: no-repeat;
-            background-size: cover;
-            background-position: bottom center;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
-            filter: brightness(0.9);
+            pointer-events: none;
         }
 
         /* --------------------------
-           3. Stars & Shooting Stars Effects
+           3. النجوم والشهب
            -------------------------- */
         .stars {
             position: absolute;
@@ -99,76 +102,87 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.8) 1px, transparent 1%),
-                              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.7) 1px, transparent 1%),
-                              radial-gradient(circle at 30% 60%, rgba(255,255,255,0.6) 1px, transparent 1%),
-                              radial-gradient(circle at 50% 10%, rgba(255,255,255,0.5) 1px, transparent 1%);
-            background-size: 100px 100px, 120px 120px, 80px 80px, 150px 150px;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 1px, transparent 1%);
+            background-size: 100px 100px;
             background-repeat: repeat;
-            opacity: 0.8;
-            z-index: -1;
-            animation: star-move 60s linear infinite alternate;
+            opacity: 0.4; /* تقليل الشفافية لتناسب الخلفية الداكنة */
+            z-index: -2;
+            animation: star-move 100s linear infinite;
         }
         
         @keyframes star-move {
             from { background-position: 0% 0%; }
-            to { background-position: 10% 10%; }
+            to { background-position: 20% 20%; }
         }
         
         .shooting-star {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             background: #fff;
             border-radius: 50%;
-            /* توهج الشهاب باستخدام لون الخلفية (08402C) */
-            box-shadow: 0 0 10px 1px #fff, 0 0 20px 5px #08402C; 
+            box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--accent-color); 
             opacity: 0;
             transform: rotateZ(315deg);
-            animation: shoot 5s linear infinite;
-            z-index: 1; 
+            animation: shoot 6s linear infinite;
+            z-index: -1; 
         }
 
         @keyframes shoot {
             0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
-            1% { opacity: 1; }
-            100% { opacity: 0; transform: translate3d(400px, 400px, 0) rotateZ(315deg); }
+            10% { opacity: 1; }
+            100% { opacity: 0; transform: translate3d(500px, 500px, 0) rotateZ(315deg); }
         }
 
+        /* --------------------------
+           4. كارت تسجيل الدخول
+           -------------------------- */
         .login-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
-            /* 💡 التعديل هنا: 40px من فوق ويمين ويسار، و 25px من أسفل */
-            padding: 40px 40px 40px 40px; 
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: var(--card-glass);
+            border-radius: 20px;
+            padding: 40px; 
+            border: 1px solid rgba(56, 189, 248, 0.1); /* حدود سماوية خفيفة */
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             width: 90%;
             max-width: 420px; 
             text-align: center;
             animation: fadeIn 1s ease-out;
             color: #ffffff;
             z-index: 10; 
+            position: relative;
+        }
+
+        /* خط مضيء أعلى الكارت */
+        .login-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20%;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            box-shadow: 0 0 10px var(--accent-color);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* --------------------------
-           5. Header & Form Elements (RTL Ready)
-           -------------------------- */
         h2 {
             margin-bottom: 30px;
             font-size: 2.2em;
             color: #ffffff;
             font-weight: 700;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5); /* توهج أزرق للنص */
             letter-spacing: 1px;
         }
 
+        /* --------------------------
+           5. حقول الإدخال
+           -------------------------- */
         .input-group {
             position: relative;
             margin-bottom: 25px;
@@ -177,9 +191,9 @@
         .input-group input {
             width: 100%;
             padding: 15px 45px 15px 15px; 
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px; 
+            background: rgba(15, 23, 42, 0.5); /* خلفية غامقة */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; 
             color: #ffffff;
             font-size: 1em;
             outline: none;
@@ -191,77 +205,74 @@
         }
 
         .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .input-group input:focus {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: var(--green-active);
-            box-shadow: 0 0 0 2px rgba(0, 245, 196, 0.3);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
 
         .input-group .icon {
             position: absolute;
             right: 15px;
-            left: auto;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9em;
+            color: var(--accent-color); /* الأيقونة بلون الثيم */
+            font-size: 1em;
         }
         
         /* --------------------------
-           6. Status Message Box
+           6. رسائل الحالة
            -------------------------- */
         #statusMessage {
             margin-bottom: 25px;
             padding: 15px;
             border-radius: 10px;
-            font-size: 1em;
+            font-size: 0.95em;
             display: none; 
             text-align: center;
             font-weight: 600;
         }
         
         /* --------------------------
-           7. Button & Link Style
+           7. الأزرار (Buttons)
            -------------------------- */
         .login-btn {
             width: 100%;
             padding: 15px;
             border: none;
-            border-radius: 10px;
-            color: #ffffff;
+            border-radius: 12px;
+            color: #0f172a; /* لون النص غامق ليظهر على الخلفية الفاتحة */
             font-size: 1.1em;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             transition: 0.3s ease;
-            letter-spacing: 0.5px;
             margin-top: 15px;
             
-            /* خلفية الزر بالتدرج الجديد (يبدأ وينتهي بدرجات من 08402C) */
-            background: linear-gradient(90deg, var(--main-light-green), var(--main-dark-green));
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            /* خلفية زرقاء مضيئة متدرجة */
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-glow));
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
 
         .login-btn:hover {
-            /* خلفية الزر عند التحويم وتوهج الظل باستخدام 08402C */
-            background: linear-gradient(90deg, #1A6041, var(--main-dark-green)); /* أخضر أفتح قليلا عند التحويم */
-            box-shadow: 0 7px 25px rgba(8, 64, 44, 0.6); 
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); 
+            filter: brightness(1.1);
         }
 
-        /* 💡 ستايل زر تواصل معنا الجديد */
+        /* زر تواصل معنا */
         .contact-us-btn {
             display: block;
             width: 100%;
             text-align: center;
             margin-top: 15px;
             padding: 12px;
-            background: rgba(255, 255, 255, 0.05); /* شفاف خفيف */
-            border: 1px solid var(--green-active); /* إطار أخضر */
-            border-radius: 10px;
-            color: var(--green-active);
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid var(--accent-color); 
+            border-radius: 12px;
+            color: var(--accent-color);
             text-decoration: none;
             font-weight: bold;
             font-size: 1em;
@@ -270,86 +281,64 @@
         }
 
         .contact-us-btn:hover {
-            background: rgba(0, 245, 196, 0.1);
-            box-shadow: 0 0 10px rgba(0, 245, 196, 0.2);
+            background: rgba(56, 189, 248, 0.1);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
 
         .contact-us-btn i {
-            margin-left: 8px; /* مسافة للأيقونة */
-        }
-        
-        .get-code-link {
-            display: block;
-            margin-top: 20px;
-            font-size: 0.95em;
-            color: var(--pending); 
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-        .get-code-link:hover {
-            color: var(--green-active); 
-            text-decoration: underline;
+            margin-left: 8px;
         }
 
         /* --------------------------
-           8. Top Code Status Bar (Firebase Active Code Display)
+           8. شريط حالة الكود العلوي
            -------------------------- */
         .top-status-bar {
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-            
-            /* 💡 التعديل لجعل المحتوى متوسطاً ومرتباً عمودياً */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
             display: flex;
-            flex-direction: column; /* ترتيب العناصر عمودياً (فوق بعض) */
-            justify-content: center; /* توسيط عمودي */
-            align-items: center; /* توسيط أفقي */
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
             text-align: center;
         }
 
         .status-text {
             font-size: 0.9em;
             font-weight: 500;
-            margin-bottom: 10px; /* مسافة تحت النص لتفصله عن الزر */
+            margin-bottom: 10px;
+            color: #cbd5e1;
         }
 
         .code-display {
-            color: var(--green-active); 
+            color: var(--accent-color); 
             font-weight: 700;
             font-family: monospace;
-            font-size: 1.1em;
+            font-size: 1.2em;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
             margin-right: 5px;
         }
 
         .clear-btn {
-            background: var(--red-error); 
-            color: var(--light-text);
-            padding: 8px 12px;
+            background: rgba(239, 68, 68, 0.2); 
+            color: #fca5a5;
+            padding: 8px 15px;
             border-radius: 8px;
             font-size: 0.85em;
             font-weight: 600;
             cursor: pointer;
-            border: none;
+            border: 1px solid rgba(239, 68, 68, 0.5);
             transition: 0.3s;
-            margin-top: 0; /* تم نقل المسافة إلى .status-text */
         }
         .clear-btn:hover {
-            opacity: 0.8;
-            transform: scale(0.98);
+            background: rgba(239, 68, 68, 0.4); 
+            color: #fff;
         }
 
         /* --------------------------
-           9. Footer Style
-           -------------------------- */
-        .footer-rights {
-            display: none !important;
-        }
-
-        /* --------------------------
-           10. New Developer Footer Style
+           9. فوتر المطور (Developer Footer)
            -------------------------- */
         .developer-footer {
             position: fixed; 
@@ -357,13 +346,13 @@
             width: 100%;
             z-index: 5; 
             padding: 15px 10px;
-            background: rgba(0, 0, 0, 0.4); 
-            backdrop-filter: blur(2px); 
-            -webkit-backdrop-filter: blur(2px);
-            
+            background: rgba(2, 6, 23, 0.8); /* خلفية غامقة جداً */
+            backdrop-filter: blur(5px); 
+            -webkit-backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .developer-info {
@@ -372,39 +361,23 @@
             color: var(--light-text);
             font-size: 1em;
             font-weight: 600;
-            flex-direction: row-reverse; /* عكس الترتيب */
-            gap: 15px; /* مسافة بين العناصر */
+            flex-direction: row-reverse;
+            gap: 15px;
         }
 
         .developed-text {
             order: 1;
-            opacity: 0.7;
-            margin-right: 5px;
-            margin-left: 0; 
+            opacity: 0.6;
+            font-size: 0.9em;
         }
 
         .developer-name {
-            color: var(--green-active); /* لون Highlight زي لون النجاح #00F5C4 */
-            font-size: 1.5em; /* كبرنا الخط ليكون أحرف */
-            font-weight: 700;
-            margin-right: 0; 
-            letter-spacing: 0.5px;
-            /* زيادة التوهج ليكون واضحًا وقويًا */
-            text-shadow: 0 0 15px var(--green-active), 0 0 20px var(--green-active); 
-            order: 2; /* الترتيب التاني */
-        }
-
-        .logo-box {
-            background-color: var(--main-light-green); /* اللون الأخضر اللي اخترتيه: 08402C */
-            color: #fff;
-            padding: 7px 20px; /* زيادة الـ Padding */
-            border-radius: 8px;
-            font-weight: 900; /* خط أثقل */
-            font-size: 1.1em; /* كبرنا خط اللوجو */
-            /* زيادة الظل ليكون بارز */
-            box-shadow: 0 6px 15px rgba(8, 64, 44, 0.9);
-            transform: skewX(-5deg); 
-            order: 3; /* الترتيب الأول */
+            color: var(--accent-color); 
+            font-size: 1.5em; 
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px var(--accent-color); 
+            order: 2; 
         }
     </style>
 </head>
@@ -414,16 +387,16 @@
     <div class="login-card">
         
         <div id="topCodeStatus" class="top-status-bar">
-            </div>
+        </div>
 
         <h2>Full-Mark منصة</h2>
         <div id="statusMessage" style="display:none;">
-            </div>
+        </div>
 
         <form id="loginForm">
             <div class="input-group">
                 <i class="fas fa-lock icon"></i>
-                <input type="text" id="activationCode" placeholder="ادخل كودك " pattern="\d{6}" maxlength="6" required>
+                <input type="text" id="activationCode" placeholder="ادخل كود التفعيل هنا" pattern="\d{6}" maxlength="6" required>
             </div>
 
             <button type="submit" id="loginBtn" class="login-btn">
@@ -439,11 +412,10 @@
     </div>
     
     <footer class="developer-footer">
-    <div class="developer-info">
-        
-        <span class="developer-name">ELGIZAWY</span>
-        <span class="developed-text">Developed By </span>
-    </div>
+        <div class="developer-info">
+            <span class="developer-name">ELGIZAWY</span>
+            <span class="developed-text">Developed By </span>
+        </div>
     </footer>
 
     <script>
@@ -459,184 +431,125 @@
           measurementId: "G-J5R2EFM2D0"
         };
         
-        // تشغيل الفايربيس وتفعيل الأداوت 
+        // تشغيل الفايربيس
         if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
-
             firebase.initializeApp(firebaseConfig);
-
         }
-
-        // تفعيل جوجل أناليتكس 
-        
 
         const db = firebase.database();
 
-        // 💡 تعريف عناصر واجهة المستخدم
+        // تعريف العناصر
         const STATUS_MESSAGE = document.getElementById('statusMessage');
         const LOGIN_FORM = document.getElementById('loginForm');
         const LOGIN_BTN = document.getElementById('loginBtn');
         const ACTIVATION_CODE_INPUT = document.getElementById('activationCode');
-        const codeStatusDiv = document.getElementById('topCodeStatus'); // شريط عرض الكود
+        const codeStatusDiv = document.getElementById('topCodeStatus');
 
-
-        // 💡 دالة لعرض رسائل الحالة بخلفية متغيرة
+        // دالة لعرض الرسائل (محدثة لتناسب الثيم الأزرق)
         function updateStatusMessage(text, type) {
             STATUS_MESSAGE.textContent = text;
             STATUS_MESSAGE.style.display = 'block';
             
-            // تحديد الألوان بناءً على النوع
             if (type === 'success') {
-                STATUS_MESSAGE.style.background = 'rgba(0, 245, 196, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'rgba(0, 245, 196, 0.4)';
+                STATUS_MESSAGE.style.background = 'rgba(56, 189, 248, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--accent-color)';
                 STATUS_MESSAGE.style.border = '1px solid';
-                STATUS_MESSAGE.style.color = 'var(--green-active)';
+                STATUS_MESSAGE.style.color = 'var(--accent-color)';
             } else if (type === 'error') {
-                STATUS_MESSAGE.style.background = 'rgba(255, 79, 79, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'rgba(255, 79, 79, 0.4)';
+                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--red-error)';
                 STATUS_MESSAGE.style.border = '1px solid';
                 STATUS_MESSAGE.style.color = 'var(--red-error)';
             } else if (type === 'pending') {
-                STATUS_MESSAGE.style.background = 'rgba(255, 179, 71, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'rgba(255, 179, 71, 0.4)';
+                STATUS_MESSAGE.style.background = 'rgba(245, 158, 11, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--pending)';
                 STATUS_MESSAGE.style.border = '1px solid';
                 STATUS_MESSAGE.style.color = 'var(--pending)';
             }
         }
 
-
-        // **********************************************
-        // 🚨 الدوال الأساسية: توليد Device ID والتحقق من الكود 
-        // **********************************************
-
-        // دالة توليد Device ID فريد للجهاز
+        // --- باقي كود الجافاسكربت كما هو ---
+        
         function generateDeviceID() {
              return 'DID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + Date.now().toString(36);
         }
 
-        // 1. استرجاع أو توليد Device ID للجهاز الحالي
         let localDeviceId = localStorage.getItem('localDeviceId');
         if (!localDeviceId) {
             localDeviceId = generateDeviceID();
             localStorage.setItem('localDeviceId', localDeviceId);
         }
 
-        // 2. دالة حذف الكود من الجهاز
         function clearLocalCode() {
             localStorage.removeItem('activeCode');
             localStorage.removeItem('approved'); 
-            
             updateStatusMessage('✅ تم حذف الكود بنجاح. جاري إعادة تحميل الصفحة...', 'success');
             LOGIN_BTN.disabled = true;
-
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
+            setTimeout(() => { window.location.reload(); }, 1000);
         }
 
-        // 3. عرض حالة الكود في الشريط العلوي عند تحميل الصفحة (مع خاصية الدخول التلقائي)
         const activeCode = localStorage.getItem('activeCode');
         
-        // *******************************************************************
-        // 💡 التعديل: دالة جديدة للتحقق من حالة الكود المخزن محلياً والدخول التلقائي
-        // *******************************************************************
         async function checkAutoLoginStatus() {
             if (!activeCode) {
-                 // حالة عدم وجود كود مسجل
-                codeStatusDiv.innerHTML = `<span class="status-text" style="color:rgba(255, 255, 255, 0.7);">ليس لديك كود تفعيل مُحفوظ على هذا الجهاز.</span>`;
+                codeStatusDiv.innerHTML = `<span class="status-text" style="opacity:0.6;">ليس لديك كود تفعيل مُحفوظ.</span>`;
                 STATUS_MESSAGE.style.display = 'none'; 
-                
-                // تفعيل معالج الحدث لـ LOGIN_FORM
-                LOGIN_FORM.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    checkAndLogin();
-                });
+                LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
                 return;
             }
 
-            // 1. عرض حالة الكود الحالي
             codeStatusDiv.innerHTML = `
-                <span class="status-text">كود تفعيلك الحالي: <span class="code-display">${activeCode}</span></span>
-                <button class="clear-btn" onclick="clearLocalCode()">حذف الكود من جهازك</button>
+                <span class="status-text">كودك الحالي: <span class="code-display">${activeCode}</span></span>
+                <button class="clear-btn" onclick="clearLocalCode()">حذف الكود</button>
             `;
-            LOGIN_FORM.style.display = 'none'; // إخفاء الفورم أثناء التحقق/الدخول
-
-            updateStatusMessage('⏳ جاري التحقق من صلاحية الكود المحفوظ...', 'pending');
+            LOGIN_FORM.style.display = 'none'; 
+            updateStatusMessage('⏳ جاري التحقق من الكود...', 'pending');
 
             try {
                 const snapshot = await db.ref('approvedStudents/' + activeCode).once('value');
                 const data = snapshot.val();
-                // نستخدم Date.now() للتحقق من انتهاء الصلاحية بناءً على الوقت الحالي
                 const now = Date.now(); 
                 
-                // 2. التحقق من انتهاء الصلاحية أو التعطيل
                 if (!data || (data.expiry && data.expiry <= now) || data.isBlocked === true) {
-                    
-                    // إزالة الكود القديم في حال كان منتهي الصلاحية أو محظوراً
                     localStorage.removeItem('activeCode');
                     localStorage.removeItem('approved'); 
-
                     updateStatusMessage('انتهت صلاحية الكود يرجي تجديد الاشتراك.', 'error');
-                    
-                    // إعادة إظهار الفورم
                     LOGIN_FORM.style.display = 'block'; 
-                    codeStatusDiv.innerHTML = `<span class="status-text" style="color:rgba(255, 255, 255, 0.7);">ليس لديك كود تفعيل مُحفوظ على هذا الجهاز.</span>`;
-                    
-                    // تفعيل معالج الحدث لـ LOGIN_FORM مجدداً
-                    LOGIN_FORM.addEventListener('submit', (e) => {
-                        e.preventDefault();
-                        checkAndLogin();
-                    });
-
+                    codeStatusDiv.innerHTML = `<span class="status-text">ليس لديك كود تفعيل.</span>`;
+                    LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
                     return;
                 }
 
-                // 3. حالة الكود سليم: البدء في الدخول التلقائي
-                let countdown = 5;
-                
-                // 💡 إظهار اسم الطالب في حالة الدخول التلقائي
+                let countdown = 3;
                 const studentName = data.studentName || data.name || "يا بطل";
-                
-                // إظهار رسالة العداد
-                updateStatusMessage(`✅ أهلاً ${studentName}! تم تسجيل الدخول تلقائياً. جاري التوجيه خلال: ${countdown} ثوانٍ...`, 'success');
+                updateStatusMessage(`✅ أهلاً ${studentName}! جاري الدخول...`, 'success');
 
                 const countdownInterval = setInterval(() => {
                     countdown--;
-                    updateStatusMessage(`✅ أهلاً ${studentName}! تم تسجيل الدخول تلقائياً. جاري التوجيه خلال: ${countdown} ثوانٍ...`, 'success');
-                    
                     if (countdown <= 0) {
                         clearInterval(countdownInterval);
-                        window.location.href = 'subjects.html'; // التوجيه للصفحة
+                        window.location.href = 'subjects.html'; 
                     }
                 }, 1000); 
 
             } catch (error) {
-                updateStatusMessage('❌ فشل التحقق التلقائي من الصلاحية. حاول إدخال الكود يدوياً.', 'error');
+                updateStatusMessage('❌ خطأ في الاتصال. ادخل الكود يدوياً.', 'error');
                 LOGIN_FORM.style.display = 'block';
-                console.error("Firebase auto-login error:", error);
-                
-                // تفعيل معالج الحدث لـ LOGIN_FORM
-                LOGIN_FORM.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    checkAndLogin();
-                });
+                LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
             }
         }
         
-        // استدعاء الدالة عند تحميل الصفحة
         checkAutoLoginStatus();
 
-
-        // 4. دالة التحقق من الكود في Firebase (لم يتم تغييرها، فهي تعمل بشكل صحيح)
         async function checkAndLogin() {
             const activationCode = ACTIVATION_CODE_INPUT.value.trim();
-            
             if (activationCode.length !== 6 || isNaN(activationCode)) {
-                updateStatusMessage('❌ برجاء إدخال كود تفعيل صحيح مكون من 6 أرقام.', 'error');
+                updateStatusMessage('❌ الكود يجب أن يكون 6 أرقام.', 'error');
                 return;
             }
 
             LOGIN_BTN.disabled = true;
-            updateStatusMessage('⏳ جاري التحقق من كود التفعيل...', 'pending');
+            updateStatusMessage('⏳ جاري التحقق...', 'pending');
 
             try {
                 const snapshot = await db.ref('approvedStudents/' + activationCode).once('value');
@@ -644,82 +557,54 @@
                 const now = Date.now();
 
                 if (!data) {
-                    updateStatusMessage('❌ كود التفعيل غير صحيح أو غير موجود.', 'error');
+                    updateStatusMessage('❌ الكود غير صحيح.', 'error');
                     return;
                 }
-
-                // 🚨 التحقق من انتهاء الصلاحية
                 if (data.expiry && data.expiry <= now) {
-                    updateStatusMessage('❌ كود التفعيل الخاص بك منتهي الصلاحية.', 'error');
+                    updateStatusMessage('❌ الكود منتهي الصلاحية.', 'error');
                     return;
                 }
-                
                 if (data.isBlocked === true) {
-                    updateStatusMessage(' انتهت صلاحية الكود يرجي تجديد الاشتراك.', 'error');
+                    updateStatusMessage('❌ حسابك محظور.', 'error');
                     return;
                 }
 
-                // 🚨 التحقق من شرط الجهاز الواحد 
                 const storedDeviceId = data.deviceId;
-
-                // 💡 جلب اسم الطالب لعرضه
                 const studentName = data.studentName || data.name || "يا بطل";
 
                 if (!storedDeviceId) {
-                    // الكود سليم وجهاز الطالب هو أول جهاز يسجل الدخول
                     await db.ref('approvedStudents/' + activationCode + '/deviceId').set(localDeviceId);
                     localStorage.setItem('activeCode', activationCode);
                     localStorage.setItem('approved', 'true');
-                    
-                    // 💡 هنا يتم عرض رسالة الترحيب بالاسم
-                    updateStatusMessage(`✅ أهلاً بك ${studentName}! تم التفعيل بنجاح! جاري الدخول...`, 'success');
-                    
-                    setTimeout(() => {
-                        window.location.href = 'subjects.html'; // الانتقال للصفحة الرئيسية
-                    }, 1000);
+                    updateStatusMessage(`✅ أهلاً ${studentName}! تم التفعيل بنجاح!`, 'success');
+                    setTimeout(() => { window.location.href = 'subjects.html'; }, 1000);
                     
                 } else if (storedDeviceId === localDeviceId) {
-                    // الكود سليم ومفعل بالفعل على نفس الجهاز
                     localStorage.setItem('activeCode', activationCode);
                     localStorage.setItem('approved', 'true');
-                    
-                    // 💡 هنا يتم عرض رسالة الترحيب بالاسم
-                    updateStatusMessage(`✅ أهلاً بك ${studentName}! تم تسجيل الدخول بنجاح! جاري الدخول...`, 'success');
-
-                    setTimeout(() => {
-                        window.location.href = 'subjects.html'; // الانتقال للصفحة الرئيسية
-                    }, 1000);
-
+                    updateStatusMessage(`✅ أهلاً ${studentName}! تم الدخول بنجاح!`, 'success');
+                    setTimeout(() => { window.location.href = 'subjects.html'; }, 1000);
                 } else {
-                    // ❌ الكود سليم لكن مفعل على جهاز آخر
-                    updateStatusMessage('❌ هذا الكود مُفعل على جهاز آخر بالفعل.', 'error');
+                    updateStatusMessage('❌ الكود مستخدم على جهاز آخر.', 'error');
                 }
-
             } catch (error) {
-                updateStatusMessage('❌ فشل الاتصال بالخادم. حاول مرة أخرى.', 'error');
-                console.error("Firebase error:", error);
+                updateStatusMessage('❌ خطأ في الاتصال.', 'error');
             } finally {
-                // إعادة تفعيل الزر في حالة الخطأ
                 LOGIN_BTN.disabled = false;
             }
         }
         
-        // 5. إنشاء الشهب بشكل عشوائي 
+        // تأثير الشهب
         const body = document.querySelector('body');
-        const numStars = 10; 
-
+        const numStars = 12; 
         for (let i = 0; i < numStars; i++) {
             const star = document.createElement('div');
             star.className = 'shooting-star';
-
-            const startX = Math.random() * window.innerWidth / 2;
+            const startX = Math.random() * window.innerWidth;
             const startY = Math.random() * window.innerHeight / 2;
             star.style.left = `${startX}px`;
             star.style.top = `${startY}px`;
-
-            const delay = Math.random() * 5; 
-            star.style.animationDelay = `${delay}s`;
-
+            star.style.animationDelay = `${Math.random() * 5}s`;
             body.appendChild(star);
         }
     </script>
