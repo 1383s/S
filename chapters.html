@@ -409,25 +409,30 @@ createApp({
             }
         };
         
-        const playVideo = (video) => {
-            if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
-                showToast("رابط الفيديو غير متاح", "error");
-                return;
-            }
+const playVideo = (video) => {
+    if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
+        showToast("رابط الفيديو غير متاح", "error");
+        return;
+    }
     
-    // التعديل هنا يا بطل:
-            localStorage.setItem("video_title", video.title); // عشان البلير يشوف العنوان
-            localStorage.setItem("video_url", video.stream_url); // الرابط المباشر
-    
-            if (video.sources) {
-                localStorage.setItem("video_sources", JSON.stringify(video.sources)); // الجودات
-            } else {
-                localStorage.removeItem("video_sources"); // نمسح القديم عشان ميحصلش تعارض
-            }
+    // مسح أي بيانات قديمة عشان م يحصلش تعارض
+    localStorage.removeItem("video_sources");
+    localStorage.removeItem("video_url");
 
-            window.location.href = 'player.html';
-        };
+    // تخزين العنوان
+    localStorage.setItem("video_title", video.title);
 
+    // لو فيه مصفوفة جودات (أهم حاجة للبلير بتاعك)
+    if (video.sources && video.sources.length > 0) {
+        localStorage.setItem("video_sources", JSON.stringify(video.sources));
+    } 
+    // لو مفيش جودات وفي رابط مباشر
+    else if (video.stream_url) {
+        localStorage.setItem("video_url", video.stream_url);
+    }
+
+    window.location.href = 'player.html';
+};
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
                 loading.value = false;
