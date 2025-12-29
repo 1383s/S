@@ -23,8 +23,8 @@
     <meta name="twitter:title" content="Full Mark | Elgizawy">
     <meta name="twitter:image" content="https://www2.0zz0.com/2025/12/18/18/617041603.jpg">
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -33,19 +33,27 @@
     
     <style>
         /* --------------------------
-           1. تعريف الألوان (ثيم المحيط الأزرق)
+           1. باليتة الألوان الجديدة (ستايل نيون شبابي)
            -------------------------- */
         :root {
-            --light-text: #e2e8f0;       
-            --accent-color: #38bdf8;     /* سماوي */
-            --accent-glow: #0ea5e9;      
+            /* ألوان النصوص */
+            --light-text: #ffffff;        
+            --dim-text: #94a3b8;
+
+            /* الألوان الأساسية (بنفسجي وسماوي) */
+            --primary-color: #8b5cf6;     /* بنفسجي فاتح */
+            --primary-glow: #7c3aed;      /* توهج بنفسجي */
+            --accent-color: #06b6d4;      /* سماوي نيون */
             
-            --red-error: #ef4444;        
-            --pending: #f59e0b;          
-            
-            --bg-deep: #020617;          
-            --bg-surface: #0f172a;       
-            --card-glass: rgba(15, 23, 42, 0.7); 
+            /* ألوان الحالة */
+            --red-error: #ff4d4d;        
+            --pending: #facc15;          
+            --success: #10b981;
+
+            /* الخلفيات */
+            --bg-deep: #0f0518;           /* خلفية داكنة جداً مايلة للبنفسجي */
+            --bg-surface: #1e1b4b;        
+            --card-glass: rgba(17, 24, 39, 0.75); /* زجاج غامق */
         }
 
         * {
@@ -60,21 +68,24 @@
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
             min-height: 100vh;
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%);
+            /* جرادينت مودرن وغني */
+            background: radial-gradient(circle at top center, #2e1065 0%, var(--bg-deep) 70%);
             background-color: var(--bg-deep);
             overflow: hidden; position: relative;
             color: var(--light-text);
-            padding: 20px; padding-bottom: 100px; 
+            padding: 20px; padding-bottom: 80px; 
         }
 
+        /* شبكة خلفية خفيفة */
         body::before {
             content: ''; position: absolute; top: 0; left: 0;
             width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+                linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
             z-index: -1; pointer-events: none;
+            mask-image: radial-gradient(circle, black 40%, transparent 80%);
         }
 
         /* --------------------------
@@ -82,29 +93,30 @@
            -------------------------- */
         .stars {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 1px, transparent 1%);
-            background-size: 100px 100px; background-repeat: repeat;
-            opacity: 0.4; z-index: -2;
-            animation: star-move 100s linear infinite;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.7) 1px, transparent 1%);
+            background-size: 120px 120px; background-repeat: repeat;
+            opacity: 0.5; z-index: -2;
+            animation: star-move 120s linear infinite;
         }
         
         @keyframes star-move {
             from { background-position: 0% 0%; }
-            to { background-position: 20% 20%; }
+            to { background-position: 10% 20%; }
         }
         
         .shooting-star {
-            position: absolute; width: 3px; height: 3px; background: #fff;
+            position: absolute; width: 2px; height: 2px; background: #fff;
             border-radius: 50%;
-            box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--accent-color); 
+            /* تغيير لون الشهاب للبنفسجي الفاتح */
+            box-shadow: 0 0 10px 2px #fff, 0 0 20px 4px var(--primary-color); 
             opacity: 0; transform: rotateZ(315deg);
-            animation: shoot 6s linear infinite; z-index: -1; 
+            animation: shoot 5s linear infinite; z-index: -1; 
         }
 
         @keyframes shoot {
             0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
             10% { opacity: 1; }
-            100% { opacity: 0; transform: translate3d(500px, 500px, 0) rotateZ(315deg); }
+            100% { opacity: 0; transform: translate3d(600px, 600px, 0) rotateZ(315deg); }
         }
 
         /* --------------------------
@@ -112,31 +124,43 @@
            -------------------------- */
         .login-card {
             background: var(--card-glass);
-            border-radius: 20px; padding: 40px; 
-            border: 1px solid rgba(56, 189, 248, 0.1); 
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.05);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            width: 90%; max-width: 420px; 
-            text-align: center; animation: fadeIn 1s ease-out;
+            border-radius: 24px; padding: 45px 30px; 
+            /* حدود مضيئة */
+            border: 1px solid rgba(139, 92, 246, 0.2); 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 
+                        inset 0 0 30px rgba(139, 92, 246, 0.05);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            width: 100%; max-width: 400px; 
+            text-align: center; 
+            animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
             color: #ffffff; z-index: 10; position: relative;
         }
 
-        .login-card::after {
-            content: ''; position: absolute; top: 0; left: 20%;
-            width: 60%; height: 2px;
+        /* خط علوي ملون للكارت */
+        .login-card::before {
+            content: ''; position: absolute; top: -1px; left: 25%;
+            width: 50%; height: 2px;
             background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
-            box-shadow: 0 0 10px var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         h2 {
-            margin-bottom: 30px; font-size: 2.2em; color: #ffffff;
-            font-weight: 700; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-            letter-spacing: 1px;
+            margin-bottom: 10px; font-size: 2em; color: #ffffff;
+            font-weight: 800; 
+            text-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+            letter-spacing: -0.5px;
+        }
+        
+        h2 span { color: var(--accent-color); } /* تلوين جزء من العنوان لو حابب */
+
+        .sub-title {
+            color: var(--dim-text); font-size: 0.9em; margin-bottom: 35px;
+            font-weight: 400;
         }
 
         /* --------------------------
@@ -145,101 +169,140 @@
         .input-group { position: relative; margin-bottom: 25px; }
 
         .input-group input {
-            width: 100%; padding: 15px 45px 15px 15px; 
-            background: rgba(15, 23, 42, 0.5); 
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; color: #ffffff; font-size: 1em;
-            outline: none; transition: all 0.3s ease;
+            width: 100%; padding: 18px 50px 18px 20px; 
+            background: rgba(0, 0, 0, 0.3); 
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px; color: #ffffff; font-size: 1.1em;
+            outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: right; font-family: 'Tajawal', sans-serif;
-            font-weight: 500; letter-spacing: 1px;
+            font-weight: 600; letter-spacing: 2px;
         }
 
-        .input-group input::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .input-group input::placeholder { 
+            color: rgba(255, 255, 255, 0.3); 
+            font-weight: 400; letter-spacing: 0; font-size: 0.9em;
+        }
 
         .input-group input:focus {
-            background: rgba(15, 23, 42, 0.8);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            background: rgba(139, 92, 246, 0.05);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
         }
 
         .input-group .icon {
-            position: absolute; right: 15px; top: 50%;
-            transform: translateY(-50%); color: var(--accent-color); font-size: 1em;
+            position: absolute; right: 20px; top: 50%;
+            transform: translateY(-50%); 
+            color: var(--dim-text); 
+            font-size: 1.2em; transition: 0.3s;
         }
+        
+        .input-group input:focus + .icon { color: var(--accent-color); }
         
         /* --------------------------
            6. رسائل الحالة
            -------------------------- */
         #statusMessage {
-            margin-bottom: 25px; padding: 15px; border-radius: 10px;
-            font-size: 0.95em; display: none; text-align: center; font-weight: 600;
+            margin-bottom: 20px; padding: 12px; border-radius: 12px;
+            font-size: 0.9em; display: none; text-align: center; font-weight: 700;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         
         /* --------------------------
            7. الأزرار (Buttons)
            -------------------------- */
         .login-btn {
-            width: 100%; padding: 15px; border: none; border-radius: 12px;
-            color: #0f172a; font-size: 1.1em; font-weight: 800;
-            cursor: pointer; transition: 0.3s ease; margin-top: 15px;
-            background: linear-gradient(135deg, var(--accent-color), var(--accent-glow));
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            color: #ffffff; font-size: 1.1em; font-weight: 800;
+            cursor: pointer; transition: all 0.3s ease; margin-top: 10px;
+            /* جرادينت بنفسجي عصري */
+            background: linear-gradient(135deg, var(--primary-color), #ec4899);
+            box-shadow: 0 10px 20px -5px rgba(139, 92, 246, 0.5);
+            position: relative; overflow: hidden;
+        }
+
+        .login-btn::after {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
         }
 
         .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); filter: brightness(1.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px -5px rgba(236, 72, 153, 0.6); 
         }
+        
+        .login-btn:hover::after { left: 100%; }
 
         /* --------------------------
            8. شريط حالة الكود العلوي
            -------------------------- */
         .top-status-bar {
-            padding: 15px; border-radius: 10px; margin-bottom: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 12px; border-radius: 16px; margin-bottom: 25px;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.03);
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center; text-align: center;
         }
 
         .status-text {
-            font-size: 0.9em; font-weight: 500; margin-bottom: 10px; color: #cbd5e1;
+            font-size: 0.9em; font-weight: 600; margin-bottom: 8px; color: var(--dim-text);
         }
 
         .code-display {
-            color: var(--accent-color); font-weight: 700; font-family: monospace;
-            font-size: 1.2em; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); margin-right: 5px;
+            color: var(--accent-color); font-weight: 800; font-family: 'Courier New', monospace;
+            font-size: 1.4em; letter-spacing: 2px;
+            text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); margin-right: 5px;
         }
 
         .clear-btn {
-            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
-            padding: 8px 15px; border-radius: 8px;
-            font-size: 0.85em; font-weight: 600; cursor: pointer;
-            border: 1px solid rgba(239, 68, 68, 0.5); transition: 0.3s;
+            background: rgba(255, 77, 77, 0.1); color: #ff8080;
+            padding: 8px 20px; border-radius: 50px;
+            font-size: 0.8em; font-weight: 700; cursor: pointer;
+            border: 1px solid rgba(255, 77, 77, 0.3); transition: 0.3s;
+            margin-top: 5px;
         }
-        .clear-btn:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
+        .clear-btn:hover { background: rgba(255, 77, 77, 0.25); color: #fff; transform: scale(1.05); }
 
         /* --------------------------
            9. فوتر المطور
            -------------------------- */
         .developer-footer {
-            position: fixed; bottom: 10px; width: 100%; z-index: 5; 
-            padding: 15px 10px; background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            position: fixed; bottom: 0; width: 100%; z-index: 5; 
+            padding: 15px; background: transparent;
             display: flex; justify-content: center; align-items: center;
-            border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .developer-info {
-            display: flex; align-items: center; color: var(--light-text);
-            font-size: 1em; font-weight: 600; flex-direction: row-reverse; gap: 15px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9em; font-weight: 600; flex-direction: row-reverse; gap: 10px;
+            background: rgba(15, 5, 24, 0.8);
+            padding: 8px 20px; border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
         }
 
-        .developed-text { order: 1; opacity: 0.6; font-size: 0.9em; }
+        .developed-text { order: 1; color: var(--dim-text); font-size: 0.85em; }
 
         .developer-name {
-            color: var(--accent-color); font-size: 1.5em; font-weight: 800;
-            letter-spacing: 1px; text-shadow: 0 0 15px var(--accent-color); order: 2; 
+            color: var(--accent-color); font-size: 1.1em; font-weight: 900;
+            letter-spacing: 1px; order: 2; 
+        }
+        
+        /* --------------------------
+           10. تحسينات الموبايل
+           -------------------------- */
+        @media (max-width: 480px) {
+            .login-card { padding: 35px 20px; width: 95%; }
+            h2 { font-size: 1.8em; }
+            .login-btn { font-size: 1em; padding: 14px; }
         }
     </style>
 </head>
@@ -250,17 +313,19 @@
         
         <div id="topCodeStatus" class="top-status-bar"></div>
 
-        <h2>Full-Mark منصة</h2>
+        <h2>منصة Full-Mark</h2>
+        <p class="sub-title">سجل دخولك وابدأ رحلة التفوق 🚀</p>
+        
         <div id="statusMessage" style="display:none;"></div>
 
         <form id="loginForm">
             <div class="input-group">
+                <input type="text" id="activationCode" placeholder="اكتب كود التفعيل" pattern="\d{6}" maxlength="6" required autocomplete="off">
                 <i class="fas fa-lock icon"></i>
-                <input type="text" id="activationCode" placeholder="ادخل كود التفعيل هنا" pattern="\d{6}" maxlength="6" required>
             </div>
 
             <button type="submit" id="loginBtn" class="login-btn">
-                 تفعيل ودخول
+                  تفعيل ودخول
             </button>
             
             </form>
@@ -275,7 +340,10 @@
     </footer>
 
     <script>
-        // 🚨 Configuration - إعدادات Firebase
+        // ----------------------------------------------------
+        // 🚨 DO NOT TOUCH: FIREBASE CONFIGURATION & LOGIC 🚨
+        // ----------------------------------------------------
+        
         const firebaseConfig = {
           apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
           authDomain: "thanawy-1383.firebaseapp.com",
@@ -303,21 +371,22 @@
             STATUS_MESSAGE.textContent = text;
             STATUS_MESSAGE.style.display = 'block';
             
+            // Updated Colors for JS Logic to match new CSS
             if (type === 'success') {
-                STATUS_MESSAGE.style.background = 'rgba(56, 189, 248, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'var(--accent-color)';
+                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.15)'; 
+                STATUS_MESSAGE.style.borderColor = '#10b981';
                 STATUS_MESSAGE.style.border = '1px solid';
-                STATUS_MESSAGE.style.color = 'var(--accent-color)';
+                STATUS_MESSAGE.style.color = '#10b981';
             } else if (type === 'error') {
-                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'var(--red-error)';
+                STATUS_MESSAGE.style.background = 'rgba(255, 77, 77, 0.15)'; 
+                STATUS_MESSAGE.style.borderColor = '#ff4d4d';
                 STATUS_MESSAGE.style.border = '1px solid';
-                STATUS_MESSAGE.style.color = 'var(--red-error)';
+                STATUS_MESSAGE.style.color = '#ff4d4d';
             } else if (type === 'pending') {
-                STATUS_MESSAGE.style.background = 'rgba(245, 158, 11, 0.1)'; 
-                STATUS_MESSAGE.style.borderColor = 'var(--pending)';
+                STATUS_MESSAGE.style.background = 'rgba(250, 204, 21, 0.15)'; 
+                STATUS_MESSAGE.style.borderColor = '#facc15';
                 STATUS_MESSAGE.style.border = '1px solid';
-                STATUS_MESSAGE.style.color = 'var(--pending)';
+                STATUS_MESSAGE.style.color = '#facc15';
             }
         }
 
