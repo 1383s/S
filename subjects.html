@@ -15,149 +15,145 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* -------------------------------------------
-       1. إعدادات الألوان (CSS Variables)
-       ------------------------------------------- */
+    /* =========================================
+       1. نظام الألوان (Theming System)
+       ========================================= */
     :root {
       /* 🔵 الوضع الافتراضي (الحوت الأزرق - Dark) */
-      --bg-deep: #020617;
-      --glass-bg: rgba(15, 23, 42, 0.7);
-      --glass-border: rgba(0, 243, 255, 0.2);
+      --bg-main: #020617;          
+      --card-bg: rgba(15, 23, 42, 0.7); 
       --card-hover: rgba(15, 23, 42, 0.95);
-      --accent-neon: #00f3ff;  /* سماوي نيون */
+      --accent-color: #00f3ff;      
       --accent-dim: #0099a0;
-      --text-main: #e2e8f0;
+      --text-main: #e2e8f0;       
       --text-sec: #94a3b8;
+      --border-color: rgba(0, 243, 255, 0.2);
       
-      /* خلفية الصفحة (الليلي) */
-      --page-bg-image: 
-          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
+      --bg-image: 
+          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-main) 80%),
           linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
           linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
     }
 
     /* ☀️ الوضع النهاري (Light Mode) */
     [data-theme="light"] {
-      --bg-deep: #f0f9ff;
-      --glass-bg: rgba(255, 255, 255, 0.85);
-      --glass-border: rgba(2, 132, 199, 0.2);
+      --bg-main: #f0f9ff;          
+      --card-bg: rgba(255, 255, 255, 0.9);
       --card-hover: #ffffff;
-      --accent-neon: #0284c7;  /* أزرق غامق واضح */
+      --accent-color: #0284c7;      /* أزرق غامق ليكون واضحاً */
       --accent-dim: #bae6fd;
-      --text-main: #0f172a;
+      --text-main: #0f172a;       
       --text-sec: #475569;
+      --border-color: rgba(2, 132, 199, 0.2);
 
-      /* خلفية الصفحة (النهاري) */
-      --page-bg-image: 
+      --bg-image: 
           radial-gradient(circle at 50% 0%, #bae6fd 0%, #f0f9ff 80%),
           linear-gradient(0deg, rgba(2,132,199,0.05) 1px, transparent 1px),
           linear-gradient(90deg, rgba(2,132,199,0.05) 1px, transparent 1px);
     }
 
-    /* -------------------------------------------
-       2. التنسيقات العامة
-       ------------------------------------------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Cairo', sans-serif;
-      background-color: var(--bg-deep);
-      background-image: var(--page-bg-image);
-      background-size: 100% 100%, 50px 50px, 50px 50px;
-      color: var(--text-main);
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding-top: 90px;
-      padding-bottom: 70px;
+      padding: 90px 15px 70px;
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg-main);
+      background-image: var(--bg-image);
+      background-size: 100% 100%, 50px 50px, 50px 50px;
+      color: var(--text-main);
+      margin: 0;
       overflow-x: hidden;
+      min-height: 100vh;
       transition: background 0.3s ease, color 0.3s ease;
     }
 
-    /* البار العلوي */
+    /* --- الهيدر (Topbar) --- */
     .topbar {
-      position: fixed;
-      top: 0; right: 0; left: 0;
-      height: 70px;
-      background: var(--glass-bg);
-      backdrop-filter: blur(10px);
-      border-bottom: 2px solid var(--accent-neon);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      background: var(--card-bg); 
+      backdrop-filter: blur(15px); 
+      padding: 10px 20px;
+      position: fixed;
+      top: 0; right: 0; left: 0;
       z-index: 1000;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      border-bottom: 2px solid var(--accent-color);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
       transition: background 0.3s;
     }
 
     .title {
       font-size: 16px;
-      font-weight: 700;
-      color: var(--accent-neon);
+      color: var(--accent-color);
       font-family: 'Orbitron', sans-serif;
+      font-weight: 700;
       letter-spacing: 2px;
-      text-shadow: 0 0 5px var(--glass-border);
+      text-shadow: 0 0 5px var(--border-color);
     }
 
     .icons { display: flex; align-items: center; gap: 15px; }
-
-    /* أيقونات الهيدر */
-    .icon-btn {
-      width: 35px; height: 35px;
-      border-radius: 50%;
-      display: flex; justify-content: center; align-items: center;
-      cursor: pointer;
-      transition: 0.3s;
-      color: var(--text-main);
-      background: rgba(128,128,128,0.1);
-      border: 1px solid transparent;
-    }
-    .icon-btn:hover {
-        background: var(--accent-neon);
-        color: var(--bg-deep);
-        box-shadow: 0 0 10px var(--accent-neon);
-    }
-    .icon-btn img { 
-        width: 24px; height: 24px; 
-        /* فلتر يجعل الصور تتماشى مع لون النص */
-        filter: drop-shadow(0 0 1px var(--accent-neon)); 
-    }
-    /* تعديل الصور في الوضع النهاري */
-    [data-theme="light"] .icon-btn img { filter: none; }
     
-    /* العنوان الرئيسي */
+    /* زر الثيم الجديد */
+    .theme-btn {
+        width: 35px; height: 35px;
+        border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        background: rgba(128, 128, 128, 0.15);
+        cursor: pointer;
+        transition: 0.3s;
+        border: 1px solid var(--border-color);
+        color: var(--text-main);
+    }
+    .theme-btn:hover {
+        background: var(--accent-color);
+        color: var(--bg-main);
+        box-shadow: 0 0 15px var(--accent-color);
+    }
+
+    .icons img { 
+        width: 28px; height: 28px; 
+        filter: drop-shadow(0 0 2px var(--accent-color)); 
+        cursor: pointer; 
+        transition: transform 0.3s;
+    }
+    .icons img:hover { transform: scale(1.1); }
+    /* تعديل الأيقونات للوضع النهاري */
+    [data-theme="light"] .icons img { filter: none; }
+
+    /* --- العنوان --- */
     h1 {
-      color: var(--accent-neon);
+      color: var(--accent-color);
       text-align: center;
       font-size: 3rem;
       margin-bottom: 50px;
-      text-shadow: 0 0 15px var(--glass-border);
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
     }
 
-    /* شبكة المواد */
+    /* --- الشبكة --- */
     ul {
       padding: 0 10px;
       list-style: none;
-      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, minmax(250px, 1fr)); /* كما في الكود الأصلي */
+      grid-template-columns: repeat(3, minmax(250px, 1fr));
       gap: 30px;
     }
 
-    /* كارت المادة */
+    /* --- كارت المادة --- */
     li {
-      background: var(--glass-bg);
+      background: var(--card-bg);
       border-radius: 20px;
       padding: 30px 25px;
       cursor: pointer;
-      border: 1px solid var(--glass-border);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
       display: flex;
       flex-direction: column;
@@ -169,85 +165,79 @@
 
     li:hover {
       background: var(--card-hover);
-      transform: translateY(-8px) scale(1.02);
-      border-color: var(--accent-neon);
-      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15);
+      transform: translateY(-8px);
+      border-color: var(--accent-color);
+      box-shadow: 0 15px 50px rgba(0, 243, 255, 0.2);
     }
 
     /* دائرة الصورة */
     .circle {
-      width: 120px; height: 120px;
-      border-radius: 50%;
+      width: 120px; height: 120px; border-radius: 50%;
       background: rgba(0,0,0,0.2);
       margin-bottom: 25px;
-      border: 3px solid var(--accent-neon);
-      box-shadow: 0 0 15px var(--accent-neon);
+      border: 3px solid var(--accent-color);
+      box-shadow: 0 0 15px var(--accent-color);
       display: flex; justify-content: center; align-items: center;
       transition: 0.3s;
     }
     
     li:hover .circle {
+        box-shadow: 0 0 30px var(--accent-color);
         transform: scale(1.05);
-        box-shadow: 0 0 25px var(--accent-neon);
     }
 
     .circle img { 
-        width: 80%; height: 80%; 
+        width: 75%; height: 75%; 
         object-fit: contain; 
-        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); 
+        filter: drop-shadow(0 0 5px rgba(255,255,255,0.3)); 
     }
 
-    li span {
-      font-weight: 700;
-      font-size: 1.4rem;
-      font-family: 'Tajawal', sans-serif;
-      color: var(--text-main);
-      z-index: 2;
+    li span { 
+        font-weight: 700; font-size: 1.4rem; font-family: 'Tajawal', sans-serif; 
+        color: var(--text-main);
+        z-index: 2;
     }
 
     /* التحميل */
-    li.loading {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: var(--text-sec);
-      font-size: 1.3rem;
-      background: transparent; border: none; box-shadow: none;
+    li.loading { 
+        grid-column: 1 / -1; text-align: center; color: var(--text-sec); font-size: 1.3rem;
+        background: transparent; border: none; box-shadow: none;
     }
     li.loading::after {
-      content: "";
-      width: 35px; height: 35px;
-      border: 4px solid var(--accent-neon);
-      border-top: 4px solid transparent;
-      border-radius: 50%;
-      display: inline-block;
-      margin-right: 15px;
-      animation: spin 1s linear infinite;
+      content: ""; width: 35px; height: 35px; border: 4px solid var(--accent-color);
+      border-top: 4px solid transparent; border-radius: 50%; display: inline-block;
+      margin-right: 15px; animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* زر البروفايل العائم */
     .profile-float-btn {
-      position: fixed; bottom: 30px; left: 30px;
-      width: 60px; height: 60px;
-      border-radius: 50%;
-      background: var(--glass-bg);
-      border: 3px solid var(--accent-neon);
-      display: flex; justify-content: center; align-items: center;
-      z-index: 1200;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      transition: 0.3s;
+      position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
+      border-radius: 50%; 
+      background: var(--card-bg); 
+      border: 3px solid var(--accent-color);
+      display: flex; justify-content: center; align-items: center; z-index: 1200;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
       backdrop-filter: blur(5px);
+      transition: 0.3s;
     }
-    .profile-float-btn:hover {
-        transform: scale(1.1) rotate(10deg);
-        box-shadow: 0 0 35px var(--accent-neon);
+    .profile-float-btn:hover { 
+        transform: scale(1.1) rotate(10deg); 
+        box-shadow: 0 0 35px var(--accent-color);
     }
     .profile-float-btn img { 
-        width: 30px; height: 30px; 
-        filter: invert(1);
+        width: 30px; height: 30px; filter: invert(1); transition: 0.3s; 
     }
     [data-theme="light"] .profile-float-btn img { filter: none; }
 
+    /* تعديل التوست ليتناسب مع الثيم (Override JS Styles) */
+    .custom-toast {
+        background: var(--card-bg) !important;
+        color: var(--text-main) !important;
+        border-color: var(--accent-color) !important;
+        backdrop-filter: blur(10px) !important;
+    }
+    
     @media (max-width: 480px) {
         ul { grid-template-columns: 1fr; }
         h1 { font-size: 1.8rem; }
@@ -259,17 +249,14 @@
   <div class="topbar">
     <div class="title">By ELGIZAWY</div>
     <div class="icons">
-      
-      <div class="icon-btn" id="themeToggle" title="تغيير المظهر">
-        <i class="fas fa-sun"></i> 
+      <div class="theme-btn" id="themeToggle">
+        <i class="fas fa-sun"></i>
       </div>
 
-      <a href="" target="_blank" class="icon-btn">
+      <div class="toggle-dark" id="darkToggle" style="display:none"></div> <a href="" target="_blank">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
       </a>
-      <div class="icon-btn" id="shareBtn">
-        <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
-      </div>
+      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
     </div>
   </div>
 
@@ -288,20 +275,22 @@
   const themeIcon = themeBtn.querySelector('i');
   const body = document.body;
 
-  // استرجاع الثيم
+  // 1. استرجاع الثيم المحفوظ
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'light') {
       body.setAttribute('data-theme', 'light');
       themeIcon.classList.replace('fa-sun', 'fa-moon');
   }
 
-  // التبديل عند الضغط
+  // 2. وظيفة التبديل
   themeBtn.onclick = () => {
       if (body.getAttribute('data-theme') === 'light') {
+          // التحويل لليلي (أزرق)
           body.removeAttribute('data-theme');
           localStorage.setItem('theme', 'dark');
           themeIcon.classList.replace('fa-moon', 'fa-sun');
       } else {
+          // التحويل للنهاري
           body.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
           themeIcon.classList.replace('fa-sun', 'fa-moon');
@@ -310,16 +299,16 @@
 </script>
 
 <script>
+// ✅ Toast احترافية
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `custom-toast ${type}`;
   toast.innerHTML = `<span>${message}</span>`;
-  
   const style = document.createElement("style");
   style.textContent = `
-    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid var(--accent-neon); display:flex; align-items:center; animation: slideIn 0.5s ease; background: var(--glass-bg); backdrop-filter: blur(10px); }
-    .custom-toast.info { color: var(--accent-neon); }
-    .custom-toast.success { color: #00ff88; border-color: #00ff88; }
+    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid #27d97e; display:flex; align-items:center; animation: slideIn 0.5s ease; }
+    .custom-toast.info { background: #08402C; }
+    .custom-toast.success { background: #27d97e; }
     @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
   `;
   document.head.appendChild(style);
