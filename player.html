@@ -217,8 +217,8 @@
 
 <script>
 let qualitySources = [];
-let videoTitle = localStorage.getItem("current_video") || "Lecture Video";
-const savedSources = localStorage.getItem("video_url");
+let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
+const savedSources = localStorage.getItem("video_sources");
 
 if (savedSources) {
   try {
