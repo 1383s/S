@@ -1,440 +1,510 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>الفيديوهات - منصة 1383</title>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  <script>
-    // 🚨 1. Configuration - لازم تحط نفس الإعدادات اللي في index.html
-    const firebaseConfig = {
-      apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
-      authDomain: "thanawy-1383.firebaseapp.com",
-      databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
-      projectId: "thanawy-1383",
-      storageBucket: "thanawy-1383.firebasestorage.app",
-      messagingSenderId: "1026664406457",
-      appId: "1:1026664406457:web:87d71f7e41bef36ba0aa68",
-      measurementId: "G-J5R2EFM2D0"
-    };
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الفيديوهات | Full Mark</title>
+  
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 
-    // 🚨 2. عنوان صفحة الدخول اللي هترجع ليها
-    const LOGIN_PAGE_URL = "https://1383ss.vercel.app"; 
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&family=Tajawal:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    // دالة التوجيه لصفحة الدخول
-    function redirectToLogin(reason) {
-        // بنستخدم replace عشان الصفحة دي متتسجلش في الـ Browser History
-        window.location.replace(LOGIN_PAGE_URL);
-    }
+    <style>
+        :root {
+            /* 🔵 ثيم الحوت الأزرق */
+            --bg-deep: #020617;          
+            --cyan-neon: #00f3ff;      
+            --cyan-dim: #0099a0;       
+            --text-white: #e2e8f0;       
+            --glass-bg: rgba(15, 23, 42, 0.7); 
+            --glass-border: rgba(0, 243, 255, 0.2); 
+            --card-hover: rgba(15, 23, 42, 0.95);
+            --gray-text: #94a3b8;
+            --success: #00ff88;
+        }
 
-    // *******************************************************************
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    const activeCode = localStorage.getItem('activeCode');
-    const localDeviceId = localStorage.getItem('localDeviceId');
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-deep);
+            background-image: 
+                radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
+                linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 50px 50px, 50px 50px;
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            overflow-x: hidden;
+        }
 
-    // 3. التحقق المبدئي: لو مفيش كود أو Device ID متسجل محليًا
-    if (!activeCode || !localDeviceId) {
-        redirectToLogin("Missing local code or Device ID.");
-    } else {
-        // 4. التحقق من Firebase
+        /* --- الهيدر --- */
+        .header {
+            position: fixed; top: 0; left: 0; width: 100%; height: 70px;
+            background: rgba(2, 6, 23, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--cyan-neon);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; z-index: 1000;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .header-info {
+            display: flex; align-items: center; gap: 12px;
+        }
         
-        if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const db = firebase.database();
-
-        async function verifyCodeOnServer(code) {
-            try {
-                // بنحاول نقرا بيانات الكود ده من الداتا بيز مرة واحدة بس
-                const snapshot = await db.ref('approvedStudents/' + code).once('value');
-                const data = snapshot.val();
-                const now = Date.now();
-
-                // أ. الكود مش موجود
-                if (!data) {
-                    redirectToLogin("Code not found.");
-                    return;
-                }
-
-                // ب. الكود منتهي الصلاحية
-                if (data.expiry <= now) {
-                    redirectToLogin("Code is expired.");
-                    return;
-                }
-                
-                // ج. الكود مُعطّل من الإدارة
-                if (data.isBlocked === true) {
-                    redirectToLogin("Code is blocked.");
-                    return;
-                }
-                
-                // د. الكود مفعل على جهاز تاني
-                const storedDeviceId = data.deviceId;
-                
-                if (!storedDeviceId || storedDeviceId !== localDeviceId) {
-                    // عشان الأمان، بنمسح الداتا المحلية عشان الطالب يرجع يسجل دخول تاني
-                    localStorage.removeItem('activeCode');
-                    localStorage.removeItem('localDeviceId');
-                    redirectToLogin("Code linked to another device.");
-                    return;
-                }
-
-                // لو وصل لحد هنا يبقى: ✅ الكود سليم ومفعل على نفس الجهاز
-                // خلاص، سيبه يكمل ويشوف المحتوى
-
-            } catch (error) {
-                // لو فشل الاتصال بالخادم، الأمان يقتضي إننا نرجعه لصفحة الدخول
-                // عشان منعاً للدخول غير المصرح به لو الـ Server كان واقع
-                redirectToLogin("Verification server error.");
-            }
+        .icon-box {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: rgba(0, 243, 255, 0.1); border: 1px solid var(--glass-border);
+            display: flex; justify-content: center; align-items: center;
+            color: var(--cyan-neon); font-size: 1.2rem;
         }
 
-        // إبدأ عملية التحقق
-        verifyCodeOnServer(activeCode);
-    }
-</script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap" rel="stylesheet">
-  <style>
-    /*
-* شاتي - ستايل الـ Dark Mode لصفحة الفيديوهات باللون الأزرق
-*/
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap');
+        .titles h1 {
+            font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2;
+        }
+        .titles p {
+            font-size: 0.75rem; color: var(--gray-text); font-family: 'Orbitron', sans-serif;
+        }
 
-body {
-    font-family: 'Cairo', sans-serif;
-    background: #0d0d0d;
-    color: #fff;
-    margin: 0;
-    padding: 15px;
-}
+        .back-btn {
+            width: 35px; height: 35px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            display: flex; justify-content: center; align-items: center;
+            color: var(--text-white); text-decoration: none; transition: 0.3s;
+        }
+        .back-btn:hover { background: var(--cyan-neon); color: #000; box-shadow: 0 0 15px var(--cyan-neon); }
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        /* --- المحتوى الرئيسي --- */
+        .main-container {
+            padding: 100px 20px 40px;
+            width: 100%; max-width: 1200px; margin: 0 auto; flex: 1;
+        }
 
-header h1 {
-    /* 🔵 اللون الأزرق */
-    color: #3498db;
-    font-size: 1.6rem;
-    margin: 0;
-    font-weight: 900;
-    text-align: center;
-    flex-grow: 1;
-}
+        /* --- شبكة الفيديوهات (Grid) --- */
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
 
-#back {
-    /* 🔵 خلفية وإطار ولون أزرق شفاف/صلب */
-    background: rgba(52, 152, 219, 0.1);
-    border: 1.5px solid #3498db;
-    color: #3498db;
-    padding: 6px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: 0.3s;
-    margin-left: 5px;
-}
+        /* --- كارت الفيديو --- */
+        .video-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column;
+            cursor: pointer;
+        }
 
-#back:hover {
-    /* 🔵 درجة أزرق أغمق في الـ hover */
-    background: rgba(52, 152, 219, 0.2);
-    transform: translateY(-1px);
-}
+        .video-card:hover {
+            border-color: var(--cyan-neon);
+            box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15);
+            transform: translateY(-5px);
+        }
 
-#videos-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    max-width: 1100px;
-    margin: auto;
-}
+        .video-thumb {
+            height: 160px;
+            background: #000;
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+        
+        .video-thumb img {
+            width: 100%; height: 100%; object-fit: cover; opacity: 0.6; transition: 0.3s;
+        }
+        .video-card:hover .video-thumb img { opacity: 0.4; transform: scale(1.05); }
 
-.video-box {
-    background: #1a1a1a;
-    /* 🔵 إطار أزرق شفاف */
-    border: 1px solid rgba(52, 152, 219, 0.15);
-    border-radius: 12px;
-    padding: 12px;
-    transition: 0.3s;
-    overflow: hidden;
-    /* 🔵 ظل أزرق خفيف */
-    box-shadow: 0 0 10px rgba(52, 152, 219, 0.05);
-}
+        .play-icon {
+            position: absolute; font-size: 3rem; color: var(--cyan-neon);
+            text-shadow: 0 0 20px rgba(0,0,0,0.8); transition: 0.3s;
+        }
+        .video-card:hover .play-icon { transform: scale(1.2); text-shadow: 0 0 30px var(--cyan-neon); }
 
-.video-box:hover {
-    transform: translateY(-4px);
-    /* 🔵 ظل أزرق واضح في الـ hover */
-    box-shadow: 0 0 18px rgba(52, 152, 219, 0.25);
-}
+        .video-info {
+            padding: 15px;
+            flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;
+        }
 
-.video-title {
-    font-size: 18px;
-    font-weight: 800;
-    /* 🔵 اللون الأزرق */
-    color: #3498db;
-    text-align: center;
-    margin-bottom: 8px;
-}
+        .video-title {
+            font-size: 1rem; font-weight: 700; color: #fff; margin-bottom: 10px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
 
-.thumb {
-    background: #000;
-    border-radius: 10px;
-    height: 160px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    cursor: pointer;
-}
+        .video-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; color: var(--gray-text);
+        }
+        .quality-badge {
+            background: rgba(0, 243, 255, 0.1); color: var(--cyan-neon);
+            padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 243, 255, 0.2);
+        }
 
-.thumb::after {
-    content: "▶";
-    position: absolute;
-    font-size: 40px;
-    /* 🔵 اللون الأزرق لزر التشغيل */
-    color: #3498db;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-    transition: transform 0.3s ease;
-}
+        /* --- نافذة اختيار الجودة (Modal) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center; z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
 
-.thumb:hover::after {
-    transform: scale(1.1);
-}
+        .quality-modal {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--cyan-neon);
+            border-radius: 20px; padding: 25px;
+            width: 90%; max-width: 350px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+            animation: zoomIn 0.3s ease;
+        }
 
-.loading, .error {
-    text-align: center;
-    /* 🔵 اللون الأزرق للرسائل */
-    color: #3498db;
-    font-size: 17px;
-    padding: 20px;
-}
+        .modal-title {
+            font-size: 1.2rem; color: var(--cyan-neon); margin-bottom: 20px; font-weight: bold;
+        }
 
-footer {
-    text-align: center;
-    color: #888;
-    margin-top: 35px;
-    font-size: 0.85rem;
-    /* 🔵 خط أزرق شفاف فاصل */
-    border-top: 1px solid rgba(52, 152, 219, 0.1);
-    padding-top: 15px;
-}
+        .quality-btn {
+            display: block; width: 100%; padding: 12px; margin-bottom: 10px;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
+            color: #fff; border-radius: 10px; cursor: pointer; transition: 0.3s;
+            font-size: 1rem; font-weight: bold;
+        }
+        .quality-btn:hover {
+            background: var(--cyan-neon); color: #000; box-shadow: 0 0 15px var(--cyan-neon);
+        }
 
-footer span {
-    /* 🔵 اللون الأزرق */
-    color: #3498db;
-}
+        .cancel-btn {
+            background: transparent; color: #ff4444; border: 1px solid #ff4444;
+            margin-top: 10px;
+        }
+        .cancel-btn:hover { background: rgba(255, 68, 68, 0.1); color: #ff4444; box-shadow: none; }
 
-/* ✅ نافذة اختيار الجودات */
-.popup {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    display: none;
-}
+        /* --- Loading & Empty --- */
+        .loading-container {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 50vh; color: var(--cyan-neon);
+        }
+        .spinner {
+            width: 50px; height: 50px; border: 4px solid var(--cyan-neon);
+            border-top-color: transparent; border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-.popup-content {
-    background: #1a1a1a;
-    /* 🔵 إطار أزرق */
-    border: 2px solid #3498db;
-    border-radius: 14px;
-    padding: 20px;
-    text-align: center;
-    width: 300px;
-    /* 🔵 ظل أزرق */
-    box-shadow: 0 0 20px rgba(52, 152, 219, 0.2);
-}
+        .no-data {
+            grid-column: 1 / -1;
+            text-align: center; padding: 40px; color: var(--gray-text);
+            background: var(--glass-bg); border-radius: 20px; border: 1px dashed var(--glass-border);
+        }
 
-.popup-content h3 {
-    /* 🔵 اللون الأزرق */
-    color: #3498db;
-    margin-bottom: 15px;
-    font-size: 20px;
-}
+        /* Toast */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast {
+            background: rgba(15, 23, 42, 0.95); border: 1px solid var(--cyan-neon);
+            color: #fff; padding: 12px 20px; border-radius: 12px;
+            font-size: 0.9rem; box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px;
+        }
+        .toast.error { border-color: #ff4444; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
-.quality-btn {
-    display: block;
-    /* 🔵 خلفية زرقاء */
-    background: #3498db;
-    /* ⚪️ تم تغيير لون الخط للأبيض لضمان الرؤية على الخلفية الزرقاء */
-    color: #fff;
-    border: none;
-    padding: 10px 15px;
-    margin: 8px auto;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
-    width: 80%;
-}
-
-.quality-btn:hover {
-    /* 🔵 أزرق أغمق للـ hover */
-    background: #2980b9;
-    transform: translateY(-2px);
-}
-
-.cancel-btn {
-    margin-top: 10px;
-    background: none;
-    /* 🔵 إطار ولون خط أزرق */
-    border: 1px solid #3498db;
-    color: #3498db;
-    padding: 8px 20px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.cancel-btn:hover {
-    /* 🔵 خلفية أزرق شفاف في الـ hover */
-    background: rgba(52, 152, 219, 0.1);
-}
-  </style>
+    </style>
 </head>
 
 <body>
-  <header>
-    <button id="back">⬅ رجوع</button>
-    <h1>🎬 الفيديوهات</h1>
-    <div style="width:35px;"></div>
-  </header>
 
-  <main>
-    <div id="videos-container">
-      <div class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</div>
+<div id="app">
+
+    <header class="header">
+        <div class="header-info">
+            <div class="icon-box">
+                <i class="fas fa-video"></i>
+            </div>
+            <div class="titles">
+                <h1>{{ lectureData.name || 'الفيديوهات' }}</h1>
+                <p>{{ teacherData.name || 'المدرس' }}</p>
+            </div>
+        </div>
+        
+        <a :href="`chapters.html?yid=${params.yid}&sid=${params.sid}&tid=${params.tid}`" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </header>
+
+    <main class="main-container">
+        
+        <div v-if="loading" class="loading-container">
+            <div class="spinner"></div>
+            <p>جاري تحميل الفيديوهات...</p>
+        </div>
+
+        <div v-else>
+            
+            <div v-if="videos.length > 0" class="videos-grid">
+                <div v-for="video in videos" :key="video.name" class="video-card" @click="openQualityModal(video)">
+                    
+                    <div class="video-thumb">
+                        <img src="https://i.ytimg.com/vi/placeholder/maxresdefault.jpg" alt="thumbnail" 
+                             onerror="this.src='https://via.placeholder.com/640x360/020617/00f3ff?text=No+Thumbnail'">
+                        <i class="fas fa-play-circle play-icon"></i>
+                    </div>
+
+                    <div class="video-info">
+                        <div class="video-title">{{ video.name }}</div>
+                        <div class="video-meta">
+                            <span><i class="fas fa-film"></i> فيديو</span>
+                            <span class="quality-badge" v-if="video.links.length > 1">Multi-Quality</span>
+                            <span class="quality-badge" v-else>HD</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div v-else class="no-data">
+                <i class="fas fa-film" style="font-size: 3rem; margin-bottom: 15px; color: var(--cyan-dim);"></i>
+                <p>لا توجد فيديوهات متاحة في هذه المحاضرة.</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+        <div class="quality-modal">
+            <div class="modal-title">اختر الجودة <i class="fas fa-cog"></i></div>
+            
+            <div v-if="selectedVideo">
+                <button v-for="link in selectedVideo.links" :key="link.label" 
+                        class="quality-btn" @click="playVideo(link)">
+                    {{ link.label || 'Standard' }} <span style="font-size:0.8em; opacity:0.7">p</span>
+                </button>
+            </div>
+
+            <button class="quality-btn cancel-btn" @click="closeModal">إلغاء</button>
+        </div>
     </div>
-  </main>
 
-  <footer>
-    © جميع الحقوق محفوظة لمنصة <span>1383</span> 🔥
-  </footer>
-
-  <!-- ✅ نافذة اختيار الجوده -->
-  <div id="popup" class="popup">
-    <div class="popup-content">
-      <h3>اختر الجودة 🎥</h3>
-      <div id="quality-options"></div>
-      <button class="cancel-btn" onclick="closePopup()">إلغاء</button>
+    <div class="toast-container">
+        <transition-group name="toast">
+            <div v-for="toast in toasts" :key="toast.id" :class="['toast', toast.type]">
+                <i class="fas" :class="toast.type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
+                {{ toast.message }}
+            </div>
+        </transition-group>
     </div>
-  </div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const subject = urlParams.get("subject");
-    const teacher = urlParams.get("teacher");
-    const chapter = urlParams.get("chapter");
-    const lecture = urlParams.get("lecture");
+</div>
 
-    const videosContainer = document.getElementById("videos-container");
-    const backBtn = document.getElementById("back");
-    const popup = document.getElementById("popup");
-    const qualityOptions = document.getElementById("quality-options");
+<script>
+const { createApp, ref, reactive, onMounted } = Vue;
 
-    backBtn.onclick = () => {
-      window.location.href = `lecture_name.html?subject=${encodeURIComponent(subject)}&teacher=${encodeURIComponent(teacher)}&chapter=${encodeURIComponent(chapter)}`;
-    };
+// 1. روابط البيانات (نفس الروابط المستخدمة سابقاً)
+// ملاحظة: تأكد أن ملف JSON الخاص بك يحتوي على هيكل البيانات الصحيح (Videos -> Links)
+const JSON_URLS = {
+    'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+    'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json", 
+    'أزهر': "https://plus-teal.vercel.app/organized_output.json", 
+    'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
+};
 
-    function normalize(str) {
-      return (str || "").trim().replace(/[\s.\-ـ_]/g, "").toLowerCase();
-    }
+// إعدادات الفايربيز
+const firebaseConfig = {
+    apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+    authDomain: "thanawy-1383.firebaseapp.com",
+    databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+    projectId: "thanawy-1383",
+};
 
-    function closePopup() {
-      popup.style.display = "none";
-    }
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
 
-    function showQualityOptions(video) {
-      qualityOptions.innerHTML = "";
-      popup.style.display = "flex";
+function getUrlParams() {
+    const params = {};
+    window.location.search.substring(1).split('&').forEach(pair => {
+        const [key, value] = pair.split('=');
+        if (key && value) params[key] = decodeURIComponent(value);
+    });
+    return params;
+}
 
-      video.links.forEach(link => {
-        const btn = document.createElement("button");
-        btn.className = "quality-btn";
-        btn.textContent = link.label ? link.label + "p" : "غير معروف";
-        btn.onclick = () => {
-          localStorage.setItem("video_sources", JSON.stringify(link));
-          localStorage.setItem("video_title", video.name);
-          window.location.href = "player.html";
+createApp({
+    setup() {
+        const loading = ref(true);
+        const videos = ref([]);
+        const showModal = ref(false);
+        const selectedVideo = ref(null);
+        const params = getUrlParams();
+        
+        const teacherData = reactive({ name: '' });
+        const lectureData = reactive({ name: '' });
+
+        // التوست
+        const toasts = ref([]);
+        const showToast = (message, type='info') => {
+             const id = Date.now();
+            toasts.value.push({ id, message, type });
+            setTimeout(() => {
+                toasts.value = toasts.value.filter(t => t.id !== id);
+            }, 3000);
         };
-        qualityOptions.appendChild(btn);
-      });
-    }
 
-    async function loadVideos() {
-      try {
-        const res = await fetch("coursatk_scraped_data.json");
-        if (!res.ok) throw new Error("فشل تحميل البيانات");
-        const json = await res.json();
-        const data = json.data || json;
+        // فتح نافذة الجودة
+        const openQualityModal = (video) => {
+            selectedVideo.value = video;
+            showModal.value = true;
+        };
 
-        const wantedSubject = normalize(subject);
-        const wantedTeacher = normalize(teacher);
-        const wantedChapter = normalize(chapter);
-        const wantedLecture = normalize(lecture);
+        const closeModal = () => {
+            showModal.value = false;
+            selectedVideo.value = null;
+        };
 
-        const videos = [];
-
-        (data || []).forEach((year) => {
-          (year.subjects || []).forEach((sub) => {
-            if (normalize(sub.subject_name).includes(wantedSubject)) {
-              (sub.teachers || []).forEach((t) => {
-                if (normalize(t.teacher_name).includes(wantedTeacher)) {
-                  (t.chapters || []).forEach((chap) => {
-                    if (normalize(chap.chapter_name).includes(wantedChapter)) {
-                      (chap.lectures || []).forEach((lec) => {
-                        if (!lecture || normalize(lec.lecture_name).includes(wantedLecture)) {
-                          (lec.videos || []).forEach((vid) => {
-                            if (vid.links && vid.links.length > 0) {
-                              videos.push({
-                                name: vid.video_name,
-                                links: vid.links
-                              });
-                            }
-                          });
-                        }
-                      });
-                    }
-                  });
-                }
-              });
+        // تشغيل الفيديو
+        const playVideo = (link) => {
+            // حفظ الرابط والجودة المختارة
+            localStorage.setItem("video_sources", JSON.stringify(link)); // قد تحتاج تعديل حسب بنية المشغل لديك
+            localStorage.setItem("video_title", selectedVideo.value.name);
+            
+            // لو المشغل بيحتاج رابط مباشر
+            if (link.file || link.url) {
+                 localStorage.setItem("video_url", link.file || link.url);
             }
-          });
-        });
 
-        videosContainer.innerHTML = "";
+            window.location.href = 'player.html';
+        };
 
-        if (videos.length === 0) {
-          videosContainer.innerHTML = "<div class='error'>⚠️ لا توجد فيديوهات في هذه المحاضرة.</div>";
-          return;
+        // دالة تطبيع النصوص للمقارنة (مهمة جداً للبحث في JSON)
+        const normalize = (str) => {
+            return (str || "").trim().replace(/[\s.\-ـ_]/g, "").toLowerCase();
+        };
+
+        // جلب البيانات
+        const fetchData = async () => {
+            // ملاحظة: في كودك الأصلي كنت بتستخدم أسماء (Strings) في الرابط، هنا بنستخدم IDs لو متاح، أو الأسماء لو هيكل JSON بيعتمد عليها.
+            // سأفترض أنك تمرر الأسماء كما في كودك القديم (subject, teacher, chapter, lecture)
+            // أو الـ IDs كما في صفحاتي السابقة. سأدعم الاثنين.
+
+            const subjectParam = params.subject || params.sid; // دعم الاسم أو الـ ID
+            const teacherParam = params.teacher || params.tid;
+            const chapterParam = params.chapter || params.cid; // cid افتراضي لو مش موجود
+            const lectureParam = params.lecture || params.lid; // lid افتراضي
+
+            if (!subjectParam || !teacherParam) {
+                loading.value = false;
+                showToast("بيانات الرابط غير مكتملة", "error");
+                return;
+            }
+
+            const activeCode = localStorage.getItem("activeCode");
+
+            try {
+                // 1. تحديد الشعبة
+                let studentDivision = 'الافتراضي';
+                if (activeCode) {
+                    const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+                    const studentData = snapshot.val();
+                    if (studentData && studentData.section) {
+                        studentDivision = studentData.section.trim();
+                    }
+                }
+
+                // 2. تحميل البيانات
+                const url = JSON_URLS[studentDivision] || JSON_URLS['الافتراضي'];
+                const res = await fetch(url); // في كودك القديم كان بيحمل ملف محلي (coursatk_scraped_data.json)، عدله هنا لو لزم الأمر
+                
+                // لو بتستخدم ملف محلي، غير السطر اللي فات لـ:
+                // const res = await fetch("coursatk_scraped_data.json"); 
+
+                if (!res.ok) throw new Error("فشل تحميل البيانات");
+                const fullData = await res.json();
+                
+                // التعامل مع هيكل البيانات (قد يختلف حسب الملف JSON)
+                // سأستخدم منطق البحث المتداخل (Nested Loop) من كودك القديم للتأكد من التوافق
+                
+                const data = fullData.data || fullData;
+                const foundVideos = [];
+
+                // البحث "المرن" باستخدام normalize
+                const wantedSubject = normalize(subjectParam);
+                const wantedTeacher = normalize(teacherParam);
+                const wantedChapter = normalize(chapterParam);
+                const wantedLecture = normalize(lectureParam);
+
+                (data || []).forEach((year) => {
+                    (year.subjects || []).forEach((sub) => {
+                        // مقارنة الاسم أو الـ ID
+                        if (normalize(sub.subject_name).includes(wantedSubject) || sub.id == subjectParam) {
+                            
+                            (sub.teachers || []).forEach((t) => {
+                                if (normalize(t.teacher_name).includes(wantedTeacher) || t.id == teacherParam) {
+                                    teacherData.name = t.teacher_name; // تحديث اسم المدرس
+
+                                    (t.chapters || []).forEach((chap) => {
+                                        if (normalize(chap.chapter_name).includes(wantedChapter) || chap.id == chapterParam) {
+                                            
+                                            (chap.lectures || []).forEach((lec) => {
+                                                if (!lectureParam || normalize(lec.lecture_name).includes(wantedLecture) || lec.id == lectureParam) {
+                                                    lectureData.name = lec.lecture_name; // تحديث اسم المحاضرة
+
+                                                    (lec.videos || []).forEach((vid) => {
+                                                        // التأكد من وجود روابط
+                                                        if (vid.links && vid.links.length > 0) {
+                                                            foundVideos.push({
+                                                                name: vid.video_name,
+                                                                links: vid.links,
+                                                                // صورة افتراضية لو مش موجودة في الـ JSON
+                                                                image: vid.image || null 
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                });
+
+                videos.value = foundVideos;
+                
+                if(foundVideos.length > 0) {
+                    showToast(`تم العثور على ${foundVideos.length} فيديو`, "success");
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToast("حدث خطأ أثناء تحميل الفيديوهات", "error");
+            } finally {
+                loading.value = false;
+            }
         }
 
-        videos.forEach((video) => {
-          const box = document.createElement("div");
-          box.className = "video-box";
-          box.innerHTML = `
-            <div class="video-title">${video.name}</div>
-            <div class="thumb"></div>
-          `;
-          box.querySelector(".thumb").onclick = () => showQualityOptions(video);
-          videosContainer.appendChild(box);
-        });
+        onMounted(fetchData);
 
-      } catch (err) {
-        console.error(err);
-        videosContainer.innerHTML = "<div class='error'>❌ حدث خطأ أثناء تحميل البيانات.</div>";
-      }
+        return { 
+            loading, videos, showModal, selectedVideo,
+            teacherData, lectureData, params,
+            toasts, openQualityModal, closeModal, playVideo 
+        };
     }
+}).mount('#app');
+</script>
 
-    loadVideos();
-  </script>
 </body>
 </html>
