@@ -3,276 +3,348 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Full Mark Player 🎬</title>
+<title>full mark player </title>
   
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="auth.js"></script>
-    
-    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 
+    <script src="auth.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 <style>
-  /* 🔵 ثوابت ثيم "الحوت الأزرق" */
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700;800;900&display=swap');
+
+  /* 🟢 ثوابت الـ Green Theme */
   :root {
-    --bg-deep: #020617;          
-    --cyan-neon: #00f3ff;      
-    --cyan-dim: #0099a0;       
-    --text-white: #e2e8f0;       
-    --glass-bg: rgba(15, 23, 42, 0.7); 
-    --glass-border: rgba(0, 243, 255, 0.25); 
-    --danger: #ff4d4d;
-    --success: #00ff88;
-    
-    /* Plyr Overrides */
-    --plyr-color-main: #00f3ff;
-    --plyr-video-control-color: #e2e8f0;
-    --plyr-video-control-color-hover: #00f3ff;
+    --dark-black: #020A07;           /* الخلفية الأساسية (أسود فاحم) */
+    --main-green-bg: #08402C;        /* أخضر داكن (لون الكارد الرئيسي) */
+    --darker-green-bg: #0C241C;      /* أخضر أغمق (للكونتينرات) */
+    --neon-accent: #27d97e;          /* أخضر نيون ساطع (للمسات والإضاءة) */
+    --error: #ff4d4d;
+    --success: #00C896;
+    --light-text: #f0f0f5;
   }
 
   body {
     font-family: 'Cairo', sans-serif;
-    background-color: var(--bg-deep);
-    background-image: 
-        radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
-        linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
-    background-size: 100% 100%, 50px 50px, 50px 50px;
-    color: var(--text-white);
+    /* خلفية متدرجة بسيطة */
+    background: linear-gradient(180deg, var(--dark-black) 0%, #000 100%);
+    color: var(--light-text);
     margin: 0;
     text-align: center;
     overflow-x: hidden;
-    min-height: 100vh;
   }
 
+  /* ===== الشريط العلوي (Top Bar) ===== */
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: rgba(2, 6, 23, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    padding: 12px 20px;
+    background: rgba(8, 64, 44, 0.4); /* خلفية شفافة من الأخضر الأساسي */
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    padding: 14px 18px;
     position: sticky;
     top: 0;
     z-index: 100;
-    border-bottom: 1px solid var(--cyan-neon);
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);
+    /* ظل نيون خفيف */
+    box-shadow: 0 0 10px rgba(39, 217, 126, 0.3);
+    border-bottom: 2px solid var(--neon-accent);
   }
   .title {
-    color: var(--cyan-neon); 
+    color: var(--neon-accent); /* نيون أخضر */
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 18px;
     font-family: 'Orbitron', sans-serif;
-    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    text-shadow: 0 0 8px var(--neon-accent);
     letter-spacing: 1px;
   }
   .back {
-    width: 35px; height: 35px; border-radius: 50%;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
-    display: flex; justify-content: center; align-items: center;
-    color: var(--text-white); cursor: pointer; transition: 0.3s; font-size: 1.2rem;
+    font-size: 22px;
+    cursor: pointer;
+    color: var(--neon-accent);
+    transition: transform 0.3s;
+    user-select: none;
   }
   .back:hover { 
-    background: var(--cyan-neon); color: #000; box-shadow: 0 0 15px var(--cyan-neon);
+    transform: translateX(-5px) scale(1.1); 
+    text-shadow: 0 0 5px var(--neon-accent);
   }
 
-  .video-wrapper {
-      position: relative;
-      max-width: 950px;
-      width: 95%;
-      margin: 30px auto;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--cyan-neon);
-      box-shadow: 0 0 30px rgba(0, 243, 255, 0.15), 0 0 10px rgba(0,0,0,0.8);
-      background: #000;
+  /* ===== Video Player Container ===== */
+  #player {
+    max-width: 950px;
+    width: 100%;
+    /* 60vh كويس عشان الـ Notes تبان تحته */
+    height: 60vh; 
+    border-radius: 18px;
+    margin: 25px auto;
+    /* إضاءة نيون حول الفيديو */
+    box-shadow: 0 0 30px rgba(39, 217, 126, 0.4), 0 0 15px rgba(0, 0, 0, 0.8);
+    background: var(--dark-black);
+    border: 1px solid var(--neon-accent);
   }
-
-  #player { width: 100%; height: 100%; }
 
   #hint {
-    margin-top: 10px;
-    color: var(--cyan-dim);
-    font-size: 0.85rem;
-    background: rgba(0, 243, 255, 0.05);
-    display: inline-block; padding: 5px 15px; border-radius: 20px;
-    border: 1px solid rgba(0, 243, 255, 0.1);
-    transition: opacity 0.5s;
+    margin-top: 12px;
+    color: var(--neon-accent);
+    font-size: 14px;
+    text-shadow: 0 0 4px var(--neon-accent);
   }
 
   .error-msg {
     margin: 40px auto;
-    color: var(--danger);
-    font-size: 1.2rem;
+    color: var(--error);
+    font-size: 20px;
     font-weight: 700;
-    text-shadow: 0 0 8px rgba(255, 77, 77, 0.5);
-    padding: 20px;
-    background: rgba(255, 77, 77, 0.1);
-    border: 1px solid var(--danger);
-    border-radius: 10px;
-    display: inline-block;
+    text-shadow: 0 0 8px var(--error);
+    font-family: 'Orbitron', sans-serif;
   }
 
+  /* ===== ستايلات الملاحظات (Notes) ===== */
   .notes-container {
     max-width: 950px;
     width: 95%;
-    margin: 30px auto 50px;
+    margin: 30px auto;
     padding: 25px;
-    background: var(--glass-bg); 
+    /* خلفية من اللون الثانوي الداكن */
+    background: var(--darker-green-bg); 
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    /* ظل خفيف زي الـ Cards في الصفحات اللي فاتت */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(39, 217, 126, 0.2);
     text-align: right;
-    border: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
-
-  .notes-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
 
   .notes-container h2 {
-    color: #fff; font-size: 1.1rem; margin: 0; font-weight: 700;
-    display: flex; align-items: center; gap: 8px;
+    color: var(--light-text);
+    font-size: 20px;
+    margin-bottom: 15px;
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
   }
-  .notes-container h2::before { content: '📝'; font-size: 1.2rem; }
 
   #video-notes {
     width: 100%;
-    min-height: 150px;
+    min-height: 200px;
     padding: 15px;
-    border: 1px solid var(--glass-border); 
+    /* إطار نيون واضح */
+    border: 2px solid var(--neon-accent); 
     border-radius: 12px;
-    background-color: rgba(2, 6, 23, 0.6);
-    color: var(--text-white);
-    font-size: 1rem;
+    background-color: var(--dark-black);
+    color: var(--light-text);
+    font-size: 16px;
     resize: vertical;
     font-family: 'Cairo', sans-serif;
     outline: none;
-    transition: 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
     box-sizing: border-box;
   }
 
-  #video-notes:focus { border-color: var(--cyan-neon); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
+  #video-notes:focus {
+    /* توهج أقوى عند التركيز */
+    border-color: var(--success);
+    box-shadow: 0 0 15px var(--success);
+  }
 
   #save-status {
-    font-size: 0.85rem;
+    margin-top: 10px;
     color: var(--success);
-    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
     opacity: 0;
     transition: opacity 0.5s;
-    text-shadow: 0 0 5px rgba(0, 255, 136, 0.5);
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--success);
   }
   
-  .plyr--full-ui input[type=range] { color: var(--cyan-neon); }
-  .plyr__control--overlaid { background: rgba(0, 243, 255, 0.8); color: #000; }
-  .plyr__control--overlaid:hover { background: var(--cyan-neon); }
-  .plyr--video .plyr__controls .plyr__control.plyr__tab-focus, 
-  .plyr--video .plyr__controls .plyr__control:hover, 
-  .plyr--video .plyr__controls .plyr__control[aria-expanded=true] { background: var(--cyan-neon); color: #000; }
+  /* ===== Plyr Override Styles (عشان نضمن تحويل الأزرار للنيون) ===== */
+  /* الأزرار الرئيسية (Play/Pause/Rewind/Fast-Forward) */
+  .plyr--video .plyr__controls button.plyr__controls__item:hover {
+      background: var(--neon-accent) !important;
+      color: var(--dark-black) !important;
+      box-shadow: 0 0 10px var(--neon-accent);
+  }
+
+  /* لون شريط التقدم (Progress Bar) */
+  .plyr__progress--seek {
+      /* لون شريط التقدم يكون نيون أخضر */
+      background: var(--neon-accent) !important;
+  }
+  
+  /* لون الأزرار الداخلية والـ Tooltips */
+  .plyr__control {
+      color: var(--light-text);
+      transition: 0.2s;
+  }
+  .plyr__control:hover {
+      color: var(--neon-accent);
+  }
+
+  /* لون الـ Thumb (الدائرة المتحركة في شريط التقدم) */
+  .plyr__progress--seek input[type=range] {
+      color: var(--neon-accent);
+  }
+
+  /* لون الوقت الحالي والمدة الزمنية */
+  .plyr__time {
+      color: var(--neon-accent);
+      font-family: 'Orbitron', sans-serif;
+  }
+
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="back" onclick="history.back()">➜</div>
-  <div class="title" id="page-title">Full Mark Player</div>
-  <div style="width:35px;"></div>
+  <div class="back" onclick="history.back()">⬅</div>
+  <div class="title">𝑷𝒍𝒂𝒚 𝑽𝒊𝒅𝒆𝒐 🎬</div>
+  <div style="width:25px;"></div>
 </div>
 
-<div class="video-wrapper">
-    <video id="player" playsinline controls crossorigin></video>
-</div>
-
-<div id="hint">💡 اضغط مرتين على الجوانب للتقديم/التأخير | المسطرة للإيقاف</div>
+<video id="player" playsinline controls poster="poster.jpg"></video>
+<div id="hint">💡 اسحب الفيديو لتقديمه أو تأخيره على الهاتف</div>
 
 <div class="notes-container">
-  <div class="notes-header">
-      <h2>ملاحظاتي على الدرس</h2>
-      <div id="save-status">✅ تم الحفظ</div>
-  </div>
-  <textarea id="video-notes" placeholder="سجل أفكارك وملاحظاتك هنا..."></textarea>
+  <h2>📝 ملاحظاتي</h2>
+  <textarea id="video-notes" placeholder="اكتب ملاحظاتك هنا..."></textarea>
+  <div id="save-status"></div>
 </div>
+
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <script>
-// 1. استرجاع البيانات المحفوظة
+let qualitySources = [];
 let videoTitle = localStorage.getItem("video_title") || "Lecture Video";
-let savedDirectUrl = localStorage.getItem("video_url");
-let savedSources = localStorage.getItem("video_sources");
+const savedSources = localStorage.getItem("video_sources");
 
-document.getElementById('page-title').textContent = videoTitle;
-document.title = videoTitle + " | Player";
-
-const playerElement = document.getElementById('player');
-
-// 2. تحديد رابط الفيديو النهائي (تم إصلاح منطق الفحص هنا)
-let finalUrl = "";
-if (savedDirectUrl && savedDirectUrl !== "undefined") {
-    finalUrl = savedDirectUrl;
-} else if (savedSources) {
-    try {
-        const data = JSON.parse(savedSources);
-        // التحقق مما إذا كانت البيانات مصفوفة جودات أو كائن واحد
-        if (Array.isArray(data) && data.length > 0) {
-            finalUrl = data[0].url || data[0].file || data[0].stream_url || data[0];
-        } else {
-            finalUrl = data.url || data.file || data.stream_url;
-        }
-    } catch (e) { console.error("JSON Error", e); }
-}
-
-// 3. تشغيل المشغل
-if (!finalUrl || finalUrl === "undefined") {
-    document.querySelector('.video-wrapper').innerHTML = "<div class='error-msg'>عذراً، رابط الفيديو غير متوفر 🚫</div>";
-} else {
-    // إعداد Plyr
-    const player = new Plyr(playerElement, {
-        controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
-        settings: ['quality', 'speed', 'loop'],
-        speed: { selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] },
-        i18n: { speed: 'السرعة', quality: 'الجودة' }
-    });
-
-    // دعم فيديوهات m3u8 (HLS)
-    if (finalUrl.includes('.m3u8')) {
-        if (Hls.isSupported()) {
-            const hls = new Hls();
-            hls.loadSource(finalUrl);
-            hls.attachMedia(playerElement);
-            window.hls = hls;
-        } else if (playerElement.canPlayType('application/vnd.apple.mpegurl')) {
-            playerElement.src = finalUrl;
-        }
+if (savedSources) {
+  try {
+    const links = JSON.parse(savedSources);
+    if (Array.isArray(links)) {
+      qualitySources = links.map(link => ({
+        src: link.url || link,
+        type: "application/x-mpegURL",
+        size: parseInt(link.label) || 720
+      }));
     } else {
-        // فيديوهات MP4 عادية
-        player.source = {
-            type: 'video',
-            sources: [{ src: finalUrl, type: 'video/mp4' }]
-        };
+      qualitySources = [{
+        src: links.url || links,
+        type: "application/x-mpegURL",
+        size: parseInt(links.label) || 720
+      }];
     }
+  } catch (err) {
+    console.error("❌ Error parsing savedSources:", err);
+  }
+} else {
+  document.body.innerHTML = "<div class='error-msg'>لم يتم تحديد رابط الفيديو 😢</div>";
 }
 
-// --- إخفاء التلميح ---
-setTimeout(() => {
-    const hint = document.getElementById('hint');
-    if(hint) hint.style.opacity = '0';
-}, 5000);
+const player = new Plyr('#player', {
+  controls: [
+    'play-large','play','rewind','fast-forward','progress','current-time','duration',
+    'mute','volume','settings','fullscreen'
+  ],
+  settings: ['quality','speed','loop'],
+  rewindTime: 10,
+  forwardTime: 10
+});
 
-// --- نظام الملاحظات ---
-const notesArea = document.getElementById('video-notes');
-const saveMsg = document.getElementById('save-status');
-const uniqueID = btoa(encodeURIComponent(videoTitle)).slice(0, 16);
+const video = document.querySelector("video");
+let spacePressed = false;
+let longPressTimeout = null;
+let isLongPress = false;
+document.addEventListener("keydown", function (e) {
+  if (e.code === "ArrowRight") {
+    video.currentTime += 5;
+  }
+  if (e.code === "ArrowLeft") {
+    video.currentTime -= 5;
+  }
+  if (e.code === "Space") {
+    
 
-if (notesArea) {
-    notesArea.value = localStorage.getItem(`notes_${uniqueID}`) || "";
-    notesArea.addEventListener('input', () => {
-        localStorage.setItem(`notes_${uniqueID}`, notesArea.value);
-        saveMsg.style.opacity = '1';
-        clearTimeout(window.saveTimer);
-        window.saveTimer = setTimeout(() => { saveMsg.style.opacity = '0'; }, 2000);
-    });
+    if (!spacePressed) {
+      spacePressed = true;
+
+      longPressTimeout = setTimeout(() => {
+        isLongPress = true;
+        video.playbackRate = 2; 
+      }, 300);
+    }
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.code === "Space") {
+    clearTimeout(longPressTimeout);
+
+    if (isLongPress) {
+      video.playbackRate = 1;
+    } else {
+      if (video.paused) {
+        video.play();
+      } else {
+        video.pause();
+      }
+    }
+
+    spacePressed = false;
+    isLongPress = false;
+  }
+});
+
+if (qualitySources.length > 0) {
+  const firstSrc = qualitySources[0].src;
+  if (firstSrc.endsWith(".m3u8") && Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(firstSrc);
+    hls.attachMedia(document.getElementById('player'));
+  } else {
+    player.source = {
+      type: 'video',
+      title: videoTitle,
+      sources: qualitySources
+    };
+  }
+}
+
+
+setTimeout(() => document.getElementById('hint').style.display = 'none', 5000);
+
+// كود الـ JavaScript الخاص بالملاحظات
+const notesTextarea = document.getElementById('video-notes');
+const saveStatusDiv = document.getElementById('save-status');
+let videoID = null;
+
+if (qualitySources.length > 0) {
+    videoID = btoa(qualitySources[0].src);
+    const savedNotes = localStorage.getItem(`video_notes_${videoID}`);
+    
+    if (notesTextarea && savedNotes) {
+        notesTextarea.value = savedNotes;
+    }
+
+    if (notesTextarea) {
+        notesTextarea.addEventListener('input', () => {
+            localStorage.setItem(`video_notes_${videoID}`, notesTextarea.value);
+            
+            saveStatusDiv.textContent = '✅ تم الحفظ تلقائياً';
+            saveStatusDiv.style.opacity = 1;
+            
+            setTimeout(() => {
+                saveStatusDiv.style.opacity = 0;
+            }, 2000);
+        });
+    }
+} else {
+    const notesContainer = document.querySelector('.notes-container');
+    if (notesContainer) {
+        notesContainer.style.display = 'none';
+    }
 }
 </script>
 
