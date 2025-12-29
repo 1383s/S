@@ -16,7 +16,7 @@
 
   <style>
     /* -------------------------------------------
-       1. إعدادات الألوان والثيمات (CSS Variables)
+       1. إعدادات الألوان (CSS Variables)
        ------------------------------------------- */
     :root {
       /* 🔵 الوضع الافتراضي (الحوت الأزرق - Dark) */
@@ -55,7 +55,7 @@
     }
 
     /* -------------------------------------------
-       2. التنسيقات العامة (Layout)
+       2. التنسيقات العامة
        ------------------------------------------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -112,6 +112,7 @@
       transition: 0.3s;
       color: var(--text-main);
       background: rgba(128,128,128,0.1);
+      border: 1px solid transparent;
     }
     .icon-btn:hover {
         background: var(--accent-neon);
@@ -123,6 +124,8 @@
         /* فلتر يجعل الصور تتماشى مع لون النص */
         filter: drop-shadow(0 0 1px var(--accent-neon)); 
     }
+    /* تعديل الصور في الوضع النهاري */
+    [data-theme="light"] .icon-btn img { filter: none; }
     
     /* العنوان الرئيسي */
     h1 {
@@ -143,7 +146,7 @@
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, minmax(250px, 1fr)); /* كما في الكود الأصلي */
       gap: 30px;
     }
 
