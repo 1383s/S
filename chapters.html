@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -408,21 +408,22 @@ createApp({
                 expandedChapters.value.push(id);
             }
         };
-
+        
         const playVideo = (video) => {
             if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
                 showToast("رابط الفيديو غير متاح", "error");
                 return;
             }
-            
-            const videoData = {
-                title: video.title,
-                source: video.stream_url, 
-                sources: video.sources 
-            };
-            
-            localStorage.setItem("video_url", video.stream_url); 
-            localStorage.setItem("current_video", JSON.stringify(videoData));
+    
+    // التعديل هنا يا بطل:
+            localStorage.setItem("video_title", video.title); // عشان البلير يشوف العنوان
+            localStorage.setItem("video_url", video.stream_url); // الرابط المباشر
+    
+            if (video.sources) {
+                localStorage.setItem("video_sources", JSON.stringify(video.sources)); // الجودات
+            } else {
+                localStorage.removeItem("video_sources"); // نمسح القديم عشان ميحصلش تعارض
+            }
 
             window.location.href = 'player.html';
         };
