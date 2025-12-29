@@ -53,14 +53,12 @@
         }
 
         .header-info { display: flex; align-items: center; gap: 12px; }
-        
         .icon-box {
             width: 40px; height: 40px; border-radius: 12px;
             background: rgba(0, 243, 255, 0.1); border: 1px solid var(--glass-border);
             display: flex; justify-content: center; align-items: center;
             color: var(--cyan-neon); font-size: 1.2rem;
         }
-
         .titles h1 { font-size: 1rem; font-weight: 700; color: #fff; line-height: 1.2; }
         .titles p { font-size: 0.75rem; color: var(--gray-text); font-family: 'Orbitron', sans-serif; }
 
@@ -82,15 +80,11 @@
         }
 
         .chapter-card {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 20px; overflow: hidden; transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex; flex-direction: column;
         }
-
         .chapter-card:hover { border-color: var(--cyan-neon); transform: translateY(-5px); }
 
         .chapter-header {
@@ -107,30 +101,15 @@
         }
 
         .chapter-title { font-size: 1.2rem; font-weight: 700; color: #fff; font-family: 'Tajawal', sans-serif; }
-
         .chapter-meta { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
-        .badge {
-            font-size: 0.8rem; background: rgba(0, 243, 255, 0.1); 
-            color: var(--cyan-neon); padding: 5px 12px; border-radius: 20px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-        }
-        
-        .expand-btn {
-            width: 30px; height: 30px; border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            border: 1px solid var(--gray-text); color: var(--gray-text);
-            transition: 0.3s; font-size: 0.8rem;
-        }
+        .badge { font-size: 0.8rem; background: rgba(0, 243, 255, 0.1); color: var(--cyan-neon); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(0, 243, 255, 0.2); }
+        .expand-btn { width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 1px solid var(--gray-text); color: var(--gray-text); transition: 0.3s; font-size: 0.8rem; }
         .rotate { background: var(--cyan-neon); color: #000; border-color: var(--cyan-neon); transform: rotate(180deg); }
 
-        .chapter-content {
-            border-top: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.3);
-            max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out;
-        }
+        .chapter-content { border-top: 1px solid var(--glass-border); background: rgba(0, 0, 0, 0.3); max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; }
         .chapter-content.open { max-height: 1000px; overflow-y: auto; }
 
         .lecture-item { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-
         .lecture-title { font-size: 0.9rem; color: #e2e8f0; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
 
         .resource-btn {
@@ -139,19 +118,15 @@
             text-decoration: none; color: var(--gray-text); font-size: 0.85rem; 
             border: 1px solid transparent; margin-top: 5px; transition: 0.3s; cursor: pointer;
         }
-
         .resource-btn:hover { background: rgba(0, 243, 255, 0.1); border-color: var(--cyan-neon); color: #fff; }
 
-        .res-info { display: flex; align-items: center; gap: 8px; }
         .status-tag { font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; background: rgba(0, 255, 136, 0.15); color: var(--success); }
-
         .loading-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 50vh; color: var(--cyan-neon); }
         .spinner { width: 50px; height: 50px; border: 4px solid var(--cyan-neon); border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--cyan-neon); color: #fff; padding: 12px 20px; border-radius: 12px; animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 10px; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .toast { background: rgba(15, 23, 42, 0.95); border: 1px solid var(--cyan-neon); color: #fff; padding: 12px 20px; border-radius: 12px; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
 
@@ -171,7 +146,7 @@
     <main class="main-container">
         <div v-if="loading" class="loading-container">
             <div class="spinner"></div>
-            <p>جاري تحميل الفصول...</p>
+            <p>جاري تحميل المحاضرات...</p>
         </div>
 
         <div v-else>
@@ -181,47 +156,32 @@
                         <div class="chapter-icon-large"><i class="fas fa-folder-open"></i></div>
                         <div class="chapter-title">{{ chapter.name }}</div>
                         <div class="chapter-meta">
-                            <span class="badge">{{ chapter.lectures ? chapter.lectures.length : 0 }} دروس</span>
+                            <span class="badge">{{ chapter.lectures ? chapter.lectures.length : 0 }} درس</span>
                             <div class="expand-btn" :class="{ 'rotate': expandedChapters.includes(chapter.id) }"><i class="fas fa-chevron-down"></i></div>
                         </div>
                     </div>
 
                     <div class="chapter-content" :class="{ 'open': expandedChapters.includes(chapter.id) }">
-                        <div v-if="!chapter.lectures || chapter.lectures.length === 0" class="p-4 text-center">لا توجد محاضرات.</div>
-                        <div v-else>
-                            <div v-for="lecture in chapter.lectures" :key="lecture.id" class="lecture-item">
-                                <div class="lecture-title">{{ lecture.name }}</div>
-                                <div class="resources-list">
-                                    <div v-for="video in lecture.videos" :key="video.id" @click="playVideo(video)" class="resource-btn">
-                                        <div class="res-info">
-                                            <i class="fas fa-play-circle" style="color: var(--cyan-neon)"></i>
-                                            <span>{{ video.title }}</span>
-                                        </div>
-                                        <span class="status-tag">فيديو</span>
+                        <div v-for="lecture in chapter.lectures" :key="lecture.id" class="lecture-item">
+                            <div class="lecture-title">{{ lecture.name }}</div>
+                            <div class="resources-list">
+                                <div v-for="video in lecture.videos" :key="video.id" @click="playVideo(video)" class="resource-btn">
+                                    <div class="res-info">
+                                        <i class="fas fa-play-circle" style="color: var(--cyan-neon)"></i>
+                                        <span>{{ video.title }}</span>
                                     </div>
-                                    <div v-for="pdf in lecture.pdfs" :key="pdf.id" class="resource-btn">
-                                        <div class="res-info">
-                                            <i class="fas fa-file-pdf" style="color: #ff4444"></i>
-                                            <span>{{ pdf.title }}</span>
-                                        </div>
-                                        <span class="status-tag" style="color:#ff4444; background:rgba(255,68,68,0.1)">PDF</span>
-                                    </div>
+                                    <span class="status-tag">فيديو</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div v-else class="no-data" style="text-align:center; padding:50px;">
-                <p>لا توجد فصول دراسية متاحة.</p>
-            </div>
         </div>
     </main>
 
     <div class="toast-container">
-        <div v-for="toast in toasts" :key="toast.id" :class="['toast', toast.type]">
-            {{ toast.message }}
-        </div>
+        <div v-for="toast in toasts" :key="toast.id" class="toast">{{ toast.message }}</div>
     </div>
 </div>
 
@@ -232,7 +192,6 @@ const JSON_URLS = {
     'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
     'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
     'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json", 
-    'أزهر': "https://plus-teal.vercel.app/organized_output.json", 
     'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
 };
 
@@ -261,9 +220,9 @@ createApp({
         const teacherData = reactive({ name: '' });
         const subjectData = reactive({ name: '' });
 
-        const showToast = (message, type='info') => {
+        const showToast = (message) => {
             const id = Date.now();
-            toasts.value.push({ id, message, type });
+            toasts.value.push({ id, message });
             setTimeout(() => { toasts.value = toasts.value.filter(t => t.id !== id); }, 3000);
         };
 
@@ -274,60 +233,50 @@ createApp({
         };
 
         const playVideo = (video) => {
-            if (!video) return showToast("بيانات الفيديو ناقصة", "error");
+            if (!video) return showToast("بيانات الفيديو ناقصة");
             
-            // تنظيف القديم وتخزين الجديد
+            // 1. تنظيف وتخزين في LocalStorage
             localStorage.removeItem("video_sources");
             localStorage.removeItem("video_url");
-            
             localStorage.setItem("video_title", video.title || "فيديو تعليمي");
             
-            // التحقق من نوع المصدر وتخزينه
+            let finalUrl = "";
             if (video.sources && video.sources.length > 0) {
                 localStorage.setItem("video_sources", JSON.stringify(video.sources));
-            } else if (video.stream_url) {
-                localStorage.setItem("video_url", video.stream_url);
-            } else if (video.file) {
-                localStorage.setItem("video_url", video.file);
+                finalUrl = video.sources[0].url || video.sources[0].file;
             } else {
-                return showToast("لا يوجد رابط متاح للمشاهدة", "error");
+                finalUrl = video.stream_url || video.file;
+                localStorage.setItem("video_url", finalUrl);
             }
-            
-            // انتقال فوري
-            window.location.href = 'player.html';
+
+            // 2. الحركة الذكية: نبعت الرابط في الـ URL كـ Back-up
+            const secureUrl = encodeURIComponent(finalUrl || "");
+            const secureTitle = encodeURIComponent(video.title || "");
+            window.location.href = `player.html?url=${secureUrl}&title=${secureTitle}`;
         };
 
         const fetchData = async () => {
             try {
                 const activeCode = localStorage.getItem("activeCode");
                 let studentDivision = 'الافتراضي';
-                
                 if (activeCode) {
                     const snap = await db.ref(`approvedStudents/${activeCode}`).once('value');
                     if (snap.val()?.section) studentDivision = snap.val().section.trim();
                 }
-
                 const res = await fetch(JSON_URLS[studentDivision] || JSON_URLS['الافتراضي']);
                 const fullData = await res.json();
-
                 const year = fullData.find(y => y.id == params.yid);
                 const subject = year?.subjects.find(s => s.id == params.sid);
                 const teacher = subject?.teachers.find(t => t.id == params.tid);
-
                 if (teacher) {
                     subjectData.name = subject.name;
                     teacherData.name = teacher.name;
                     chapters.value = teacher.chapters || [];
                 }
-            } catch (err) {
-                showToast("فشل تحميل البيانات", "error");
-            } finally {
-                loading.value = false;
-            }
+            } catch (err) { showToast("خطأ في تحميل البيانات"); } finally { loading.value = false; }
         };
 
         onMounted(fetchData);
-
         return { loading, chapters, expandedChapters, teacherData, subjectData, params, toasts, toggleChapter, playVideo };
     }
 }).mount('#app');
