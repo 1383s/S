@@ -15,119 +15,131 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
-    /* إعدادات المتغيرات للألوان (Theming) */
+    /* -------------------------------------------
+       1. إعدادات الألوان والثيمات (CSS Variables)
+       ------------------------------------------- */
     :root {
-      /* 🔵 الوضع الليلي (الحوت الأزرق) - الافتراضي */
-      --bg-main: #020617;          
-      --card-bg: rgba(15, 23, 42, 0.6);
-      --card-hover: rgba(15, 23, 42, 0.9);
-      --accent-color: #00f3ff;      
-      --text-main: #e2e8f0;       
+      /* 🔵 الوضع الافتراضي (الحوت الأزرق - Dark) */
+      --bg-deep: #020617;
+      --glass-bg: rgba(15, 23, 42, 0.7);
+      --glass-border: rgba(0, 243, 255, 0.2);
+      --card-hover: rgba(15, 23, 42, 0.95);
+      --accent-neon: #00f3ff;  /* سماوي نيون */
+      --accent-dim: #0099a0;
+      --text-main: #e2e8f0;
       --text-sec: #94a3b8;
-      --border-color: rgba(0, 243, 255, 0.2);
       
-      --bg-image: 
-          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-main) 80%),
+      /* خلفية الصفحة (الليلي) */
+      --page-bg-image: 
+          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
           linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
           linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
     }
 
     /* ☀️ الوضع النهاري (Light Mode) */
     [data-theme="light"] {
-      --bg-main: #f0f9ff;          
-      --card-bg: #ffffff;
-      --card-hover: #e0f2fe;
-      --accent-color: #0284c7;      /* أزرق غامق ليكون واضحاً */
-      --text-main: #0f172a;       
+      --bg-deep: #f0f9ff;
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(2, 132, 199, 0.2);
+      --card-hover: #ffffff;
+      --accent-neon: #0284c7;  /* أزرق غامق واضح */
+      --accent-dim: #bae6fd;
+      --text-main: #0f172a;
       --text-sec: #475569;
-      --border-color: rgba(2, 132, 199, 0.2);
 
-      --bg-image: 
-          radial-gradient(circle at 50% 0%, #bae6fd 0%, #f0f9ff 80%);
+      /* خلفية الصفحة (النهاري) */
+      --page-bg-image: 
+          radial-gradient(circle at 50% 0%, #bae6fd 0%, #f0f9ff 80%),
+          linear-gradient(0deg, rgba(2,132,199,0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(2,132,199,0.05) 1px, transparent 1px);
     }
 
+    /* -------------------------------------------
+       2. التنسيقات العامة (Layout)
+       ------------------------------------------- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg-deep);
+      background-image: var(--page-bg-image);
+      background-size: 100% 100%, 50px 50px, 50px 50px;
+      color: var(--text-main);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 90px 15px 70px;
-      font-family: 'Cairo', sans-serif;
-      background-color: var(--bg-main);
-      background-image: var(--bg-image);
-      background-size: 100% 100%, 50px 50px, 50px 50px;
-      color: var(--text-main);
-      margin: 0;
+      padding-top: 90px;
+      padding-bottom: 70px;
       overflow-x: hidden;
-      min-height: 100vh;
       transition: background 0.3s ease, color 0.3s ease;
     }
 
+    /* البار العلوي */
     .topbar {
+      position: fixed;
+      top: 0; right: 0; left: 0;
+      height: 70px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--accent-neon);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--card-bg); 
-      backdrop-filter: blur(10px); 
-      padding: 10px 20px;
-      position: fixed;
-      top: 0; right: 0; left: 0;
+      padding: 0 20px;
       z-index: 1000;
-      border-bottom: 1px solid var(--accent-color);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
       transition: background 0.3s;
     }
 
     .title {
       font-size: 16px;
-      color: var(--accent-color);
-      font-family: 'Orbitron', sans-serif;
       font-weight: 700;
+      color: var(--accent-neon);
+      font-family: 'Orbitron', sans-serif;
       letter-spacing: 2px;
+      text-shadow: 0 0 5px var(--glass-border);
     }
 
     .icons { display: flex; align-items: center; gap: 15px; }
+
+    /* أيقونات الهيدر */
+    .icon-btn {
+      width: 35px; height: 35px;
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer;
+      transition: 0.3s;
+      color: var(--text-main);
+      background: rgba(128,128,128,0.1);
+    }
+    .icon-btn:hover {
+        background: var(--accent-neon);
+        color: var(--bg-deep);
+        box-shadow: 0 0 10px var(--accent-neon);
+    }
+    .icon-btn img { 
+        width: 24px; height: 24px; 
+        /* فلتر يجعل الصور تتماشى مع لون النص */
+        filter: drop-shadow(0 0 1px var(--accent-neon)); 
+    }
     
-    /* زر تغيير الثيم */
-    .theme-toggle {
-        cursor: pointer;
-        font-size: 1.2rem;
-        color: var(--text-main);
-        transition: 0.3s;
-        width: 35px; height: 35px;
-        display: flex; justify-content: center; align-items: center;
-        border-radius: 50%;
-        border: 1px solid var(--border-color);
-    }
-    .theme-toggle:hover {
-        background: var(--accent-color);
-        color: var(--bg-main);
-        box-shadow: 0 0 10px var(--accent-color);
-    }
-
-    .icons img { 
-        width: 28px; height: 28px; 
-        /* فلتر ذكي يعكس اللون في الوضع الليلي ويتركه في النهاري */
-        filter: drop-shadow(0 0 2px var(--accent-color)); 
-        cursor: pointer; 
-    }
-    /* في الوضع النهاري نجعل الأيقونات غامقة */
-    [data-theme="light"] .icons img { filter: none; }
-
+    /* العنوان الرئيسي */
     h1 {
-      color: var(--accent-color);
+      color: var(--accent-neon);
       text-align: center;
-      font-size: 2.5rem;
+      font-size: 3rem;
       margin-bottom: 50px;
-      text-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+      text-shadow: 0 0 15px var(--glass-border);
       font-family: 'Orbitron', sans-serif;
       font-weight: 900;
     }
 
+    /* شبكة المواد */
     ul {
       padding: 0 10px;
       list-style: none;
+      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       display: grid;
@@ -135,13 +147,14 @@
       gap: 30px;
     }
 
+    /* كارت المادة */
     li {
-      background: var(--card-bg);
+      background: var(--glass-bg);
       border-radius: 20px;
       padding: 30px 25px;
       cursor: pointer;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
       transition: all 0.3s ease;
       display: flex;
       flex-direction: column;
@@ -153,85 +166,88 @@
 
     li:hover {
       background: var(--card-hover);
-      transform: translateY(-8px);
-      border-color: var(--accent-color);
+      transform: translateY(-8px) scale(1.02);
+      border-color: var(--accent-neon);
       box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15);
     }
 
+    /* دائرة الصورة */
     .circle {
-      width: 120px; height: 120px; border-radius: 50%;
-      background: rgba(0,0,0,0.1);
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.2);
       margin-bottom: 25px;
-      border: 2px solid var(--accent-color);
-      box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+      border: 3px solid var(--accent-neon);
+      box-shadow: 0 0 15px var(--accent-neon);
       display: flex; justify-content: center; align-items: center;
       transition: 0.3s;
     }
     
     li:hover .circle {
-        box-shadow: 0 0 25px var(--accent-color);
         transform: scale(1.05);
+        box-shadow: 0 0 25px var(--accent-neon);
     }
 
     .circle img { 
-        width: 70%; height: 70%; 
+        width: 80%; height: 80%; 
         object-fit: contain; 
-        filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); 
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7)); 
     }
 
-    li span { 
-        font-weight: 700; font-size: 1.4rem; font-family: 'Tajawal', sans-serif; 
-        color: var(--text-main);
-        z-index: 2;
+    li span {
+      font-weight: 700;
+      font-size: 1.4rem;
+      font-family: 'Tajawal', sans-serif;
+      color: var(--text-main);
+      z-index: 2;
     }
 
-    /* كلمة دخول المادة */
-    .enter-text {
-        font-size: 0.9rem;
-        color: var(--accent-color);
-        margin-top: 10px;
-        opacity: 0;
-        transform: translateY(15px);
-        transition: 0.3s;
-        font-weight: bold;
-    }
-    li:hover .enter-text {
-        opacity: 1; transform: translateY(0);
-    }
-
-    li.loading { 
-        grid-column: 1 / -1; text-align: center; color: var(--text-sec); font-size: 1.3rem;
-        background: transparent; border: none; box-shadow: none;
+    /* التحميل */
+    li.loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-sec);
+      font-size: 1.3rem;
+      background: transparent; border: none; box-shadow: none;
     }
     li.loading::after {
-      content: ""; width: 35px; height: 35px; border: 3px solid var(--accent-color);
-      border-top: 3px solid transparent; border-radius: 50%; display: inline-block;
-      margin-right: 15px; animation: spin 1s linear infinite;
+      content: "";
+      width: 35px; height: 35px;
+      border: 4px solid var(--accent-neon);
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 15px;
+      animation: spin 1s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* زر البروفايل العائم */
     .profile-float-btn {
-      position: fixed; bottom: 30px; left: 30px; width: 60px; height: 60px;
-      border-radius: 50%; 
-      background: var(--card-bg); 
-      border: 2px solid var(--accent-color);
-      display: flex; justify-content: center; align-items: center; z-index: 1200;
+      position: fixed; bottom: 30px; left: 30px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: var(--glass-bg);
+      border: 3px solid var(--accent-neon);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 1200;
       box-shadow: 0 0 20px rgba(0,0,0,0.3);
-      backdrop-filter: blur(5px);
       transition: 0.3s;
+      backdrop-filter: blur(5px);
     }
-    .profile-float-btn:hover { transform: scale(1.1) rotate(10deg); background: var(--accent-color); }
-    .profile-float-btn img { width: 30px; height: 30px; filter: invert(1); transition: 0.3s; }
-    .profile-float-btn:hover img { filter: brightness(0); }
-    
-    [data-theme="light"] .profile-float-btn img { filter: none; }
-    [data-theme="light"] .profile-float-btn:hover img { filter: brightness(100); }
+    .profile-float-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px var(--accent-neon);
+    }
+    .profile-float-btn img { 
+        width: 30px; height: 30px; 
+        filter: invert(1); /* عشان تكون بيضاء في الوضع الليلي */
+    }
+    [data-theme="light"] .profile-float-btn img { filter: none; } /* سوداء في النهاري */
 
     @media (max-width: 480px) {
-        ul { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        li { padding: 20px 10px; min-height: 180px; }
+        ul { grid-template-columns: 1fr; }
         h1 { font-size: 1.8rem; }
-        .enter-text { opacity: 1; transform: translateY(0); margin-top: 5px; font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -240,18 +256,22 @@
   <div class="topbar">
     <div class="title">By ELGIZAWY</div>
     <div class="icons">
-      <div class="theme-toggle" id="themeBtn">
-        <i class="fas fa-sun"></i>
+      
+      <div class="icon-btn" id="themeToggle" title="تغيير المظهر">
+        <i class="fas fa-sun"></i> 
       </div>
 
-      <a href="" target="_blank">
+      <a href="" target="_blank" class="icon-btn">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
       </a>
-      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
+      <div class="icon-btn" id="shareBtn">
+        <img src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
+      </div>
     </div>
   </div>
 
   <h1> SUBJECTS 2026 </h1>
+  
   <ul id="subjects-list">
     <li class="loading">⏳....𝑳𝒐𝒂𝒅𝒊𝒏𝒈</li>
   </ul>
@@ -261,26 +281,24 @@
   </a>
 
 <script>
-  const themeBtn = document.getElementById('themeBtn');
+  const themeBtn = document.getElementById('themeToggle');
   const themeIcon = themeBtn.querySelector('i');
   const body = document.body;
 
-  // 1. استرجاع الثيم المحفوظ
+  // استرجاع الثيم
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme === 'light') {
       body.setAttribute('data-theme', 'light');
-      themeIcon.classList.replace('fa-sun', 'fa-moon'); // تغيير الأيقونة لقمر
+      themeIcon.classList.replace('fa-sun', 'fa-moon');
   }
 
-  // 2. وظيفة الزر
+  // التبديل عند الضغط
   themeBtn.onclick = () => {
       if (body.getAttribute('data-theme') === 'light') {
-          // التحويل لليلي (أزرق)
           body.removeAttribute('data-theme');
           localStorage.setItem('theme', 'dark');
           themeIcon.classList.replace('fa-moon', 'fa-sun');
       } else {
-          // التحويل للنهاري
           body.setAttribute('data-theme', 'light');
           localStorage.setItem('theme', 'light');
           themeIcon.classList.replace('fa-sun', 'fa-moon');
@@ -289,15 +307,15 @@
 </script>
 
 <script>
-// ✅ Toast احترافية
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `custom-toast ${type}`;
   toast.innerHTML = `<span>${message}</span>`;
+  
   const style = document.createElement("style");
   style.textContent = `
-    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid var(--accent-color); display:flex; align-items:center; animation: slideIn 0.5s ease; background: var(--card-bg); backdrop-filter: blur(10px); }
-    .custom-toast.info { color: var(--accent-color); }
+    .custom-toast { position: fixed; bottom: 20px; right: 20px; padding: 14px 22px; border-radius: 14px; font-family: "Cairo", sans-serif; color: #fff; z-index: 9999; border: 1px solid var(--accent-neon); display:flex; align-items:center; animation: slideIn 0.5s ease; background: var(--glass-bg); backdrop-filter: blur(10px); }
+    .custom-toast.info { color: var(--accent-neon); }
     .custom-toast.success { color: #00ff88; border-color: #00ff88; }
     @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
   `;
@@ -308,7 +326,7 @@ function showToast(message, type = "info") {
 </script>
 
 <script type="module">
-// 🌐 تهيئة الفايربيز (نفس الكود الأصلي)
+// 🌐 تهيئة الفايربيز (استخدم بياناتك الحقيقية من الكود المرفق)
 const firebaseConfig = {
     apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
     authDomain: "thanawy-1383.firebaseapp.com",
@@ -392,12 +410,7 @@ async function loadSubjects() {
       const span = document.createElement("span");
       span.textContent = subject.name;
 
-      // إضافة كلمة "دخول المادة"
-      const enterText = document.createElement("div");
-      enterText.className = "enter-text";
-      enterText.textContent = "دخول المادة";
-
-      li.append(circle, span, enterText);
+      li.append(circle, span);
 
       // التوجيه لصفحة المدرسين
       li.onclick = () => {
