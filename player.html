@@ -207,26 +207,27 @@ document.title = videoTitle + " | Player";
 
 const playerElement = document.getElementById('player');
 
-// 2. تحديد رابط الفيديو النهائي
+// 2. تحديد رابط الفيديو النهائي (تم إصلاح منطق الفحص هنا)
 let finalUrl = "";
-if (savedDirectUrl) {
+if (savedDirectUrl && savedDirectUrl !== "undefined") {
     finalUrl = savedDirectUrl;
 } else if (savedSources) {
     try {
         const data = JSON.parse(savedSources);
+        // التحقق مما إذا كانت البيانات مصفوفة جودات أو كائن واحد
         if (Array.isArray(data) && data.length > 0) {
-            finalUrl = data[0].url || data[0].file || data[0];
+            finalUrl = data[0].url || data[0].file || data[0].stream_url || data[0];
         } else {
-            finalUrl = data.url || data.file;
+            finalUrl = data.url || data.file || data.stream_url;
         }
     } catch (e) { console.error("JSON Error", e); }
 }
 
 // 3. تشغيل المشغل
-if (!finalUrl) {
+if (!finalUrl || finalUrl === "undefined") {
     document.querySelector('.video-wrapper').innerHTML = "<div class='error-msg'>عذراً، رابط الفيديو غير متوفر 🚫</div>";
 } else {
-    // إعداد Plyr مع الخصائص الأساسية
+    // إعداد Plyr
     const player = new Plyr(playerElement, {
         controls: ['play-large', 'play', 'rewind', 'fast-forward', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
         settings: ['quality', 'speed', 'loop'],
