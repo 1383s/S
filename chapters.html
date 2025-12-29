@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>الفصول الدراسية | Full Mark</title>
+    <title>المحاضرات | Full Mark</title>
   
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -83,16 +83,17 @@
         /* --- المحتوى الرئيسي --- */
         .main-container {
             padding: 100px 20px 40px;
+            /* 🟢 توسيع الحاوية لتشبه صفحة المدرسين */
             width: 100%; max-width: 1200px; margin: 0 auto; flex: 1;
         }
 
-        /* --- الشبكة العريضة (Grid) --- */
+        /* --- شبكة الفصول (Grid) --- */
         .chapters-grid {
             display: grid;
-            /* كروت عريضة تملأ المساحة */
+            /* 🟢 نظام شبكة متجاوب: كارتين في الشاشات المتوسطة، 3 في الكبيرة */
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
-            align-items: start;
+            align-items: start; /* لمنع تمدد الكروت الفارغة */
         }
 
         /* --- كارت الفصل --- */
@@ -112,7 +113,6 @@
             transform: translateY(-5px);
         }
 
-        /* رأس الكارت */
         .chapter-header {
             padding: 25px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -124,6 +124,7 @@
         }
         .chapter-header:hover { background: rgba(0, 243, 255, 0.05); }
 
+        /* أيقونة الفصل الكبيرة */
         .chapter-icon-large {
             width: 70px; height: 70px; border-radius: 50%;
             background: rgba(2, 6, 23, 0.6);
@@ -140,7 +141,7 @@
         }
 
         .chapter-title {
-            font-size: 1.3rem; font-weight: 700; color: #fff;
+            font-size: 1.2rem; font-weight: 700; color: #fff;
             font-family: 'Tajawal', sans-serif;
         }
 
@@ -153,14 +154,18 @@
             border: 1px solid rgba(0, 243, 255, 0.2);
         }
         
-        .expand-icon {
-            color: var(--gray-text); transition: 0.3s;
+        .expand-btn {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            border: 1px solid var(--gray-text); color: var(--gray-text);
+            transition: 0.3s; font-size: 0.8rem;
         }
         .rotate { 
-            color: var(--cyan-neon); transform: rotate(180deg); 
+            background: var(--cyan-neon); color: #000; border-color: var(--cyan-neon);
+            transform: rotate(180deg); 
         }
 
-        /* --- محتوى الفصل (القائمة المنسدلة) --- */
+        /* --- محتوى الفصل (Lectures) --- */
         .chapter-content {
             border-top: 1px solid var(--glass-border);
             background: rgba(0, 0, 0, 0.3);
@@ -175,41 +180,38 @@
         .lecture-item:last-child { border-bottom: none; }
 
         .lecture-title {
-            font-size: 0.95rem; color: #e2e8f0; font-weight: 600; margin-bottom: 10px;
+            font-size: 0.9rem; color: #e2e8f0; font-weight: 600; margin-bottom: 10px;
             display: flex; align-items: center; gap: 8px;
         }
         .lecture-title::before {
             content: ''; width: 6px; height: 6px; background: var(--cyan-dim); border-radius: 50%;
         }
 
-        /* أزرار التشغيل */
         .resource-btn {
             display: flex; align-items: center; justify-content: space-between;
             background: rgba(255, 255, 255, 0.05);
-            padding: 10px 15px; border-radius: 10px;
+            padding: 8px 12px; border-radius: 8px;
             text-decoration: none; color: var(--gray-text);
-            font-size: 0.85rem; border: 1px solid transparent;
+            font-size: 0.8rem; border: 1px solid transparent;
             margin-top: 5px; transition: 0.3s; cursor: pointer;
         }
 
         .resource-btn:hover {
             background: rgba(0, 243, 255, 0.1);
             border-color: var(--cyan-neon);
-            color: #fff; transform: translateX(-3px);
+            color: #fff;
         }
 
-        .res-info { display: flex; align-items: center; gap: 10px; }
-        .res-icon { font-size: 1.1rem; }
+        .res-info { display: flex; align-items: center; gap: 8px; }
         .fa-play-circle { color: var(--cyan-neon); }
         .fa-file-pdf { color: #ff4444; }
 
         .status-tag {
-            font-size: 0.7rem; padding: 2px 8px; border-radius: 6px;
-            font-weight: bold; background: rgba(0, 255, 136, 0.1); color: var(--success);
-            border: 1px solid rgba(0, 255, 136, 0.2);
+            font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;
+            font-weight: bold; background: rgba(0, 255, 136, 0.15); color: var(--success);
         }
 
-        /* Loading */
+        /* --- Loading & Empty --- */
         .loading-container {
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             height: 50vh; color: var(--cyan-neon);
@@ -286,7 +288,9 @@
                         </div>
                         <div class="chapter-meta">
                             <span class="badge">{{ chapter.lectures ? chapter.lectures.length : 0 }} دروس</span>
-                            <i class="fas fa-chevron-down expand-icon" :class="{ 'rotate': expandedChapters.includes(chapter.id) }"></i>
+                            <div class="expand-btn" :class="{ 'rotate': expandedChapters.includes(chapter.id) }">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
                     </div>
 
@@ -301,7 +305,6 @@
                                 <div class="lecture-title">{{ lecture.name }}</div>
                                 
                                 <div class="resources-list">
-                                    
                                     <div v-for="video in lecture.videos" :key="video.id" 
                                          @click="playVideo(video)" 
                                          class="resource-btn">
@@ -312,16 +315,13 @@
                                         <span class="status-tag ready">فيديو</span>
                                     </div>
 
-                                    <div v-if="lecture.pdfs" v-for="pdf in lecture.pdfs" :key="pdf.id" 
-                                         @click="openPdf(pdf.url)"
-                                         class="resource-btn">
+                                    <div v-if="lecture.pdfs" v-for="pdf in lecture.pdfs" :key="pdf.id" class="resource-btn">
                                         <div class="res-info">
                                             <i class="fas fa-file-pdf res-icon"></i>
                                             <span>{{ pdf.title }}</span>
                                         </div>
-                                        <span class="status-tag" style="color:#ff4444; border-color:rgba(255,68,68,0.3); background:rgba(255,68,68,0.1)">PDF</span>
+                                        <span class="status-tag" style="color:#ff4444; background:rgba(255,68,68,0.1)">PDF</span>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -361,7 +361,6 @@ const JSON_URLS = {
     'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
 };
 
-// إعدادات الفايربيز
 const firebaseConfig = {
     apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
     authDomain: "thanawy-1383.firebaseapp.com",
@@ -410,33 +409,21 @@ createApp({
             }
         };
 
-        const openPdf = (url) => {
-            if(url) window.open(url, '_blank');
-            else showToast("رابط الملف غير متاح", "error");
-        };
-
-        // 🟢 الدالة المسؤولة عن تشغيل الفيديو (الحل للمشكلة)
         const playVideo = (video) => {
-            // التحقق من الرابط
             if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
                 showToast("رابط الفيديو غير متاح", "error");
                 return;
             }
             
-            // 1. تجهيز بيانات الفيديو بشكل كامل
             const videoData = {
                 title: video.title,
-                // نستخدم الرابط المباشر، أو أول رابط في قائمة sources
-                source: video.stream_url || (video.sources && video.sources[0] ? video.sources[0].src : ''),
-                sources: video.sources // لو فيه جودات
+                source: video.stream_url, 
+                sources: video.sources 
             };
             
-            // 2. الحفظ في LocalStorage (عشان player.html يقرأهم)
+            localStorage.setItem("video_url", video.stream_url); 
             localStorage.setItem("current_video", JSON.stringify(videoData));
-            localStorage.setItem("video_url", videoData.source); // Fallback
-            localStorage.setItem("video_title", videoData.title);
 
-            // 3. التوجيه
             window.location.href = 'player.html';
         };
 
@@ -477,10 +464,6 @@ createApp({
 
                 chapters.value = teacher.chapters || [];
                 
-                if (chapters.value.length > 0) {
-                    expandedChapters.value.push(chapters.value[0].id);
-                }
-
                 showToast(`تم تحميل المحتوى بنجاح`, "success");
 
             } catch (err) {
@@ -496,7 +479,7 @@ createApp({
         return { 
             loading, chapters, expandedChapters, 
             teacherData, subjectData, params,
-            toasts, toggleChapter, playVideo, openPdf
+            toasts, toggleChapter, playVideo 
         };
     }
 }).mount('#app');
