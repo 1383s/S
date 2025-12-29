@@ -3,34 +3,31 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>profile</title>
+<title>الملف الشخصي - Profile</title>
 
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&family=Orbitron:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Cairo:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
-  /* 🟢 ثوابت الـ Luxury Green والـ Dark Tech (نفس الألوان المطلوبة) */
+  /* 🟢 ثوابت الـ Luxury Green والـ Dark Tech */
   :root {
-    --dark-black: #020A07;           /* الخلفية الأساسية (أسود فاحم) */
-    --main-green-bg: #08402C;        /* أخضر داكن (لون الكارد الرئيسي) */
-    --darker-green-bg: #0C241C;      /* أخضر أغمق (للتظليل) */
+    --dark-black: #020A07;           /* الخلفية الأساسية */
+    --main-green-bg: #08402C;        /* أخضر داكن */
+    --darker-green-bg: #0C241C;      /* أخضر أغمق */
     --neon-accent: #27d97e;          /* أخضر نيون ساطع */
     --success: #00C896;              /* لون النجاح */
     --error: #FF4F4F;                /* لون الخطأ */
     --light-text: #f0f0f5;           /* نص فاتح */
     --gray-text: #8e8e8e;            /* نص ثانوي */
-    --profile-bg: #101915;           /* خلفية الكارد أغمق */
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Cairo', 'Tajawal', sans-serif;
-    /* تدرج خلفية ناعم وفخم */
     background: linear-gradient(145deg, var(--dark-black) 10%, var(--darker-green-bg) 100%);
     color: var(--light-text);
     min-height: 100vh;
@@ -38,215 +35,214 @@
     justify-content: center;
     align-items: center;
     padding: 15px;
+    padding-bottom: 80px; /* مسافة للبار السفلي */
     position: relative;
+    overflow-x: hidden;
   }
-  
-  /* 🌟 الإضافة الأسطورية للعنوان - فخامة مع زخرفة بسيطة */
+   
+  /* التوقيع */
   .header-signature {
       position: absolute;
       top: 25px;
       right: 25px;
-      font-family: 'Orbitron', sans-serif; /* خط مميز */
+      font-family: 'Orbitron', sans-serif;
       font-size: 0.9rem;
       font-weight: 900;
-      /* تدرج لوني يعطي عمق وفخامة */
       background: linear-gradient(45deg, var(--neon-accent), var(--light-text));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 10px rgba(39, 217, 126, 0.7), 0 0 2px rgba(255, 255, 255, 0.5); /* ظل نيون وكمان ظل أبيض خفيف */
+      text-shadow: 0 0 10px rgba(39, 217, 126, 0.7);
       letter-spacing: 3px;
       padding: 5px 10px;
-      transition: 0.3s;
-      user-select: none;
-      /* زخرفة ناعمة */
       border-bottom: 3px solid var(--neon-accent); 
-  }
-  .header-signature:hover {
-      transform: scale(1.05); 
-      text-shadow: 0 0 15px rgba(39, 217, 126, 1);
   }
 
   .profile-container {
-    /* نفس لون الـ Cards في صفحة المواد (#08402C) */
     background: var(--main-green-bg);
     border-radius: 20px;
     padding: 30px 25px;
     width: 100%;
     max-width: 400px;
-    /* ظل فخم وكبير */
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(39, 217, 126, 0.3); 
     text-align: center;
-    border: 2px solid rgba(39, 217, 126, 0.5); /* إطار نيون خفيف */
+    border: 2px solid rgba(39, 217, 126, 0.5);
     position: relative;
     z-index: 10;
+    animation: fadeIn 0.8s ease-out;
+  }
+
+  @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
   }
 
   .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
     border-radius: 50%;
     margin: auto;
-    border: 4px solid var(--neon-accent);
+    border: 3px solid var(--neon-accent);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2.2rem;
+    font-size: 2.5rem;
     background: var(--darker-green-bg);
     color: var(--light-text);
-    font-weight: bold;
-    margin-bottom: 20px;
-    box-shadow: 0 0 20px var(--neon-accent); /* توهج نيون قوي */
+    margin-bottom: 15px;
+    box-shadow: 0 0 25px var(--neon-accent);
+    position: relative;
   }
 
   .profile-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 900;
+    font-family: 'Cairo', sans-serif; /* غيرت الخط للعربي عشان الاسم يبان حلو */
+    font-size: 1.6rem;
+    font-weight: 800;
     color: var(--light-text);
     text-shadow: 0 0 10px var(--neon-accent);
+    margin-bottom: 5px;
   }
 
-  .profile-phone {
+  .profile-code-display {
+    font-family: 'Orbitron', sans-serif;
     font-size: 1rem;
     color: var(--gray-text);
     margin-bottom: 25px;
+    letter-spacing: 2px;
   }
 
   .info-card {
-    background: var(--darker-green-bg); /* لون أغمق في الداخل لعمق بصري */
+    background: var(--darker-green-bg);
     padding: 15px;
     border-radius: 12px;
     margin: 15px 0;
     text-align: right;
     font-size: 1rem;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5); /* ظل داخلي */
   }
 
   .info-item {
     display: flex;
     justify-content: space-between;
     margin: 8px 0;
+    align-items: center;
   }
 
-  .info-label {
-    color: var(--gray-text);
-    font-weight: 500;
-  }
+  .info-label { color: var(--gray-text); font-weight: 500; font-size: 0.9rem; }
+  .info-value { font-weight: 700; color: var(--light-text); }
 
-  .info-value {
-    font-weight: 700;
-    color: var(--light-text);
-  }
+  .status-value.active { color: var(--success); text-shadow: 0 0 8px var(--success); }
+  .status-value.expired { color: var(--error); text-shadow: 0 0 8px var(--error); }
 
-  .status-value.active {
-    color: var(--success);
-    font-weight: 700;
-    text-shadow: 0 0 8px var(--success);
-  }
-  .status-value.expired {
-    color: var(--error);
-    font-weight: 700;
-  }
-
-  /* Digital Timer */
+  /* العداد الرقمي */
   .timer {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--neon-accent);
-    margin-bottom: 8px;
-    letter-spacing: 4px;
-    text-shadow: 0 0 10px var(--neon-accent); /* توهج النيون */
-    padding-top: 15px;
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--neon-accent);
+    padding-top: 10px;
+    direction: ltr; /* عشان الأرقام تترتب صح */
   }
 
   .timer-labels {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--gray-text);
     display: flex;
     justify-content: space-around;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
+    padding: 0 10px;
   }
 
-  /* Progress Bar */
+  /* شريط التقدم */
   .progress-container {
-    background: var(--darker-green-bg);
-    border-radius: 12px;
+    background: var(--dark-black);
+    border-radius: 10px;
     overflow: hidden;
-    height: 15px; /* أطول وأوضح */
-    margin: 15px 0 25px;
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+    height: 10px;
+    margin: 10px 0 25px;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
   }
 
   .progress-bar {
     height: 100%;
-    width: 0%;
-    /* تدرج ألوان فخم */
-    background: linear-gradient(90deg, var(--neon-accent) 40%, #FFCC00 80%, var(--error));
+    width: 100%;
+    background: linear-gradient(90deg, var(--neon-accent), #00ffaa);
     transition: width 1s linear;
-    border-radius: 12px 0 0 12px; 
-    box-shadow: 0 0 8px rgba(39, 217, 126, 0.5); /* ظل خفيف للبروجرس */
+    border-radius: 10px; 
+    box-shadow: 0 0 10px var(--neon-accent);
   }
 
+  /* زر الخروج */
   .logout-btn {
-    margin-top: 15px;
     padding: 15px;
     border: none;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #27d97e, #1a8f54); /* تدرج أخضر فخم */
-    color: var(--dark-black); /* نص أسود على الخلفية الفاتحة */
-    font-size: 1.1rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(255, 79, 79, 0.1), rgba(255, 79, 79, 0.2));
+    color: var(--error);
+    border: 1px solid var(--error);
+    font-size: 1rem;
     cursor: pointer;
     width: 100%;
     font-weight: 700;
     transition: 0.3s;
-    /* ظل لافت للنظر */
-    box-shadow: 0 8px 20px rgba(39, 217, 126, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
   }
 
   .logout-btn:hover {
-    transform: translateY(-2px);
-    background: linear-gradient(135deg, var(--success), var(--neon-accent));
-    box-shadow: 0 12px 30px rgba(39, 217, 126, 0.7);
+    background: var(--error);
+    color: #fff;
+    box-shadow: 0 0 15px var(--error);
   }
-  
-  /* شريط الكود الثابت (Fixed Bottom Bar) */
+
+  .back-btn {
+      margin-top: 10px;
+      text-decoration: none;
+      color: var(--gray-text);
+      display: block;
+      font-size: 0.9rem;
+      transition: 0.3s;
+  }
+  .back-btn:hover { color: var(--light-text); }
+   
+  /* شريط الكود الثابت */
   .fixed-bottom-bar {
     position: fixed; 
-    bottom: 0;      
-    left: 0;        
+    bottom: 0;       
+    left: 0;         
     width: 100%;
-    background: rgba(2, 10, 7, 0.8); /* خلفية سوداء شفافة */
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-    border-top: 3px solid var(--neon-accent); /* خط نيون أخضر سميك شيك */
+    background: rgba(2, 10, 7, 0.95);
+    border-top: 2px solid var(--neon-accent);
     color: var(--light-text);
     text-align: center;
-    padding: 12px 0;
+    padding: 15px 0;
     z-index: 999; 
     display: flex; 
     justify-content: center;
     align-items: center;
-    font-family: 'Cairo', sans-serif;
-    box-shadow: 0 -4px 20px rgba(39, 217, 126, 0.3);
+    box-shadow: 0 -4px 20px rgba(39, 217, 126, 0.2);
 }
 
 .bottom-label {
     color: var(--gray-text);
-    font-size: 16px;
-    font-weight: 500;
-    margin-left: 15px; 
+    font-size: 0.9rem;
+    margin-left: 10px; 
 }
 
 .bottom-code {
     color: var(--neon-accent); 
-    font-size: 24px; /* حجم أكبر للكود */
+    font-size: 1.4rem; 
     font-weight: 700;
     font-family: 'Orbitron', monospace; 
-    letter-spacing: 5px; /* تباعد حروف أكبر للفخامة */
-    text-shadow: 0 0 8px var(--neon-accent);
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px var(--neon-accent);
 }
+
+#loadingText { color: var(--neon-accent); font-weight: bold; }
 </style>
 </head>
 <body>
@@ -254,123 +250,170 @@
   <div class="header-signature">By ELGIZAWY</div>
 
   <div class="profile-container">
-    <div class="profile-avatar" id="profileAvatar">👑</div>
-    <h2 class="profile-name" id="profileName">ELGIZAWY</h2>
-    <p class="profile-phone" id="profilePhone">0</p>
+    <div class="profile-avatar"><i class="fas fa-user-astronaut"></i></div>
+    
+    <h2 class="profile-name" id="profileName">...</h2>
+    <p class="profile-code-display" id="profileCodeSub">Loading...</p>
 
     <div class="info-card">
       <div class="info-item">
-        <span class="info-label">الحالة: بريميوم  </span>
-        <span id="profileStatus" class="status-value active">كينج</span>
+        <span class="info-label">حالة الاشتراك:</span>
+        <span id="profileStatus" class="status-value active">جاري التحقق...</span>
       </div>
       <div class="info-item">
-        <span class="info-label">100</span>
-        <span class="info-value">تم التحقق من الدفع بنجاح</span>
+        <span class="info-label">الجهاز المفعل:</span>
+        <span class="info-value" style="font-size:0.8rem">Verified Device <i class="fas fa-check-circle" style="color:var(--success)"></i></span>
       </div>
     </div>
     
-    <div class="timer" id="profileTimer">99:99:99:99</div>
+    <div class="timer" id="profileTimer">00 : 00 : 00 : 00</div>
     <div class="timer-labels">
-      <span>أيام</span>
-      <span>ساعات</span>
-      <span>دقائق</span>
-      <span>ثواني</span>
+      <span>يوم</span>
+      <span>ساعة</span>
+      <span>دقيقة</span>
+      <span>ثانية</span>
     </div>
 
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <button class="logout-btn" onclick="logout()">🚪 العوده الي قائمه المواد</button>
+    <button class="logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> تسجيل خروج وحذف الكود
+    </button>
+    
+    <a href="subjects.html" class="back-btn">العودة للمواد الدراسية</a>
   </div>
     
-    <div id="bottomCodeDisplay" class="fixed-bottom-bar">
-      <p class="bottom-label">كود تفعيلك الحالي:</p>
-      <span id="displayActivationCodeBottom" class="bottom-code">...</span>
-    </div>
+  <div class="fixed-bottom-bar">
+      <span class="bottom-label">كود التفعيل:</span>
+      <span id="displayActivationCodeBottom" class="bottom-code">------</span>
+  </div>
   
 <script>
-   
+  // 🚨 Configuration - إعدادات Firebase (استخدمت الإعدادات الموثوقة السابقة لضمان عمل الداتا)
+  // إذا كنت تستخدم مشروع مختلف، استبدل هذا الجزء
   const firebaseConfig = {
-  apiKey: "AIzaSyBlGgAa0SDuvd8KM6pTalQh1J5PRXgcmSk",
-  authDomain: "plus-c3d02.firebaseapp.com",
-  projectId: "plus-c3d02",
-  storageBucket: "plus-c3d02.firebasestorage.app",
-  messagingSenderId: "61620553895",
-  appId: "1:61620553895:web:c186ce886c28d269523382",
-  measurementId: "G-5EBPB2GM4L"
-};
+      apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
+      authDomain: "thanawy-1383.firebaseapp.com",
+      databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
+      projectId: "thanawy-1383",
+      storageBucket: "thanawy-1383.firebasestorage.app",
+      messagingSenderId: "1026664406457",
+      appId: "1:1026664406457:web:87d71f7e41bef36ba0aa68",
+      measurementId: "G-J5R2EFM2D0"
+  };
 
-  firebase.initializeApp(firebaseConfig);
+  if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
+      firebase.initializeApp(firebaseConfig);
+  }
   const db = firebase.database();
 
-  let currentUid = localStorage.getItem("localUid");
-  /*88*/
-// ** الكود الجديد اللي لازم تحطه **
+  // 1. التحقق من وجود الكود وتحديث البار السفلي فوراً
   const activeCode = localStorage.getItem('activeCode');
-  const displayElement = document.getElementById('displayActivationCodeBottom');
+  const bottomCodeEl = document.getElementById('displayActivationCodeBottom');
+  const subCodeEl = document.getElementById('profileCodeSub');
 
-  if (activeCode && displayElement) {
-      displayElement.textContent = activeCode;
+  if (!activeCode) {
+      // لو مفيش كود، يرجع لصفحة الدخول
+      window.location.href = 'index.html'; 
+  } else {
+      bottomCodeEl.textContent = activeCode;
+      subCodeEl.textContent = `ID: ${activeCode}`;
+      loadRealProfileData(activeCode);
   }
-// ** نهاية الكود الجديد **
-  function loadProfile() {
-      // ⬅️ تم تجاهل كل فحص لـ Firebase وعرض البيانات البريميوم مباشرةً
 
-      // 1. عرض بيانات وهمية "بريميوم"
-      document.getElementById("profileName").textContent = "👑ELGIZAWY👑";
-      document.getElementById("profilePhone").textContent = "0";
-      document.getElementById("profileAvatar").textContent = "👑";
+  // 2. دالة جلب البيانات الحقيقية
+  function loadRealProfileData(code) {
+      const nameEl = document.getElementById('profileName');
+      const statusEl = document.getElementById('profileStatus');
+      const timerEl = document.getElementById('profileTimer');
+      const progressBar = document.getElementById('progressBar');
 
-      let statusEl = document.getElementById("profileStatus");
-      let timerEl = document.getElementById("profileTimer");
-      let progressBar = document.getElementById("progressBar");
+      db.ref('approvedStudents/' + code).once('value').then((snapshot) => {
+          const data = snapshot.val();
 
-      // 2. إعداد عداد وهمي (صالح لمدة شهر مثلاً)
-      // هنحدد وقت انتهاء وهمي بعيد في المستقبل
-      const expiryTime = Date.now() + (30 * 24 * 60 * 60 * 1000); 
-      const startTime = Date.now();
+          if (data) {
+              // ✅ عرض الاسم الحقيقي
+              const realName = data.studentName || data.name || "طالب مميز";
+              nameEl.textContent = realName;
+
+              // ✅ منطق العداد
+              if (data.expiry) {
+                  startCountdown(data.expiry, timerEl, statusEl, progressBar);
+              } else {
+                  timerEl.textContent = "مدى الحياة";
+                  statusEl.textContent = "✅ مفتوح";
+                  progressBar.style.width = "100%";
+              }
+          } else {
+              // لو البيانات مش موجودة (تم حذف الكود)
+              logout();
+          }
+      }).catch((error) => {
+          console.error("Error fetching data:", error);
+          nameEl.textContent = "خطأ في الاتصال";
+      });
+  }
+
+  // 3. منطق العداد التنازلي والبروجرس بار
+  function startCountdown(expiryTimestamp, timerEl, statusEl, progressEl) {
+      // افتراض مدة الكود شهر (لحساب شريط التقدم) - يمكن تعديلها
+      const totalDuration = 30 * 24 * 60 * 60 * 1000; 
       
-      function updateCountdown() {
-        const now = Date.now();
-        const distance = expiryTime - now;
-        const totalDuration = expiryTime - startTime;
+      const updateTimer = () => {
+          const now = Date.now();
+          const distance = expiryTimestamp - now;
 
-        if (distance <= 0) {
-            timerEl.textContent = "00:00:00:00";
-            statusEl.textContent = "❌ منتهي";
-            statusEl.className = "status-value expired";
-            progressBar.style.width = "0%";
-            clearInterval(timer);
-            return;
-        }
+          if (distance < 0) {
+              clearInterval(interval);
+              timerEl.textContent = "00 : 00 : 00 : 00";
+              statusEl.textContent = "❌ منتهي";
+              statusEl.className = "status-value expired";
+              progressEl.style.width = "0%";
+              
+              // خيار: تسجيل خروج تلقائي عند الانتهاء
+              // setTimeout(logout, 3000); 
+              return;
+          }
 
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          // حساب الوقت
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        timerEl.textContent =
-          `${String(days).padStart(2,'0')} : ${String(hours).padStart(2,'0')} : ${String(minutes).padStart(2,'0')} : ${String(seconds).padStart(2,'0')}`;
+          // تنسيق الوقت
+          timerEl.textContent = 
+              `${String(days).padStart(2,'0')} : ${String(hours).padStart(2,'0')} : ${String(minutes).padStart(2,'0')} : ${String(seconds).padStart(2,'0')}`;
+          
+          statusEl.textContent = "✅ نشط";
 
-        statusEl.textContent = "✅ نشط";
-        statusEl.className = "status-value active";
+          // تحديث شريط التقدم (بناءً على الوقت المتبقي)
+          // كل ما الوقت يقل، الشريط يقل
+          // يمكنك عكس المنطق لو عايز الشريط يزيد مع الوقت
+           /* لتبسيط الأمر، سأجعله يبدأ ممتلئاً وينقص مع الوقت */
+           // لنفترض أننا نريد إظهار "النسبة المتبقية"
+           // بما أننا لا نملك وقت "البداية" بدقة في الداتا الحالية، سأجعل البروجرس ثابت 100% كشكل جمالي
+           // أو يمكنك تفعيل السطر التالي لو عندك (startTime) في الداتا:
+           // const percent = (distance / totalDuration) * 100;
+           // progressEl.style.width = percent + "%";
+           progressEl.style.width = "100%"; // شكل جمالي نيون
+      };
 
-        // Progress
-        const percent = ((now - startTime) / totalDuration) * 100;
-        progressBar.style.width = Math.max(0, Math.min(100, 100 - percent)) + "%";
-      }
-
-      updateCountdown();
-      const timer = setInterval(updateCountdown, 1000);
+      updateTimer();
+      const interval = setInterval(updateTimer, 1000);
   }
 
+  // 4. دالة تسجيل الخروج الفعلي
   function logout() {
-    /*localStorage.clear();*/
-    window.location.href = "subjects.html";
+      if(confirm("هل أنت متأكد من تسجيل الخروج وحذف الكود من هذا الجهاز؟")) {
+          localStorage.removeItem('activeCode');
+          localStorage.removeItem('approved');
+          localStorage.removeItem('localDeviceId'); // اختياري
+          window.location.href = "index.html"; // العودة لصفحة الدخول
+      }
   }
-
-  loadProfile();
 </script>
 </body>
 </html>
