@@ -3,297 +3,304 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Full Mark | المواد الدراسية</title>
+<title>المواد الدراسية | Full Mark</title>
+  
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
+  <script type="module" src="devcheck.js"></script>
+  <script src="auth.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-<script type="module" src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
-<script type="module" src="devcheck.js"></script>
-<script src="auth.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500;700;900&family=Tajawal:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      /* 🔵 ثيم الحوت الأزرق */
+      --bg-deep: #020617;          
+      --cyan-neon: #00f3ff;      
+      --cyan-dim: #0099a0;       
+      --text-white: #e2e8f0;       
+      --glass-bg: rgba(15, 23, 42, 0.6); 
+      --glass-border: rgba(0, 243, 255, 0.15); 
+      --card-hover: rgba(15, 23, 42, 0.85);
+    }
 
-<style>
-/* 🔵 ثيم الحوت الأزرق + الزجاجي */
-:root {
-  --bg-deep: #020617;          /* أزرق غامق جداً */
-  --bg-ocean: #0f172a;         /* درجة أفتح قليلاً */
-  --cyan-neon: #00f3ff;        /* لون الإضاءة الأساسي */
-  --cyan-dim: #0ea5e9;         /* لون ثانوي */
-  --text-white: #f1f5f9;
-  --glass-bg: rgba(30, 41, 59, 0.6); /* خلفية الكروت الزجاجية */
-  --glass-border: rgba(56, 189, 248, 0.2); /* حدود الكروت */
-  --glass-blur: 12px;          /* درجة التمويه */
-}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-body {
-  margin: 0;
-  padding: 100px 20px 80px; /* مسافات عشان البار العلوي والسفلي */
-  font-family: 'Cairo', sans-serif;
-  background-color: var(--bg-deep);
-  /* خلفية المحيط مع الشبكة */
-  background-image: 
-      radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
-      linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
-  background-size: 100% 100%, 40px 40px, 40px 40px;
-  color: var(--text-white);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-x: hidden;
-}
+    body {
+      font-family: 'Cairo', sans-serif;
+      background-color: var(--bg-deep);
+      /* خلفية المحيط */
+      background-image: 
+          radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%),
+          linear-gradient(0deg, rgba(0,243,255,0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 50px 50px, 50px 50px;
+      color: var(--text-white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px; /* مسافة للهيدر */
+      padding-bottom: 40px;
+      overflow-x: hidden;
+    }
 
-/* --- البار العلوي --- */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(2, 6, 23, 0.85); /* شفاف غامق */
-  backdrop-filter: blur(15px);
-  padding: 15px 20px;
-  position: fixed;
-  top: 0; right: 0; left: 0;
-  z-index: 1000;
-  border-bottom: 1px solid var(--cyan-neon);
-  box-shadow: 0 4px 20px rgba(0, 243, 255, 0.15);
-}
+    /* --- الهيدر (Topbar) --- */
+    .topbar {
+      position: fixed;
+      top: 0; left: 0; width: 100%;
+      height: 70px;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--cyan-neon);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+    }
 
-.title {
-  font-size: 1.2rem;
-  color: var(--cyan-neon);
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 700;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px rgba(0, 243, 255, 0.6);
-}
+    .brand {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--cyan-neon);
+      letter-spacing: 1px;
+      text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    }
 
-.icons { display: flex; align-items: center; gap: 15px; }
-/* تلوين الأيقونات بالأبيض */
-.icons img { 
-    width: 26px; height: 26px; 
-    filter: brightness(0) invert(1); 
-    transition: 0.3s; 
-    cursor: pointer; 
-}
-.icons img:hover { transform: scale(1.1); filter: drop-shadow(0 0 5px var(--cyan-neon)); }
+    .nav-icons {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-icons img {
+      width: 24px; height: 24px;
+      filter: invert(1) drop-shadow(0 0 5px var(--cyan-neon));
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .nav-icons img:hover { transform: scale(1.1); }
 
-/* --- العنوان الرئيسي --- */
-h1 {
-  color: #fff;
-  text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 40px;
-  font-family: 'Orbitron', sans-serif;
-  font-weight: 800;
-  text-transform: uppercase;
-  /* تدرج لوني للنص */
-  background: linear-gradient(to bottom, #fff, var(--cyan-neon));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-}
+    /* --- العنوان --- */
+    h1 {
+      margin: 30px 0 40px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(to bottom, #fff, var(--cyan-neon));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+      text-align: center;
+    }
 
-/* --- شبكة المواد (Grid System) --- */
-ul {
-  padding: 0;
-  list-style: none;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  display: grid;
-  /* التجاوب: أعمدة تلقائية بحد أدنى 280 بيكسل */
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-}
+    /* --- شبكة الكروت (Grid) --- */
+    ul {
+      list-style: none;
+      width: 100%;
+      max-width: 1200px;
+      padding: 0 20px;
+      display: grid;
+      /* التجاوب الذكي: من 1 عمود للموبايل إلى 4 للشاشات الكبيرة */
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+    }
 
-/* --- تصميم البطاقة الزجاجية --- */
-li {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 30px 20px;
-  cursor: pointer;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* حركة ناعمة */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 220px;
-  position: relative;
-  overflow: hidden;
-}
+    /* --- كارت المادة --- */
+    li {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
 
-/* تأثير الإضاءة عند التحويم */
-li:hover {
-  background: rgba(30, 41, 59, 0.8);
-  transform: translateY(-10px);
-  border-color: var(--cyan-neon);
-  box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
-}
+    /* تأثير عند التحويم (Hover) */
+    li:hover {
+      background: var(--card-hover);
+      transform: translateY(-10px);
+      box-shadow: 0 15px 40px rgba(0, 243, 255, 0.15);
+      border-color: var(--cyan-neon);
+    }
 
-/* دائرة الصورة */
-.circle {
-  width: 100px; height: 100px; 
-  border-radius: 50%;
-  background: radial-gradient(circle, #1e293b, #0f172a);
-  margin-bottom: 20px;
-  border: 2px solid var(--cyan-neon);
-  box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-  display: flex; justify-content: center; align-items: center;
-  transition: 0.4s;
-}
+    /* دائرة الصورة */
+    .circle {
+      width: 100px; height: 100px;
+      background: rgba(2, 6, 23, 0.5);
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      border: 2px solid var(--cyan-dim);
+      box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+      margin-bottom: 20px;
+      transition: 0.3s;
+    }
+    
+    li:hover .circle {
+        border-color: var(--cyan-neon);
+        box-shadow: 0 0 25px rgba(0, 243, 255, 0.5);
+        transform: scale(1.1);
+    }
 
-li:hover .circle {
-    transform: scale(1.1) rotate(5deg);
-    box-shadow: 0 0 30px rgba(0, 243, 255, 0.4);
-}
+    .circle img {
+      width: 65%; height: 65%;
+      object-fit: contain;
+    }
 
-.circle img { 
-    width: 70%; height: 70%; 
-    object-fit: contain; 
-    filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); 
-}
+    /* اسم المادة */
+    li span {
+      font-family: 'Tajawal', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
 
-/* اسم المادة */
-li span { 
-    font-weight: 700; 
-    font-size: 1.3rem; 
-    font-family: 'Tajawal', sans-serif;
-    color: var(--text-white);
-    transition: 0.3s;
-}
+    /* زر الدخول داخل الكارت (إضافة جمالية) */
+    .enter-text {
+        font-size: 0.8rem;
+        color: var(--cyan-neon);
+        margin-top: 10px;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: 0.3s;
+        font-weight: bold;
+    }
+    
+    li:hover .enter-text {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-li:hover span {
-    color: var(--cyan-neon);
-    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-}
+    /* حالة التحميل */
+    li.loading {
+      grid-column: 1 / -1;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      color: var(--cyan-neon);
+      font-size: 1.5rem;
+      display: flex;
+      flex-direction: row;
+      gap: 15px;
+    }
+    li.loading::after {
+      content: "";
+      width: 30px; height: 30px;
+      border: 3px solid var(--cyan-neon);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-/* حالة التحميل */
-li.loading { 
-    grid-column: 1 / -1; 
-    background: transparent; 
-    border: none; 
-    box-shadow: none;
-    color: var(--cyan-neon); 
-    font-size: 1.5rem; 
-    font-family: 'Orbitron', sans-serif;
-}
+    /* زر البروفايل العائم */
+    .profile-float-btn {
+      position: fixed;
+      bottom: 30px; left: 30px;
+      width: 60px; height: 60px;
+      background: rgba(2, 6, 23, 0.9);
+      border: 2px solid var(--cyan-neon);
+      border-radius: 50%;
+      display: flex; justify-content: center; align-items: center;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+      z-index: 1200;
+      transition: 0.3s;
+    }
+    .profile-float-btn:hover {
+        transform: scale(1.1) rotate(10deg);
+        box-shadow: 0 0 30px rgba(0, 243, 255, 0.8);
+    }
+    .profile-float-btn img {
+      width: 30px; height: 30px;
+      filter: invert(1);
+    }
 
-/* زر البروفايل العائم */
-.profile-float-btn {
-  position: fixed; bottom: 25px; left: 25px; 
-  width: 55px; height: 55px;
-  border-radius: 50%; 
-  background: rgba(15, 23, 42, 0.9); 
-  border: 2px solid var(--cyan-neon);
-  display: flex; justify-content: center; align-items: center; 
-  z-index: 1200;
-  box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-  transition: 0.3s;
-}
-.profile-float-btn:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--cyan-neon); }
-.profile-float-btn img { width: 28px; height: 28px; filter: invert(1); }
-
-/* للموبايل الصغير */
-@media (max-width: 480px) {
-    h1 { font-size: 1.8rem; margin-bottom: 30px; }
-    ul { gap: 15px; }
-    li { min-height: 180px; padding: 20px; }
-    .circle { width: 80px; height: 80px; }
-    li span { font-size: 1.1rem; }
-}
-</style>
+    @media (max-width: 480px) {
+      h1 { font-size: 2rem; }
+    }
+  </style>
 </head>
 <body>
 
   <div class="topbar">
-    <div class="title">ELGIZAWY</div>
-    <div class="icons">
+    <div class="brand">By ELGIZAWY</div>
+    <div class="nav-icons">
+      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share">
       <a href="" target="_blank">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp">
       </a>
-      <img id="shareBtn" src="https://cdn-icons-png.flaticon.com/512/929/929610.png" alt="Share" onclick="shareApp()">
     </div>
   </div>
 
   <h1>SUBJECTS 2026</h1>
 
   <ul id="subjects-list">
-    <li class="loading">
-        <i class="fas fa-spinner fa-spin" style="margin-left:10px;"></i> Loading...
-    </li>
+    <li class="loading">جارٍ تحميل البيانات...</li>
   </ul>
 
   <a href="profile.html" class="profile-float-btn">
-    <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" alt="Profile">
+    <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Profile">
   </a>
 
 <script>
+// ✅ Toast احترافية (بتصميم أزرق)
 function showToast(message, type = "info") {
   const toast = document.createElement("div");
   toast.className = `custom-toast ${type}`;
-  toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> <span>${message}</span>`;
+  toast.innerHTML = `
+    <i class="fas fa-info-circle" style="margin-left:8px"></i> 
+    <span>${message}</span>`;
   
   const style = document.createElement("style");
   style.textContent = `
     .custom-toast { 
-        position: fixed; bottom: 30px; right: 20px; 
-        padding: 12px 20px; border-radius: 12px; 
-        font-family: "Cairo", sans-serif; font-weight: 600; color: #fff; 
-        z-index: 9999; border: 1px solid rgba(255,255,255,0.1);
-        display:flex; align-items:center; gap: 10px;
-        backdrop-filter: blur(10px); box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: fixed; bottom: 30px; right: 30px; 
+        padding: 15px 25px; border-radius: 12px; 
+        font-family: "Cairo", sans-serif; font-weight:bold; color: #fff; 
+        z-index: 9999; display:flex; align-items:center; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid var(--cyan-neon);
+        backdrop-filter: blur(10px);
     }
-    .custom-toast.info { background: rgba(2, 6, 23, 0.9); border-color: #0ea5e9; }
-    .custom-toast.success { background: rgba(6, 78, 59, 0.9); border-color: #00f3ff; color: #00f3ff; }
-    @keyframes slideIn { from { transform: translateX(100%) scale(0.5); opacity:0; } to { transform: translateX(0) scale(1); opacity:1; } }
+    .custom-toast i { color: var(--cyan-neon); }
+    @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
   `;
   document.head.appendChild(style);
   document.body.appendChild(toast);
   setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateY(20px)';
       setTimeout(() => toast.remove(), 500);
   }, 3000);
-}
-
-// دالة المشاركة البسيطة
-function shareApp() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Full Mark Platform',
-            text: 'أقوى منصة تعليمية للثانوية العامة',
-            url: window.location.href,
-        });
-    } else {
-        showToast("تم نسخ الرابط!", "success");
-        navigator.clipboard.writeText(window.location.href);
-    }
 }
 </script>
 
 <script type="module">
-// 🌐 إعدادات الفايربيز (نفس بياناتك)
+// 🌐 تهيئة الفايربيز
 const firebaseConfig = {
     apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
     authDomain: "thanawy-1383.firebaseapp.com",
     databaseURL: "https://thanawy-1383-default-rtdb.firebaseio.com",
     projectId: "thanawy-1383",
 };
-
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const subjectsList = document.getElementById('subjects-list');
 
-// صور المواد (نفس اللينكات بتاعتك)
+// صور المواد (كما هي)
 const subjectImages = {
     "أحياء": "1.jpg",
     "فيزياء": "2.jpg",
@@ -306,4 +313,4 @@ const subjectImages = {
     "جغرافيا": "9.jpg",
     "الإحصاء": "8.jpg",
     "ادبي": "https://www2.0zz0.com/2025/10/01/19/580067879.jpeg",
-    "Le français": "data:image/jpeg;base64,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
+    "Le français": "data:image/jpeg;base64,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
