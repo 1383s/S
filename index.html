@@ -36,23 +36,20 @@
            1. تعريف الألوان (ثيم المحيط الأزرق)
            -------------------------- */
         :root {
-            --light-text: #e2e8f0;       /* أبيض مائل للرمادي الفاتح للقراءة المريحة */
-            --accent-color: #38bdf8;     /* أزرق سماوي مضيء (Primary Color) */
-            --accent-glow: #0ea5e9;      /* درجة أغمق قليلاً للتوهج */
+            --light-text: #e2e8f0;       
+            --accent-color: #38bdf8;     /* سماوي */
+            --accent-glow: #0ea5e9;      
             
-            --red-error: #ef4444;        /* لون الخطأ */
-            --pending: #f59e0b;          /* لون الانتظار */
+            --red-error: #ef4444;        
+            --pending: #f59e0b;          
             
-            /* خلفيات المحيط */
-            --bg-deep: #020617;          /* أزرق أسود (قاع المحيط) */
-            --bg-surface: #0f172a;       /* كحلي غامق (سطح الماء ليلاً) */
-            --card-glass: rgba(15, 23, 42, 0.7); /* لون الكارت الزجاجي */
+            --bg-deep: #020617;          
+            --bg-surface: #0f172a;       
+            --card-glass: rgba(15, 23, 42, 0.7); 
         }
 
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
             font-family: 'Cairo', 'Tajawal', sans-serif;
         }
 
@@ -60,53 +57,34 @@
            2. الخلفية وتأثيرات الصفحة
            -------------------------- */
         body {
-            display: flex;
-            flex-direction: column; 
-            justify-content: center;
-            align-items: center;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center;
             min-height: 100vh;
-            
-            /* تدرج لوني دائري يوحي بالعمق */
             background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%);
             background-color: var(--bg-deep);
-            
-            overflow: hidden;
-            position: relative;
+            overflow: hidden; position: relative;
             color: var(--light-text);
-            padding: 20px;
-            padding-bottom: 100px; 
+            padding: 20px; padding-bottom: 100px; 
         }
 
-        /* تأثير شبكة خفيفة جداً في الخلفية */
         body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
             background-image: 
                 linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
             background-size: 50px 50px;
-            z-index: -1;
-            pointer-events: none;
+            z-index: -1; pointer-events: none;
         }
 
         /* --------------------------
            3. النجوم والشهب
            -------------------------- */
         .stars {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 1px, transparent 1%);
-            background-size: 100px 100px;
-            background-repeat: repeat;
-            opacity: 0.4; /* تقليل الشفافية لتناسب الخلفية الداكنة */
-            z-index: -2;
+            background-size: 100px 100px; background-repeat: repeat;
+            opacity: 0.4; z-index: -2;
             animation: star-move 100s linear infinite;
         }
         
@@ -116,16 +94,11 @@
         }
         
         .shooting-star {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: #fff;
+            position: absolute; width: 3px; height: 3px; background: #fff;
             border-radius: 50%;
             box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--accent-color); 
-            opacity: 0;
-            transform: rotateZ(315deg);
-            animation: shoot 6s linear infinite;
-            z-index: -1; 
+            opacity: 0; transform: rotateZ(315deg);
+            animation: shoot 6s linear infinite; z-index: -1; 
         }
 
         @keyframes shoot {
@@ -139,29 +112,18 @@
            -------------------------- */
         .login-card {
             background: var(--card-glass);
-            border-radius: 20px;
-            padding: 40px; 
-            border: 1px solid rgba(56, 189, 248, 0.1); /* حدود سماوية خفيفة */
+            border-radius: 20px; padding: 40px; 
+            border: 1px solid rgba(56, 189, 248, 0.1); 
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            width: 90%;
-            max-width: 420px; 
-            text-align: center;
-            animation: fadeIn 1s ease-out;
-            color: #ffffff;
-            z-index: 10; 
-            position: relative;
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            width: 90%; max-width: 420px; 
+            text-align: center; animation: fadeIn 1s ease-out;
+            color: #ffffff; z-index: 10; position: relative;
         }
 
-        /* خط مضيء أعلى الكارت */
         .login-card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 20%;
-            width: 60%;
-            height: 2px;
+            content: ''; position: absolute; top: 0; left: 20%;
+            width: 60%; height: 2px;
             background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
             box-shadow: 0 0 10px var(--accent-color);
         }
@@ -172,41 +134,27 @@
         }
 
         h2 {
-            margin-bottom: 30px;
-            font-size: 2.2em;
-            color: #ffffff;
-            font-weight: 700;
-            text-shadow: 0 0 15px rgba(56, 189, 248, 0.5); /* توهج أزرق للنص */
+            margin-bottom: 30px; font-size: 2.2em; color: #ffffff;
+            font-weight: 700; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
             letter-spacing: 1px;
         }
 
         /* --------------------------
            5. حقول الإدخال
            -------------------------- */
-        .input-group {
-            position: relative;
-            margin-bottom: 25px;
-        }
+        .input-group { position: relative; margin-bottom: 25px; }
 
         .input-group input {
-            width: 100%;
-            padding: 15px 45px 15px 15px; 
-            background: rgba(15, 23, 42, 0.5); /* خلفية غامقة */
+            width: 100%; padding: 15px 45px 15px 15px; 
+            background: rgba(15, 23, 42, 0.5); 
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; 
-            color: #ffffff;
-            font-size: 1em;
-            outline: none;
-            transition: all 0.3s ease;
-            text-align: right;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 500;
-            letter-spacing: 1px;
+            border-radius: 12px; color: #ffffff; font-size: 1em;
+            outline: none; transition: all 0.3s ease;
+            text-align: right; font-family: 'Tajawal', sans-serif;
+            font-weight: 500; letter-spacing: 1px;
         }
 
-        .input-group input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-        }
+        .input-group input::placeholder { color: rgba(255, 255, 255, 0.4); }
 
         .input-group input:focus {
             background: rgba(15, 23, 42, 0.8);
@@ -215,169 +163,102 @@
         }
 
         .input-group .icon {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--accent-color); /* الأيقونة بلون الثيم */
-            font-size: 1em;
+            position: absolute; right: 15px; top: 50%;
+            transform: translateY(-50%); color: var(--accent-color); font-size: 1em;
         }
         
         /* --------------------------
            6. رسائل الحالة
            -------------------------- */
         #statusMessage {
-            margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 0.95em;
-            display: none; 
-            text-align: center;
-            font-weight: 600;
+            margin-bottom: 25px; padding: 15px; border-radius: 10px;
+            font-size: 0.95em; display: none; text-align: center; font-weight: 600;
         }
         
         /* --------------------------
            7. الأزرار (Buttons)
            -------------------------- */
         .login-btn {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 12px;
-            color: #0f172a; /* لون النص غامق ليظهر على الخلفية الفاتحة */
-            font-size: 1.1em;
-            font-weight: 800;
-            cursor: pointer;
-            transition: 0.3s ease;
-            margin-top: 15px;
-            
-            /* خلفية زرقاء مضيئة متدرجة */
+            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            color: #0f172a; font-size: 1.1em; font-weight: 800;
+            cursor: pointer; transition: 0.3s ease; margin-top: 15px;
             background: linear-gradient(135deg, var(--accent-color), var(--accent-glow));
             box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
 
         .login-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); 
-            filter: brightness(1.1);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); filter: brightness(1.1);
         }
 
-        /* زر تواصل معنا */
-        .contact-us-btn {
-            display: block;
-            width: 100%;
-            text-align: center;
-            margin-top: 15px;
-            padding: 12px;
+        /* 🟢 أزرار التواصل (Contact Buttons) */
+        .contact-us-btn, .group-btn {
+            display: block; width: 100%; text-align: center;
+            margin-top: 15px; padding: 12px;
             background: rgba(255, 255, 255, 0.03); 
             border: 1px solid var(--accent-color); 
-            border-radius: 12px;
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1em;
-            transition: 0.3s;
-            cursor: pointer;
+            border-radius: 12px; color: var(--accent-color);
+            text-decoration: none; font-weight: bold; font-size: 1em;
+            transition: 0.3s; cursor: pointer;
         }
 
-        .contact-us-btn:hover {
+        .contact-us-btn:hover, .group-btn:hover {
             background: rgba(56, 189, 248, 0.1);
             box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+            transform: translateY(-2px);
         }
 
-        .contact-us-btn i {
-            margin-left: 8px;
-        }
+        .contact-us-btn i, .group-btn i { margin-left: 8px; }
 
         /* --------------------------
            8. شريط حالة الكود العلوي
            -------------------------- */
         .top-status-bar {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 30px;
+            padding: 15px; border-radius: 10px; margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            text-align: center;
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
         }
 
         .status-text {
-            font-size: 0.9em;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: #cbd5e1;
+            font-size: 0.9em; font-weight: 500; margin-bottom: 10px; color: #cbd5e1;
         }
 
         .code-display {
-            color: var(--accent-color); 
-            font-weight: 700;
-            font-family: monospace;
-            font-size: 1.2em;
-            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-            margin-right: 5px;
+            color: var(--accent-color); font-weight: 700; font-family: monospace;
+            font-size: 1.2em; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); margin-right: 5px;
         }
 
         .clear-btn {
-            background: rgba(239, 68, 68, 0.2); 
-            color: #fca5a5;
-            padding: 8px 15px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid rgba(239, 68, 68, 0.5);
-            transition: 0.3s;
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
+            padding: 8px 15px; border-radius: 8px;
+            font-size: 0.85em; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(239, 68, 68, 0.5); transition: 0.3s;
         }
-        .clear-btn:hover {
-            background: rgba(239, 68, 68, 0.4); 
-            color: #fff;
-        }
+        .clear-btn:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
 
         /* --------------------------
-           9. فوتر المطور (Developer Footer)
+           9. فوتر المطور
            -------------------------- */
         .developer-footer {
-            position: fixed; 
-            bottom: 10px; 
-            width: 100%;
-            z-index: 5; 
-            padding: 15px 10px;
-            background: rgba(2, 6, 23, 0.8); /* خلفية غامقة جداً */
-            backdrop-filter: blur(5px); 
-            -webkit-backdrop-filter: blur(5px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            position: fixed; bottom: 10px; width: 100%; z-index: 5; 
+            padding: 15px 10px; background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
 
         .developer-info {
-            display: flex;
-            align-items: center;
-            color: var(--light-text);
-            font-size: 1em;
-            font-weight: 600;
-            flex-direction: row-reverse;
-            gap: 15px;
+            display: flex; align-items: center; color: var(--light-text);
+            font-size: 1em; font-weight: 600; flex-direction: row-reverse; gap: 15px;
         }
 
-        .developed-text {
-            order: 1;
-            opacity: 0.6;
-            font-size: 0.9em;
-        }
+        .developed-text { order: 1; opacity: 0.6; font-size: 0.9em; }
 
         .developer-name {
-            color: var(--accent-color); 
-            font-size: 1.5em; 
-            font-weight: 800;
-            letter-spacing: 1px;
-            text-shadow: 0 0 15px var(--accent-color); 
-            order: 2; 
+            color: var(--accent-color); font-size: 1.5em; font-weight: 800;
+            letter-spacing: 1px; text-shadow: 0 0 15px var(--accent-color); order: 2; 
         }
     </style>
 </head>
@@ -386,12 +267,10 @@
 
     <div class="login-card">
         
-        <div id="topCodeStatus" class="top-status-bar">
-        </div>
+        <div id="topCodeStatus" class="top-status-bar"></div>
 
         <h2>Full-Mark منصة</h2>
-        <div id="statusMessage" style="display:none;">
-        </div>
+        <div id="statusMessage" style="display:none;"></div>
 
         <form id="loginForm">
             <div class="input-group">
@@ -405,6 +284,10 @@
 
             <a href="https://t.me/elgizawy9" target="_blank" class="contact-us-btn">
                 <i class="fab fa-telegram-plane"></i> تواصل معنا
+            </a>
+
+            <a href="https://t.me/giza_full_mark" target="_blank" class="group-btn">
+                <i class="fas fa-users"></i> جروب الدعم
             </a>
 
         </form>
@@ -431,21 +314,18 @@
           measurementId: "G-J5R2EFM2D0"
         };
         
-        // تشغيل الفايربيس
         if (typeof firebase === 'undefined' || firebase.apps.length === 0) {
             firebase.initializeApp(firebaseConfig);
         }
 
         const db = firebase.database();
 
-        // تعريف العناصر
         const STATUS_MESSAGE = document.getElementById('statusMessage');
         const LOGIN_FORM = document.getElementById('loginForm');
         const LOGIN_BTN = document.getElementById('loginBtn');
         const ACTIVATION_CODE_INPUT = document.getElementById('activationCode');
         const codeStatusDiv = document.getElementById('topCodeStatus');
 
-        // دالة لعرض الرسائل (محدثة لتناسب الثيم الأزرق)
         function updateStatusMessage(text, type) {
             STATUS_MESSAGE.textContent = text;
             STATUS_MESSAGE.style.display = 'block';
@@ -468,8 +348,6 @@
             }
         }
 
-        // --- باقي كود الجافاسكربت كما هو ---
-        
         function generateDeviceID() {
              return 'DID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + Date.now().toString(36);
         }
