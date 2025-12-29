@@ -410,28 +410,48 @@ createApp({
         };
         
 const playVideo = (video) => {
-    if (!video.stream_url && (!video.sources || video.sources.length === 0)) {
-        showToast("رابط الفيديو غير متاح", "error");
+    if (!video) {
+        showToast("بيانات الفيديو غير متاحة", "error");
         return;
     }
     
-    // مسح أي بيانات قديمة عشان م يحصلش تعارض
+    // تنظيف بيانات قديمة
     localStorage.removeItem("video_sources");
     localStorage.removeItem("video_url");
-
+    localStorage.removeItem("video_title");
+    
     // تخزين العنوان
-    localStorage.setItem("video_title", video.title);
-
-    // لو فيه مصفوفة جودات (أهم حاجة للبلير بتاعك)
-    if (video.sources && video.sources.length > 0) {
+    localStorage.setItem("video_title", video.title || "فيديو بدون عنوان");
+    
+    // ✅ تحسين: تسجيل تفاصيل الفيديو في الكونسول للتصحيح
+    console.log("Video object to play:", video);
+    
+    // ✅ الحالة 1: إذا كان هناك مصادر متعددة (جودات)
+    if (video.sources && Array.isArray(video.sources) && video.sources.length > 0) {
+        console.log("Setting multiple quality sources:", video.sources);
         localStorage.setItem("video_sources", JSON.stringify(video.sources));
     } 
-    // لو مفيش جودات وفي رابط مباشر
-    else if (video.stream_url) {
+    // ✅ الحالة 2: إذا كان هناك رابط مباشر (stream_url)
+    else if (video.stream_url && typeof video.stream_url === 'string') {
+        console.log("Setting direct URL:", video.stream_url);
         localStorage.setItem("video_url", video.stream_url);
     }
-
-    window.location.href = 'player.html';
+    // ✅ الحالة 3: إذا كان هناك ملف فيديو مباشر
+    else if (video.file && typeof video.file === 'string') {
+        console.log("Setting file URL:", video.file);
+        localStorage.setItem("video_url", video.file);
+    }
+    // ❌ حالة فشل
+    else {
+        showToast("لا توجد مصادر فيديو متاحة للعب", "error");
+        console.error("No valid video source found:", video);
+        return;
+    }
+    
+    // الانتقال إلى البلاير بعد تأكيد الحفظ
+    setTimeout(() => {
+        window.location.href = 'player.html';
+    }, 100);
 };
         const fetchData = async () => {
             if (!params.yid || !params.sid || !params.tid) {
