@@ -4,26 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Full Mark | Elgizawy - منصة المحاضرات التعليمية</title>
+    <title>Full Mark | Elgizawy - تسجيل الدخول</title>
     
-    <meta name="description" content="منصة Full Mark التعليمية، أقوى منصة لمتابعة المحاضرات والشروحات. Developed by Elgizawy.">
-    <meta name="keywords" content="Full Mark, Elgizawy, منصة تعليمية, محاضرات, برمجة, الجيزاوي">
+    <meta name="description" content="منصة Full Mark التعليمية.">
     <meta name="author" content="Elgizawy">
-    
-    <meta name="google-site-verification" content="VEELHtMgXIgQjtZhhJuMBFTEwYIJ0Qwi_H_yzk_YipM" />
     <link rel="canonical" href="https://fulll-mark.vercel.app">
 
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fulll-mark.vercel.app/">
-    <meta property="og:title" content="Full Mark | Elgizawy">
-    <meta property="og:description" content="منصة المحاضرات التعليمية - Developed by Elgizawy">
-    <meta property="og:image" content="https://www2.0zz0.com/2025/12/18/18/617041603.jpg">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Full Mark | Elgizawy">
-    <meta name="twitter:image" content="https://www2.0zz0.com/2025/12/18/18/617041603.jpg">
-
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -32,313 +19,201 @@
     
     <style>
         /* --------------------------
-           1. الألوان والمتغيرات
+           1. Reset & Variables
            -------------------------- */
         :root {
-            --bg-color: #020617;        /* أسود الفضاء */
-            --card-bg: rgba(30, 41, 59, 0.7); /* شفاف عشان يبين النجوم وراه */
-            --input-bg: rgba(15, 23, 42, 0.8);
-            --primary-color: #3b82f6;   
-            --accent-color: #f59e0b;
-            --text-main: #ffffff;      
-            --text-sec: #cbd5e1;
-            
-            --neon-blue: #00f3ff;
-            --neon-purple: #bc13fe;
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --text-color: #ffffff;
+            --text-muted: #e2e8f0;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --error: #ef4444;
+            --success: #10b981;
         }
 
         * {
             margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Tajawal', 'Cairo', sans-serif;
+            font-family: 'Tajawal', sans-serif;
         }
 
         /* --------------------------
-           2. خلفية الفضاء والنجوم
+           2. Background Animation
            -------------------------- */
         body {
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
             min-height: 100vh;
-            background-color: var(--bg-color);
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-            color: var(--text-main);
+            /* خلفية متدرجة احترافية */
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-color);
             padding: 20px;
-            overflow: hidden;
-            position: relative;
         }
 
-        /* النجوم */
-        .stars-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            overflow: hidden; z-index: -1;
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.8;
-            animation: twinkle 2s infinite alternate;
-        }
-
-        @keyframes twinkle {
-            from { opacity: 0.3; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1.2); }
-        }
-
-        /* الشهب */
-        .meteor {
-            position: absolute;
-            top: 50%; left: 50%;
-            width: 4px; height: 4px;
-            background: #fff;
-            border-radius: 50%;
-            box-shadow: 0 0 0 4px rgba(255,255,255,0.1), 0 0 0 8px rgba(255,255,255,0.1), 0 0 20px rgba(255,255,255,1);
-            animation: meteor 3s linear infinite;
-            opacity: 0;
-        }
-
-        .meteor::before {
-            content: '';
-            position: absolute;
-            top: 50%; transform: translateY(-50%);
-            width: 300px; height: 1px;
-            background: linear-gradient(90deg, #fff, transparent);
-        }
-
-        @keyframes meteor {
-            0% { transform: rotate(215deg) translateX(0); opacity: 1; }
-            70% { opacity: 1; }
-            100% { transform: rotate(215deg) translateX(-1000px); opacity: 0; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* --------------------------
-           3. الكارت (Design)
+           3. The Card (Glassmorphism)
            -------------------------- */
         .login-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(10px); /* تغبيش الخلفية ورا الكارت */
-            border-radius: 20px; 
-            padding: 50px 40px; 
-            width: 100%; max-width: 420px; 
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2); /* وهج أزرق خفيف */
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center; 
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 60px 40px;
+            width: 100%; max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
             position: relative;
-            z-index: 10;
+            overflow: hidden;
         }
 
-        /* العنوان الملون والواضح */
-        h2 {
-            margin-bottom: 40px; 
-            font-size: 2.2em; /* كبرت الخط */
-            font-weight: 900; 
-            letter-spacing: 1px;
-            
-            /* تدرج لوني للنص */
-            background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            
-            /* ظل للنص عشان يلمع */
-            text-shadow: 0 0 20px rgba(79, 172, 254, 0.5);
-            position: relative;
-            display: inline-block;
+        /* تأثير لمعة خفيفة على الكارت */
+        .login-card::before {
+            content: ''; position: absolute;
+            top: 0; left: -50%; width: 100%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            animation: shine 6s infinite;
         }
-        
-        h2::after {
-            content: ''; position: absolute; bottom: -12px; right: 50%;
-            transform: translateX(50%);
-            width: 60px; height: 4px;
-            background: var(--accent-color);
-            border-radius: 10px;
-            box-shadow: 0 0 10px var(--accent-color);
+        @keyframes shine {
+            0% { left: -100%; }
+            20% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 2em; font-weight: 800;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            display: block; margin-bottom: 40px;
+            color: var(--text-muted); font-size: 0.95em;
+            font-family: 'Cairo', sans-serif;
         }
 
         /* --------------------------
-           4. الحقول (Inputs)
+           4. Inputs
            -------------------------- */
-        .input-group { position: relative; margin-bottom: 30px; }
+        .input-group { position: relative; margin-bottom: 25px; }
 
         .input-group input {
-            width: 100%; padding: 18px 50px 18px 15px; 
-            background: var(--input-bg); 
-            border: 2px solid rgba(255,255,255,0.05);
-            border-radius: 15px; 
-            color: #fff; 
-            font-size: 1.2em;
-            outline: none; 
-            transition: all 0.3s ease;
-            text-align: right; 
-            font-weight: 700;
-            letter-spacing: 2px; /* مسافة بين أرقام الكود */
+            width: 100%; padding: 18px 50px 18px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white; font-size: 1.1em;
+            outline: none; transition: all 0.3s ease;
+            text-align: right; font-weight: 600;
         }
 
-        .input-group input::placeholder { 
-            color: var(--text-sec); font-size: 0.8em; letter-spacing: 0; font-weight: 500;
-        }
+        .input-group input::placeholder { color: #94a3b8; font-weight: 400; }
 
-        /* تأثير لما يضغط يكتب - وهج نيون */
         .input-group input:focus {
-            background: rgba(15, 23, 42, 0.95);
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.3);
+            background: rgba(0, 0, 0, 0.4);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
         }
 
         .input-group .icon {
             position: absolute; right: 20px; top: 50%;
-            transform: translateY(-50%); 
-            color: var(--text-sec); 
-            font-size: 1.3em;
+            transform: translateY(-50%);
+            color: #94a3b8; font-size: 1.2em;
             transition: 0.3s;
         }
-
-        .input-group input:focus + .icon { 
-            color: var(--neon-blue); 
-            text-shadow: 0 0 10px var(--neon-blue);
-        }
+        .input-group input:focus + .icon { color: var(--accent); }
 
         /* --------------------------
-           5. الزرار (Button)
+           5. Button
            -------------------------- */
         .login-btn {
-            width: 100%; padding: 18px; 
-            border: none; border-radius: 15px;
-            
-            /* زرار جريدينت */
-            background: linear-gradient(45deg, #2563eb, #3b82f6);
-            color: white; 
-            font-size: 1.3em; font-weight: 800;
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-            position: relative;
-            overflow: hidden;
+            width: 100%; padding: 16px;
+            border: none; border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; font-size: 1.1em; font-weight: 700;
+            cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
         }
 
         .login-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.6);
-            background: linear-gradient(45deg, #1d4ed8, #2563eb);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(67, 97, 238, 0.4);
+            filter: brightness(1.1);
         }
-
-        .login-btn:active { transform: translateY(1px); }
+        .login-btn:active { transform: translateY(0); }
 
         /* --------------------------
-           6. رسائل الحالة (Notifications)
+           6. Status Messages
            -------------------------- */
         #statusMessage {
-            margin-bottom: 25px; padding: 15px; border-radius: 10px;
-            font-size: 1em; display: none; text-align: center; font-weight: 700;
-            border: 1px solid transparent;
+            margin-bottom: 20px; padding: 12px; border-radius: 8px;
+            font-size: 0.9em; display: none; font-weight: 600;
+            background: rgba(255,255,255,0.1);
         }
 
         .top-status-bar {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            padding: 15px; border-radius: 12px; margin-bottom: 30px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px; border-radius: 12px; margin-bottom: 25px;
             text-align: center;
+            backdrop-filter: blur(5px);
         }
-
-        .status-text { color: var(--text-sec); font-size: 1em; display: block; margin-bottom: 5px; }
-        .code-display { color: var(--accent-color); font-family: monospace; font-size: 1.4em; font-weight: bold; text-shadow: 0 0 10px rgba(245, 158, 11, 0.4); }
-        
+        .code-display { color: var(--accent); font-family: monospace; font-size: 1.2em; font-weight: bold; margin: 5px 0; display: block; }
         .clear-btn {
-            background: rgba(239, 68, 68, 0.1); color: var(--error);
-            border: 1px solid #ef4444;
-            padding: 8px 20px; border-radius: 8px;
-            font-size: 0.9em; cursor: pointer; margin-top: 10px;
-            transition: 0.2s; font-weight: 700;
+            background: transparent; color: #f87171; border: 1px solid #f87171;
+            padding: 6px 16px; border-radius: 6px; font-size: 0.8em;
+            cursor: pointer; margin-top: 5px; transition: 0.2s;
         }
-        .clear-btn:hover { background: #ef4444; color: white; box-shadow: 0 0 10px #ef4444; }
+        .clear-btn:hover { background: #f87171; color: white; }
 
         /* --------------------------
-           7. الفوتر
+           7. Footer
            -------------------------- */
-        .developer-footer {
-            position: fixed; bottom: 20px; width: 100%; 
-            text-align: center; z-index: 5;
-            color: rgba(255,255,255,0.5); font-size: 0.9em;
-            display: flex; justify-content: center; gap: 8px;
+        .footer {
+            margin-top: 30px; font-size: 0.8em; color: var(--text-muted); opacity: 0.7;
         }
-        .developer-name { color: var(--neon-blue); font-weight: 700; text-shadow: 0 0 5px var(--neon-blue); }
+        .footer span { font-weight: 700; color: var(--accent); }
 
-        /* Responsive */
-        @media (max-width: 480px) {
-            .login-card { padding: 40px 25px; width: 92%; }
-            h2 { font-size: 1.8em; }
-        }
     </style>
 </head>
 <body>
-
-    <div class="stars-container" id="starsContainer">
-        </div>
-
-    <div class="meteor" style="top: 20%; left: 80%; animation-delay: 0s;"></div>
-    <div class="meteor" style="top: 40%; left: 90%; animation-delay: 2s;"></div>
-    <div class="meteor" style="top: 10%; left: 70%; animation-delay: 5s;"></div>
 
     <div class="login-card">
         
         <div id="topCodeStatus" class="top-status-bar"></div>
 
-        <h2>منصة Full-Mark</h2>
+        <h2>تسجيل الدخول</h2>
+        <span class="subtitle">منصة Full Mark التعليمية</span>
         
         <div id="statusMessage"></div>
 
         <form id="loginForm">
             <div class="input-group">
                 <input type="text" id="activationCode" placeholder="أدخل كود التفعيل" pattern="\d{6}" maxlength="6" required autocomplete="off">
-                <i class="fas fa-rocket icon"></i> </div>
+                <i class="fas fa-shield-alt icon"></i>
+            </div>
 
             <button type="submit" id="loginBtn" class="login-btn">
-                  انطلاق <i class="fas fa-arrow-left" style="margin-right:5px; font-size:0.8em;"></i>
+                  دخول آمن
             </button>
         </form>
 
+        <div class="footer">
+            Developed by <span>ELGIZAWY</span>
+        </div>
     </div>
-    
-    <footer class="developer-footer">
-        <span class="developer-name">ELGIZAWY</span> 
-        <span>Developed By</span>
-    </footer>
 
     <script>
-        // ==========================================
-        // كود توليد النجوم (شكل جمالي فقط)
-        // ==========================================
-        function createStars() {
-            const container = document.getElementById('starsContainer');
-            const starCount = 100; // عدد النجوم
-
-            for (let i = 0; i < starCount; i++) {
-                const star = document.createElement('div');
-                star.classList.add('star');
-                // أماكن عشوائية
-                const x = Math.random() * 100;
-                const y = Math.random() * 100;
-                // أحجام عشوائية
-                const size = Math.random() * 3;
-                // تأخير عشوائي للإضاءة
-                const delay = Math.random() * 2;
-
-                star.style.left = `${x}%`;
-                star.style.top = `${y}%`;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                star.style.animationDelay = `${delay}s`;
-
-                container.appendChild(star);
-            }
-        }
-        createStars();
-
-        // ==========================================
-        // نفس الكود البرمجي (Firebase & Logic)
-        // ==========================================
-
         const firebaseConfig = {
           apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
           authDomain: "thanawy-1383.firebaseapp.com",
@@ -366,19 +241,15 @@
             STATUS_MESSAGE.textContent = text;
             STATUS_MESSAGE.style.display = 'block';
             
-            // تعديل ألوان الرسائل لتناسب التصميم الجديد
             if (type === 'success') {
-                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.2)'; 
-                STATUS_MESSAGE.style.color = '#6ee7b7';
-                STATUS_MESSAGE.style.border = '1px solid #10b981';
+                STATUS_MESSAGE.style.color = '#34d399';
+                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.1)';
             } else if (type === 'error') {
-                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.2)'; 
-                STATUS_MESSAGE.style.color = '#fca5a5';
-                STATUS_MESSAGE.style.border = '1px solid #ef4444';
+                STATUS_MESSAGE.style.color = '#f87171';
+                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.1)';
             } else if (type === 'pending') {
-                STATUS_MESSAGE.style.background = 'rgba(234, 179, 8, 0.2)'; 
-                STATUS_MESSAGE.style.color = '#fde047';
-                STATUS_MESSAGE.style.border = '1px solid #eab308';
+                STATUS_MESSAGE.style.color = '#facc15';
+                STATUS_MESSAGE.style.background = 'rgba(234, 179, 8, 0.1)';
             }
         }
 
@@ -411,12 +282,12 @@
             }
 
             codeStatusDiv.innerHTML = `
-                <span class="status-text">الكود المحفوظ</span>
-                <span class="code-display">${activeCode}</span><br>
+                <span class="status-text" style="color:#cbd5e1; font-size:0.9em;">الكود المسجل</span>
+                <span class="code-display">${activeCode}</span>
                 <button class="clear-btn" onclick="clearLocalCode()">تسجيل خروج</button>
             `;
             LOGIN_FORM.style.display = 'none'; 
-            updateStatusMessage('جاري التحقق التلقائي...', 'pending');
+            updateStatusMessage('جاري التحقق...', 'pending');
 
             try {
                 const snapshot = await db.ref('approvedStudents/' + activeCode).once('value');
