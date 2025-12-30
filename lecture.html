@@ -1,269 +1,192 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المحاضرات | FULL MARK</title>
-    
+    <title>Teacher Chapters | FULL MARK</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="auth.js"></script> <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'bg-main': '#020617',      
+            'accent': '#6366f1',       
+            'text-primary': '#E6F0E8', 
+          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] }
+        }
+      }
+    }
+    </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="auth.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
-        body { 
-            background: #00040f; 
-            color: white; 
-            font-family: 'Tajawal', sans-serif; 
-            min-height: 100vh; 
-            padding-bottom: 50px; 
-            overflow-x: hidden;
-        }
-
-        /* خلفية النجوم (نفس تصميم المواد) */
-        .stars-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
-        }
-        .star {
-            position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
-            box-shadow: 0 0 5px rgba(255,255,255,0.8);
-            animation: twinkle var(--duration) infinite ease-in-out; opacity: 0;
-        }
-        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
-
-        .bg-glow { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; 
-            background: radial-gradient(circle at 50% -10%, #1e1b4b, #00040f 80%); 
-        }
-        
-        /* كارت المحاضرة */
-        .lecture-card { 
-            background: rgba(30, 41, 59, 0.4); 
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-radius: 24px; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-        .lecture-card:hover { 
-            transform: translateY(-5px); 
-            border-color: #6366f1; 
-            background: rgba(30, 41, 59, 0.6);
-            box-shadow: 0 15px 30px -10px rgba(99, 102, 241, 0.3);
-        }
-
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-        .lec-label { color: #a855f7; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .lec-title { font-size: 1.25rem; font-weight: 800; color: #fff; margin-top: 4px; line-height: 1.4; }
-        
-        /* أيقونة المحاضرة */
-        .lec-icon { 
-            width: 50px; height: 50px; border-radius: 16px; 
-            background: linear-gradient(135deg, #6366f1, #d946ef); 
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; color: white;
-            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
-        }
-        
-        /* إحصائيات سريعة */
-        .stats-row { 
-            display: flex; gap: 10px; margin-bottom: 20px; 
-        }
-        .stat-badge {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 8px 15px; border-radius: 12px;
-            font-size: 0.8rem; color: #cbd5e1;
-            display: flex; align-items: center; gap: 6px;
-            flex: 1; justify-content: center;
-        }
-        .stat-badge i { color: #fbbf24; }
-        
-        /* زر الدخول */
-        .btn-content { 
-            background: #0f172a; 
-            color: white; width: 100%; padding: 14px; 
-            border-radius: 16px; font-weight: 800; 
-            display: flex; justify-content: center; align-items: center; 
-            gap: 10px; border: 1px solid rgba(99, 102, 241, 0.3); 
-            transition: 0.3s; cursor: pointer;
-        }
-        .lecture-card:hover .btn-content {
-            background: #6366f1;
-            border-color: transparent;
-            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.4);
-        }
-
-        /* الهيدر */
-        .header-glass {
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 40;
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; align-items: center; gap: 15px;
-        }
+    body { background-color: #020617; color: #E6F0E8; margin:0; font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.4); 
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(99, 102, 241, 0.15); 
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      background: rgba(30, 41, 59, 0.6); 
+      border-color: #6366f1;
+    }
+    .loading-dialog {
+      position: fixed; inset: 0; z-index: 50; background: #020617; display:flex; justify-content:center; align-items:center; flex-direction:column; color:white;
+    }
     </style>
 </head>
-<body>
-    <div class="bg-glow"></div>
-    
-    <div class="stars-container">
-        <div class="star" style="top:10%; left:20%; --duration:3s"></div>
-        <div class="star" style="top:50%; left:50%; --duration:5s"></div>
-        <div class="star" style="top:80%; left:70%; --duration:3s"></div>
+
+<body class="h-screen flex flex-col overflow-hidden">
+
+<div id="app" class="flex-1 flex flex-col h-full overflow-hidden p-4">
+
+    <header class="flex items-center justify-between mb-6 px-2">
+        <div>
+            <h1 class="text-xl font-bold text-indigo-400">Chapters Viewer</h1>
+            <p class="text-xs text-gray-400">{{ teacherData.name }} - {{ subjectData.name }}</p>
+        </div>
+        <button onclick="history.back()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-indigo-600 transition">
+            <i class="ph ph-arrow-left text-lg"></i>
+        </button>
+    </header>
+
+    <div v-if="loading" class="loading-dialog">
+        <i class="ph ph-spinner-gap animate-spin text-5xl mb-4 text-indigo-500"></i>
+        <p>Loading Data...</p>
     </div>
 
-    <div id="app">
-        
-        <div class="header-glass">
-            <button onclick="history.back()" class="relative z-50 w-10 h-10 bg-white/5 border border-white/10 rounded-xl text-white flex items-center justify-center hover:bg-white/10 active:scale-95 transition-all cursor-pointer">
-                <i class="fas fa-arrow-right text-sm"></i>
-            </button>
+    <main v-else class="flex-1 overflow-y-auto pb-10">
+        <div class="max-w-3xl mx-auto space-y-4">
             
-            <div class="flex-1">
-                <p class="text-indigo-400 text-[10px] font-bold uppercase tracking-wider">قائمة الدروس</p>
-                <h1 class="text-lg font-black text-white truncate">{{ teacherName || 'جاري التحميل...' }}</h1>
-            </div>
-        </div>
-
-        <div class="p-5 max-w-2xl mx-auto">
-            <div v-if="loading" class="flex flex-col items-center mt-20 opacity-50">
-                <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <p class="text-sm">جاري استدعاء المحاضرات...</p>
+            <div v-if="chapters.length === 0" class="text-center text-gray-500 mt-10">
+                No chapters found.
             </div>
 
-            <div v-else>
-                <div v-if="allLectures.length > 0">
-                    <div v-for="(ch, index) in allLectures" :key="index" class="lecture-card">
-                        <div class="card-header">
-                            <div>
-                                <span class="lec-label">المحاضرة #{{ index + 1 }}</span>
-                                <h2 class="lec-title">{{ ch.chapter_name || ch.name || 'محاضرة عامة' }}</h2>
-                            </div>
-                            <div class="lec-icon">
-                                <i class="fas fa-book-open"></i>
-                            </div>
-                        </div>
+            <div v-for="chapter in chapters" :key="chapter.id" class="glass-card rounded-xl overflow-hidden">
+                <button @click="toggleChapter(chapter.id)" class="w-full px-5 py-4 flex items-center justify-between">
+                    <span class="font-semibold text-lg">{{ chapter.name }}</span>
+                    <i class="ph ph-caret-down transition-transform" :class="{'rotate-180': expandedChapters.includes(chapter.id)}"></i>
+                </button>
 
-                        <div class="stats-row">
-                            <div class="stat-badge">
-                                <i class="fas fa-play-circle"></i>
-                                <span>{{ getVideos(ch).length }} فيديو</span>
-                            </div>
-                            <div class="stat-badge">
-                                <i class="fas fa-file-pdf"></i>
-                                <span>{{ ch.attachments ? ch.attachments.length : 0 }} ملف</span>
-                            </div>
+                <div v-show="expandedChapters.includes(chapter.id)" class="bg-slate-900/50 border-t border-white/5">
+                    <div v-for="lecture in chapter.lectures" :key="lecture.id" 
+                         @click="goToParts(lecture)"
+                         class="p-4 pl-6 border-b border-white/5 last:border-0 hover:bg-indigo-500/10 cursor-pointer flex items-center justify-between group">
+                        
+                        <div>
+                            <h4 class="font-medium text-gray-200 group-hover:text-indigo-300 transition">{{ lecture.name }}</h4>
+                            <span class="text-xs text-gray-500">{{ lecture.videos ? lecture.videos.length : 0 }} Videos</span>
                         </div>
-
-                        <button @click="openLecture(ch)" class="btn-content group">
-                            عرض محتوى المحاضرة 
-                            <i class="fas fa-chevron-left text-sm group-hover:-translate-x-1 transition-transform"></i>
-                        </button>
+                        
+                        <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-indigo-500 group-hover:text-white transition">
+                            <i class="ph ph-arrow-right"></i>
+                        </div>
                     </div>
                 </div>
-                
-                <div v-else class="text-center py-20 border border-dashed border-white/10 rounded-3xl">
-                    <i class="fas fa-box-open text-3xl text-gray-600 mb-3"></i>
-                    <p class="text-gray-500 text-sm">لا توجد محاضرات متاحة لهذا المدرس حالياً</p>
-                </div>
             </div>
 
-            <div class="text-center mt-10 opacity-30 text-[10px] tracking-widest font-bold">
-                DEVELOPED BY ELGIZAWY
-            </div>
         </div>
-    </div>
+    </main>
+</div>
 
-    <script>
-        const { createApp, ref, onMounted } = Vue;
-        createApp({
-            setup() {
-                const allLectures = ref([]);
-                const loading = ref(true);
-                const teacherName = ref('');
-                const params = new URLSearchParams(window.location.search);
+<script>
+const { createApp, ref, reactive, onMounted } = Vue; 
 
-                const getVideos = (ch) => {
-                    let vids = [];
-                    if(ch.videos && Array.isArray(ch.videos)) vids = [...vids, ...ch.videos];
-                    if(ch.lectures && Array.isArray(ch.lectures)) {
-                        ch.lectures.forEach(l => { 
-                            if(l.videos) vids = [...vids, ...l.videos];
-                            else if (l.video_id) vids.push(l);
-                        });
-                    }
-                    return vids;
-                };
+const JSON_URLS = {
+    'علمي علوم': "https://platform-sigma-seven.vercel.app/organized_output.json",
+    'أدبي': "https://platform-sigma-seven.vercel.app/organized_output-a.json", 
+    'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json", 
+    'أزهر': "https://plus-teal.vercel.app/organized_output.json", 
+    'DEFAULT': "https://plus-teal.vercel.app/organized_output.json" 
+};
 
-                const openLecture = (ch) => {
-                    const videos = getVideos(ch);
-                    if(videos.length === 0) {
-                        alert("عفواً، لا توجد فيديوهات متاحة في هذه المحاضرة بعد.");
-                        return;
-                    }
-                    localStorage.setItem('selectedLectureVids', JSON.stringify(videos));
-                    localStorage.setItem('selectedLectureTitle', ch.chapter_name || ch.name || 'المحاضرة');
-                    window.location.href = 'parts.html';
-                };
+function getUrlParams() {
+    const params = {};
+    window.location.search.substring(1).split('&').forEach(pair => {
+        const [key, value] = pair.split('=');
+        if (key && value) params[key] = decodeURIComponent(value);
+    });
+    return params;
+}
 
-                onMounted(async () => {
-                    const code = typeof checkAuth === 'function' ? checkAuth() : localStorage.getItem('alpha_user_code');
-                    if(!code) return;
+createApp({
+    setup() {
+        const loading = ref(true);
+        const chapters = ref([]);
+        const expandedChapters = ref([]);
+        const params = getUrlParams();
+        const teacherData = reactive({ name: '', id: params.tid });
+        const subjectData = reactive({ name: '', id: params.sid });
+        
+        let db;
+        try { db = firebase.database(); } catch (e) { console.error(e); }
 
-                    const db = firebase.database();
-                    try {
-                        const snap = await db.ref('approvedStudents/'+code).once('value');
-                        const userData = snap.val();
-                        if(!userData) throw new Error("بيانات الطالب غير موجودة");
+        const toggleChapter = (id) => {
+            const idx = expandedChapters.value.indexOf(id);
+            if(idx===-1) expandedChapters.value.push(id);
+            else expandedChapters.value.splice(idx,1);
+        }
 
-                        const URLS = {
-                            'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
-                            'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
-                            'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json",
-                            'أزهر': "https://plus-teal.vercel.app/organized_output.json"
-                        };
+        // ** دالة الانتقال لصفحة الأجزاء **
+        const goToParts = (lecture) => {
+            // نخزن البيانات في المتصفح لنقرأها في الصفحة التالية
+            localStorage.setItem('selectedLectureVids', JSON.stringify(lecture.videos || []));
+            localStorage.setItem('selectedLectureTitle', lecture.name);
+            
+            // التوجيه للصفحة الثانية
+            window.location.href = 'parts.html';
+        }
 
-                        const targetURL = URLS[userData.section] || URLS['علمي علوم'];
-                        const res = await fetch(targetURL);
-                        const data = await res.json();
-                        
-                        const yid = params.get('yid');
-                        const sid = params.get('sid');
-                        const tid = params.get('tid');
-
-                        const year = data.find(y => y.id == yid);
-                        if(year) {
-                            const sub = year.subjects.find(s => s.id == sid);
-                            if(sub) {
-                                const teacher = sub.teachers.find(t => t.id == tid);
-                                if(teacher) {
-                                    teacherName.value = teacher.name;
-                                    let tempLectures = [];
-                                    if(teacher.units && teacher.units.length > 0) {
-                                        teacher.units.forEach(u => { if(u.chapters) tempLectures.push(...u.chapters); });
-                                    } else if(teacher.chapters) {
-                                        tempLectures = teacher.chapters;
-                                    }
-                                    allLectures.value = tempLectures;
-                                }
-                            }
-                        }
-                    } catch(e) { console.error(e); } 
-                    finally { loading.value = false; }
-                });
-
-                return { allLectures, loading, teacherName, getVideos, openLecture };
+        const fetchData = async () => {
+            if (!params.yid || !params.sid || !params.tid) {
+                loading.value = false; return;
             }
-        }).mount('#app');
-    </script>
+            const activeCode = localStorage.getItem("activeCode");
+            if (!activeCode) { alert("Please Login"); return; }
+
+            try {
+                if (!db) db = firebase.database();
+                const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
+                const studentData = snapshot.val();
+                let division = (studentData && studentData.section) ? studentData.section.trim() : 'DEFAULT';
+                
+                const url = JSON_URLS[division] || JSON_URLS['DEFAULT'];
+                
+                const res = await fetch(url);
+                const fullData = await res.json();
+
+                const year = fullData.find(y => y.id == params.yid);
+                const subject = year?.subjects.find(s => s.id == params.sid);
+                subjectData.name = subject?.name;
+                
+                const teacher = subject?.teachers.find(t => t.id == params.tid);
+                teacherData.name = teacher?.name;
+                
+                chapters.value = teacher?.chapters || [];
+
+            } catch (err) {
+                console.error(err);
+                alert("Error loading data");
+            } finally {
+                loading.value = false;
+            }
+        }
+
+        onMounted(fetchData);
+
+        return { loading, chapters, expandedChapters, teacherData, subjectData, toggleChapter, goToParts };
+    }
+}).mount('#app');
+</script>
 </body>
 </html>
