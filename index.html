@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>Full Mark | Elgizawy - تسجيل الدخول</title>
+    <title>Full Mark | Elgizawy - منصة المحاضرات التعليمية</title>
     
-    <meta name="description" content="منصة Full Mark التعليمية.">
+    <meta name="description" content="منصة Full Mark التعليمية، أقوى منصة لمتابعة المحاضرات والشروحات. Developed by Elgizawy.">
+    <meta name="keywords" content="Full Mark, Elgizawy, منصة تعليمية, محاضرات, برمجة, الجيزاوي">
     <meta name="author" content="Elgizawy">
+    
+    <meta name="google-site-verification" content="VEELHtMgXIgQjtZhhJuMBFTEwYIJ0Qwi_H_yzk_YipM" />
     <link rel="canonical" href="https://fulll-mark.vercel.app">
 
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fulll-mark.vercel.app/">
+    <meta property="og:title" content="Full Mark | Elgizawy">
+    <meta property="og:description" content="منصة المحاضرات التعليمية - Developed by Elgizawy">
+    <meta property="og:image" content="https://www2.0zz0.com/2025/12/18/18/617041603.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Full Mark | Elgizawy">
+    <meta name="twitter:image" content="https://www2.0zz0.com/2025/12/18/18/617041603.jpg">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -19,201 +32,249 @@
     
     <style>
         /* --------------------------
-           1. Reset & Variables
+           1. تعريف الألوان (ثيم المحيط الأزرق)
            -------------------------- */
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4895ef;
-            --text-color: #ffffff;
-            --text-muted: #e2e8f0;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --error: #ef4444;
-            --success: #10b981;
+            --light-text: #e2e8f0;       
+            --accent-color: #38bdf8;     /* سماوي */
+            --accent-glow: #0ea5e9;      
+            
+            --red-error: #ef4444;        
+            --pending: #f59e0b;          
+            
+            --bg-deep: #020617;          
+            --bg-surface: #0f172a;       
+            --card-glass: rgba(15, 23, 42, 0.7); 
         }
 
         * {
             margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
+            font-family: 'Cairo', 'Tajawal', sans-serif;
         }
 
         /* --------------------------
-           2. Background Animation
+           2. الخلفية وتأثيرات الصفحة
            -------------------------- */
         body {
             display: flex; flex-direction: column; 
             justify-content: center; align-items: center;
             min-height: 100vh;
-            /* خلفية متدرجة احترافية */
-            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: var(--text-color);
-            padding: 20px;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, var(--bg-deep) 80%);
+            background-color: var(--bg-deep);
+            overflow: hidden; position: relative;
+            color: var(--light-text);
+            padding: 20px; padding-bottom: 100px; 
         }
 
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1; pointer-events: none;
         }
 
         /* --------------------------
-           3. The Card (Glassmorphism)
+           3. النجوم والشهب
            -------------------------- */
-        .login-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 60px 40px;
-            width: 100%; max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
+        .stars {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.8) 1px, transparent 1%);
+            background-size: 100px 100px; background-repeat: repeat;
+            opacity: 0.4; z-index: -2;
+            animation: star-move 100s linear infinite;
+        }
+        
+        @keyframes star-move {
+            from { background-position: 0% 0%; }
+            to { background-position: 20% 20%; }
+        }
+        
+        .shooting-star {
+            position: absolute; width: 3px; height: 3px; background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--accent-color); 
+            opacity: 0; transform: rotateZ(315deg);
+            animation: shoot 6s linear infinite; z-index: -1; 
         }
 
-        /* تأثير لمعة خفيفة على الكارت */
-        .login-card::before {
-            content: ''; position: absolute;
-            top: 0; left: -50%; width: 100%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
-            transform: skewX(-25deg);
-            animation: shine 6s infinite;
+        @keyframes shoot {
+            0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
+            10% { opacity: 1; }
+            100% { opacity: 0; transform: translate3d(500px, 500px, 0) rotateZ(315deg); }
         }
-        @keyframes shine {
-            0% { left: -100%; }
-            20% { left: 200%; }
-            100% { left: 200%; }
+
+        /* --------------------------
+           4. كارت تسجيل الدخول
+           -------------------------- */
+        .login-card {
+            background: var(--card-glass);
+            border-radius: 20px; padding: 40px; 
+            border: 1px solid rgba(56, 189, 248, 0.1); 
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.05);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            width: 90%; max-width: 420px; 
+            text-align: center; animation: fadeIn 1s ease-out;
+            color: #ffffff; z-index: 10; position: relative;
+        }
+
+        .login-card::after {
+            content: ''; position: absolute; top: 0; left: 20%;
+            width: 60%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         h2 {
-            margin-bottom: 10px;
-            font-size: 2em; font-weight: 800;
-            color: var(--text-color);
-            letter-spacing: -0.5px;
-        }
-        .subtitle {
-            display: block; margin-bottom: 40px;
-            color: var(--text-muted); font-size: 0.95em;
-            font-family: 'Cairo', sans-serif;
+            margin-bottom: 30px; font-size: 2.2em; color: #ffffff;
+            font-weight: 700; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
+            letter-spacing: 1px;
         }
 
         /* --------------------------
-           4. Inputs
+           5. حقول الإدخال
            -------------------------- */
         .input-group { position: relative; margin-bottom: 25px; }
 
         .input-group input {
-            width: 100%; padding: 18px 50px 18px 20px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: white; font-size: 1.1em;
+            width: 100%; padding: 15px 45px 15px 15px; 
+            background: rgba(15, 23, 42, 0.5); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px; color: #ffffff; font-size: 1em;
             outline: none; transition: all 0.3s ease;
-            text-align: right; font-weight: 600;
+            text-align: right; font-family: 'Tajawal', sans-serif;
+            font-weight: 500; letter-spacing: 1px;
         }
 
-        .input-group input::placeholder { color: #94a3b8; font-weight: 400; }
+        .input-group input::placeholder { color: rgba(255, 255, 255, 0.4); }
 
         .input-group input:focus {
-            background: rgba(0, 0, 0, 0.4);
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            background: rgba(15, 23, 42, 0.8);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
         }
 
         .input-group .icon {
-            position: absolute; right: 20px; top: 50%;
-            transform: translateY(-50%);
-            color: #94a3b8; font-size: 1.2em;
-            transition: 0.3s;
+            position: absolute; right: 15px; top: 50%;
+            transform: translateY(-50%); color: var(--accent-color); font-size: 1em;
         }
-        .input-group input:focus + .icon { color: var(--accent); }
-
+        
         /* --------------------------
-           5. Button
+           6. رسائل الحالة
+           -------------------------- */
+        #statusMessage {
+            margin-bottom: 25px; padding: 15px; border-radius: 10px;
+            font-size: 0.95em; display: none; text-align: center; font-weight: 600;
+        }
+        
+        /* --------------------------
+           7. الأزرار (Buttons)
            -------------------------- */
         .login-btn {
-            width: 100%; padding: 16px;
-            border: none; border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white; font-size: 1.1em; font-weight: 700;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
+            width: 100%; padding: 15px; border: none; border-radius: 12px;
+            color: #0f172a; font-size: 1.1em; font-weight: 800;
+            cursor: pointer; transition: 0.3s ease; margin-top: 15px;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-glow));
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(67, 97, 238, 0.4);
-            filter: brightness(1.1);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.6); filter: brightness(1.1);
         }
-        .login-btn:active { transform: translateY(0); }
 
         /* --------------------------
-           6. Status Messages
+           8. شريط حالة الكود العلوي
            -------------------------- */
-        #statusMessage {
-            margin-bottom: 20px; padding: 12px; border-radius: 8px;
-            font-size: 0.9em; display: none; font-weight: 600;
-            background: rgba(255,255,255,0.1);
-        }
-
         .top-status-bar {
-            background: rgba(15, 23, 42, 0.6);
+            padding: 15px; border-radius: 10px; margin-bottom: 30px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px; border-radius: 12px; margin-bottom: 25px;
-            text-align: center;
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.2);
+            display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; text-align: center;
         }
-        .code-display { color: var(--accent); font-family: monospace; font-size: 1.2em; font-weight: bold; margin: 5px 0; display: block; }
+
+        .status-text {
+            font-size: 0.9em; font-weight: 500; margin-bottom: 10px; color: #cbd5e1;
+        }
+
+        .code-display {
+            color: var(--accent-color); font-weight: 700; font-family: monospace;
+            font-size: 1.2em; text-shadow: 0 0 10px rgba(56, 189, 248, 0.5); margin-right: 5px;
+        }
+
         .clear-btn {
-            background: transparent; color: #f87171; border: 1px solid #f87171;
-            padding: 6px 16px; border-radius: 6px; font-size: 0.8em;
-            cursor: pointer; margin-top: 5px; transition: 0.2s;
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
+            padding: 8px 15px; border-radius: 8px;
+            font-size: 0.85em; font-weight: 600; cursor: pointer;
+            border: 1px solid rgba(239, 68, 68, 0.5); transition: 0.3s;
         }
-        .clear-btn:hover { background: #f87171; color: white; }
+        .clear-btn:hover { background: rgba(239, 68, 68, 0.4); color: #fff; }
 
         /* --------------------------
-           7. Footer
+           9. فوتر المطور
            -------------------------- */
-        .footer {
-            margin-top: 30px; font-size: 0.8em; color: var(--text-muted); opacity: 0.7;
+        .developer-footer {
+            position: fixed; bottom: 10px; width: 100%; z-index: 5; 
+            padding: 15px 10px; background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
         }
-        .footer span { font-weight: 700; color: var(--accent); }
 
+        .developer-info {
+            display: flex; align-items: center; color: var(--light-text);
+            font-size: 1em; font-weight: 600; flex-direction: row-reverse; gap: 15px;
+        }
+
+        .developed-text { order: 1; opacity: 0.6; font-size: 0.9em; }
+
+        .developer-name {
+            color: var(--accent-color); font-size: 1.5em; font-weight: 800;
+            letter-spacing: 1px; text-shadow: 0 0 15px var(--accent-color); order: 2; 
+        }
     </style>
 </head>
 <body>
+    <div class="stars"></div>
 
     <div class="login-card">
         
         <div id="topCodeStatus" class="top-status-bar"></div>
 
-        <h2>تسجيل الدخول</h2>
-        <span class="subtitle">منصة Full Mark التعليمية</span>
-        
-        <div id="statusMessage"></div>
+        <h2>Full-Mark منصة</h2>
+        <div id="statusMessage" style="display:none;"></div>
 
         <form id="loginForm">
             <div class="input-group">
-                <input type="text" id="activationCode" placeholder="أدخل كود التفعيل" pattern="\d{6}" maxlength="6" required autocomplete="off">
-                <i class="fas fa-shield-alt icon"></i>
+                <i class="fas fa-lock icon"></i>
+                <input type="text" id="activationCode" placeholder="ادخل كود التفعيل هنا" pattern="\d{6}" maxlength="6" required>
             </div>
 
             <button type="submit" id="loginBtn" class="login-btn">
-                  دخول آمن
+                 تفعيل ودخول
             </button>
-        </form>
+            
+            </form>
 
-        <div class="footer">
-            Developed by <span>ELGIZAWY</span>
-        </div>
     </div>
+    
+    <footer class="developer-footer">
+        <div class="developer-info">
+            <span class="developer-name">ELGIZAWY</span>
+            <span class="developed-text">Developed By </span>
+        </div>
+    </footer>
 
     <script>
+        // 🚨 Configuration - إعدادات Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyBK6FZF3LW83qaUHBKYTfiVd2Ozrd1Rf2g",
           authDomain: "thanawy-1383.firebaseapp.com",
@@ -242,14 +303,20 @@
             STATUS_MESSAGE.style.display = 'block';
             
             if (type === 'success') {
-                STATUS_MESSAGE.style.color = '#34d399';
-                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.1)';
+                STATUS_MESSAGE.style.background = 'rgba(56, 189, 248, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--accent-color)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--accent-color)';
             } else if (type === 'error') {
-                STATUS_MESSAGE.style.color = '#f87171';
-                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.1)';
+                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--red-error)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--red-error)';
             } else if (type === 'pending') {
-                STATUS_MESSAGE.style.color = '#facc15';
-                STATUS_MESSAGE.style.background = 'rgba(234, 179, 8, 0.1)';
+                STATUS_MESSAGE.style.background = 'rgba(245, 158, 11, 0.1)'; 
+                STATUS_MESSAGE.style.borderColor = 'var(--pending)';
+                STATUS_MESSAGE.style.border = '1px solid';
+                STATUS_MESSAGE.style.color = 'var(--pending)';
             }
         }
 
@@ -266,7 +333,7 @@
         function clearLocalCode() {
             localStorage.removeItem('activeCode');
             localStorage.removeItem('approved'); 
-            updateStatusMessage('✅ تم حذف الكود بنجاح.', 'success');
+            updateStatusMessage('✅ تم حذف الكود بنجاح. جاري إعادة تحميل الصفحة...', 'success');
             LOGIN_BTN.disabled = true;
             setTimeout(() => { window.location.reload(); }, 1000);
         }
@@ -275,19 +342,18 @@
         
         async function checkAutoLoginStatus() {
             if (!activeCode) {
-                codeStatusDiv.style.display = 'none';
+                codeStatusDiv.innerHTML = `<span class="status-text" style="opacity:0.6;">ليس لديك كود تفعيل مُحفوظ.</span>`;
                 STATUS_MESSAGE.style.display = 'none'; 
                 LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
                 return;
             }
 
             codeStatusDiv.innerHTML = `
-                <span class="status-text" style="color:#cbd5e1; font-size:0.9em;">الكود المسجل</span>
-                <span class="code-display">${activeCode}</span>
-                <button class="clear-btn" onclick="clearLocalCode()">تسجيل خروج</button>
+                <span class="status-text">كودك الحالي: <span class="code-display">${activeCode}</span></span>
+                <button class="clear-btn" onclick="clearLocalCode()">حذف الكود</button>
             `;
             LOGIN_FORM.style.display = 'none'; 
-            updateStatusMessage('جاري التحقق...', 'pending');
+            updateStatusMessage('⏳ جاري التحقق من الكود...', 'pending');
 
             try {
                 const snapshot = await db.ref('approvedStudents/' + activeCode).once('value');
@@ -297,16 +363,16 @@
                 if (!data || (data.expiry && data.expiry <= now) || data.isBlocked === true) {
                     localStorage.removeItem('activeCode');
                     localStorage.removeItem('approved'); 
-                    updateStatusMessage('انتهت صلاحية الكود.', 'error');
+                    updateStatusMessage('انتهت صلاحية الكود يرجي تجديد الاشتراك.', 'error');
                     LOGIN_FORM.style.display = 'block'; 
-                    codeStatusDiv.style.display = 'none';
+                    codeStatusDiv.innerHTML = `<span class="status-text">ليس لديك كود تفعيل.</span>`;
                     LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
                     return;
                 }
 
-                let countdown = 2;
+                let countdown = 3;
                 const studentName = data.studentName || data.name || "يا بطل";
-                updateStatusMessage(`مرحباً ${studentName}`, 'success');
+                updateStatusMessage(`✅ أهلاً ${studentName}! جاري الدخول...`, 'success');
 
                 const countdownInterval = setInterval(() => {
                     countdown--;
@@ -317,7 +383,7 @@
                 }, 1000); 
 
             } catch (error) {
-                updateStatusMessage('خطأ في الاتصال.', 'error');
+                updateStatusMessage('❌ خطأ في الاتصال. ادخل الكود يدوياً.', 'error');
                 LOGIN_FORM.style.display = 'block';
                 LOGIN_FORM.addEventListener('submit', (e) => { e.preventDefault(); checkAndLogin(); });
             }
@@ -328,12 +394,12 @@
         async function checkAndLogin() {
             const activationCode = ACTIVATION_CODE_INPUT.value.trim();
             if (activationCode.length !== 6 || isNaN(activationCode)) {
-                updateStatusMessage('الكود 6 أرقام فقط.', 'error');
+                updateStatusMessage('❌ الكود يجب أن يكون 6 أرقام.', 'error');
                 return;
             }
 
             LOGIN_BTN.disabled = true;
-            updateStatusMessage('جاري الدخول...', 'pending');
+            updateStatusMessage('⏳ جاري التحقق...', 'pending');
 
             try {
                 const snapshot = await db.ref('approvedStudents/' + activationCode).once('value');
@@ -341,15 +407,15 @@
                 const now = Date.now();
 
                 if (!data) {
-                    updateStatusMessage('الكود غير صحيح.', 'error');
+                    updateStatusMessage('❌ الكود غير صحيح.', 'error');
                     return;
                 }
                 if (data.expiry && data.expiry <= now) {
-                    updateStatusMessage('الكود منتهي الصلاحية.', 'error');
+                    updateStatusMessage('❌ الكود منتهي الصلاحية.', 'error');
                     return;
                 }
                 if (data.isBlocked === true) {
-                    updateStatusMessage('الحساب محظور.', 'error');
+                    updateStatusMessage('❌ حسابك محظور.', 'error');
                     return;
                 }
 
@@ -360,22 +426,36 @@
                     await db.ref('approvedStudents/' + activationCode + '/deviceId').set(localDeviceId);
                     localStorage.setItem('activeCode', activationCode);
                     localStorage.setItem('approved', 'true');
-                    updateStatusMessage(`تم التفعيل! أهلاً ${studentName}`, 'success');
+                    updateStatusMessage(`✅ أهلاً ${studentName}! تم التفعيل بنجاح!`, 'success');
                     setTimeout(() => { window.location.href = 'subjects.html'; }, 1000);
                     
                 } else if (storedDeviceId === localDeviceId) {
                     localStorage.setItem('activeCode', activationCode);
                     localStorage.setItem('approved', 'true');
-                    updateStatusMessage(`أهلاً بك مجدداً ${studentName}`, 'success');
+                    updateStatusMessage(`✅ أهلاً ${studentName}! تم الدخول بنجاح!`, 'success');
                     setTimeout(() => { window.location.href = 'subjects.html'; }, 1000);
                 } else {
-                    updateStatusMessage('الكود مستخدم على جهاز آخر.', 'error');
+                    updateStatusMessage('❌ الكود مستخدم على جهاز آخر.', 'error');
                 }
             } catch (error) {
-                updateStatusMessage('تأكد من الانترنت.', 'error');
+                updateStatusMessage('❌ خطأ في الاتصال.', 'error');
             } finally {
                 LOGIN_BTN.disabled = false;
             }
+        }
+        
+        // تأثير الشهب
+        const body = document.querySelector('body');
+        const numStars = 12; 
+        for (let i = 0; i < numStars; i++) {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight / 2;
+            star.style.left = `${startX}px`;
+            star.style.top = `${startY}px`;
+            star.style.animationDelay = `${Math.random() * 5}s`;
+            body.appendChild(star);
         }
     </script>
 </body>
