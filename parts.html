@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>أجزاء المحاضرة | FULL MARK</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="auth.js"></script>
+    <script src="auth.js"></script> 
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -91,7 +89,7 @@
 
         <div v-else class="text-center py-20">
             <i class="fas fa-ghost text-4xl text-gray-700 mb-4"></i>
-            <p class="text-gray-500">لا توجد أجزاء للعرض</p>
+            <p class="text-gray-500">جاري التحميل أو لا توجد فيديوهات...</p>
         </div>
 
         <div class="branding">FULL MARK PLAYER</div>
@@ -105,27 +103,33 @@
                 const videos = ref([]);
                 const lectureTitle = ref('المحاضرة');
 
-                // دالة التشغيل
-                const playVideo = (videoObj) => {
-                    // إرسال الفيديو المختار للمشغل (player.html)
-                    localStorage.setItem('activeLecture', JSON.stringify(videoObj));
+                // دالة التشغيل التي توجه لصفحة البلاير
+                const playVideo = (video) => {
+                    if (!video.stream_url) {
+                        alert("Stream URL not found");
+                        return;
+                    }
+                    
+                    // إعداد البيانات لصفحة player.html
+                    localStorage.setItem("video_sources", JSON.stringify(video.sources || [video.stream_url]));
+                    localStorage.setItem("video_title", video.title || video.name || 'Lecture Video');
+                    
                     window.location.href = 'player.html';
                 };
 
                 onMounted(() => {
-                    // التحقق من الأمان
-                    const code = checkAuth();
-                    if (!code) return;
+                    // 1. استرجاع البيانات التي خزنتها الصفحة السابقة
+                    const storedVids = localStorage.getItem('selectedLectureVids');
+                    const storedTitle = localStorage.getItem('selectedLectureTitle');
 
-                    // استرجاع البيانات المخزنة من الصفحة السابقة (lectures.html)
-                    const vids = localStorage.getItem('selectedLectureVids');
-                    const title = localStorage.getItem('selectedLectureTitle');
-
-                    if (vids) {
-                        videos.value = JSON.parse(vids);
+                    if (storedVids) {
+                        try {
+                            videos.value = JSON.parse(storedVids);
+                        } catch(e) { console.error("Error parsing videos", e); }
                     }
-                    if (title) {
-                        lectureTitle.value = title;
+
+                    if (storedTitle) {
+                        lectureTitle.value = storedTitle;
                     }
                 });
 
